@@ -29,7 +29,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\Enumerables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Views\IConnection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

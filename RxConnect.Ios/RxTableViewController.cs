@@ -1,33 +1,37 @@
 ﻿using System;
 using UIKit;
 using RxConnect.Views;
-using System.Reflection;
 using Foundation;
+using System.Reflection;
 
 namespace RxConnect.Ios
 {
-    public class RxViewController<T> : UIViewController, IRxViewObject<T>
+    public class RxTableViewController<T> : UITableViewController, IRxViewObject<T>
         where T : IRxObject
     {
         private IRxViewObject<T> mixin = new RxViewObject<T>();
 
-        public RxViewController() 
+        public RxTableViewController()
         {
         }
 
-        public RxViewController(string nibName, NSBundle bundle) : base(nibName, bundle)
+        public RxTableViewController(UITableViewStyle withStyle) : base(withStyle)
         {
         }
 
-        public RxViewController(NSCoder coder) : base(coder)
+        public RxTableViewController(string nibName, NSBundle bundle) : base(nibName, bundle)
         {
         }
 
-        public RxViewController(NSObjectFlag t) : base(t)
+        public RxTableViewController(NSCoder coder) : base(coder)
         {
         }
 
-        public RxViewController(IntPtr handle) : base(handle)
+        public RxTableViewController(NSObjectFlag t) : base(t)
+        {
+        }
+
+        public RxTableViewController(IntPtr handle) : base(handle)
         {
         }
 
@@ -72,4 +76,3 @@ namespace RxConnect.Ios
         }
     }
 }
-
