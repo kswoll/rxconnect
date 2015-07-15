@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChanging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxListModifiedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListMovedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />

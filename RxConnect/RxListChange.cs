@@ -8,14 +8,14 @@ namespace RxConnect
         private readonly IEnumerable<RxListItem<T>> added;
         private readonly IEnumerable<RxListItem<T>> removed;
         private readonly IEnumerable<RxListMovedItem<T>> moved;
-        private readonly IEnumerable<RxListItem<T>> modified;
+        private readonly IEnumerable<RxListModifiedItem<T>> modified;
 
-        public RxListChange(IEnumerable<RxListItem<T>> added = null, IEnumerable<RxListItem<T>> removed = null, IEnumerable<RxListMovedItem<T>> moved = null, IEnumerable<RxListItem<T>> modified = null)
+        public RxListChange(IEnumerable<RxListItem<T>> added = null, IEnumerable<RxListItem<T>> removed = null, IEnumerable<RxListMovedItem<T>> moved = null, IEnumerable<RxListModifiedItem<T>> modified = null)
         {
             this.added = added ?? Enumerable.Empty<RxListItem<T>>();
             this.removed = removed ?? Enumerable.Empty<RxListItem<T>>();
             this.moved = moved ?? Enumerable.Empty<RxListMovedItem<T>>();
-            this.modified = modified ?? Enumerable.Empty<RxListItem<T>>();
+            this.modified = modified ?? Enumerable.Empty<RxListModifiedItem<T>>();
         }
 
         public IEnumerable<RxListItem<T>> Added
@@ -33,7 +33,7 @@ namespace RxConnect
             get { return moved; }
         }
 
-        public IEnumerable<RxListItem<T>> Modified
+        public IEnumerable<RxListModifiedItem<T>> Modified
         {
             get { return modified; }
         }

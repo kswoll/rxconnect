@@ -18,7 +18,7 @@ namespace RxConnect
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeRemoved = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
         private Lazy<Subject<IEnumerable<RxListMovedItem<T>>>> rangeMoved = new Lazy<Subject<IEnumerable<RxListMovedItem<T>>>>();
-        private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeModified = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
+        private Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>> rangeModified = new Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>>();
         private Lazy<Subject<RxListChange<T>>> changed = new Lazy<Subject<RxListChange<T>>>();
 
         public RxList()
@@ -60,7 +60,7 @@ namespace RxConnect
             get { return rangeMoved.Value; }
         }
 
-        public IObservable<IEnumerable<RxListItem<T>>> RangeModified
+        public IObservable<IEnumerable<RxListModifiedItem<T>>> RangeModified
         {
             get { return rangeModified.Value; }
         }
@@ -85,7 +85,7 @@ namespace RxConnect
             get { return RangeMoved.SelectMany(x => x); }
         }
 
-        public IObservable<RxListItem<T>> Modified
+        public IObservable<RxListModifiedItem<T>> Modified
         {
             get { return RangeModified.SelectMany(x => x); }
         }
@@ -107,7 +107,7 @@ namespace RxConnect
 
         public IObservable<T> ItemModified
         {
-            get { return Modified.Select(x => x.Value); }
+            get { return Modified.Select(x => x.NewValue); }
         }
 
         public IObservable<IEnumerable<T>> ItemsAdded
@@ -127,7 +127,7 @@ namespace RxConnect
 
         public IObservable<IEnumerable<T>> ItemsModified
         {
-            get { return RangeModified.Select(x => x.Select(y => y.Value)); }
+            get { return RangeModified.Select(x => x.Select(y => y.NewValue)); }
         }
 
         protected virtual void OnChanged(RxListChange<T> change)
@@ -243,8 +243,9 @@ namespace RxConnect
             }
             set
             {
+                var oldValue = storage[index];
                 storage[index] = value;
-                OnChanged(new RxListChange<T>(modified: Enumerables.Return(new RxListItem<T>(index, value))));
+                OnChanged(new RxListChange<T>(modified: Enumerables.Return(new RxListModifiedItem<T>(index, oldValue, value))));
             }
         }
 
