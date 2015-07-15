@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6e53032b-f7d9-48db-8485-0e3f22f351a2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>RxConnect</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryObservePropertyStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IObservePropertyStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPropertyChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPropertyChanging.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IStorageStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChanging.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)packages.config" />
+  </ItemGroup>
+</Project>
