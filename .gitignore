@@ -1,0 +1,7 @@
+packages/
+RxConnect/bin/
+RxConnect/obj/
+RxConnect.Tests/obj/
+RxConnect.Tests/bin/
+*.user
+*.suo
