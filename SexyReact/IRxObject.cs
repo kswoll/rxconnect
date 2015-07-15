@@ -2,7 +2,7 @@
 using System.Reactive;
 using System.Reflection;
 
-namespace RxConnect
+namespace SexyReact
 {
     public interface IRxObject : IDisposable
     {

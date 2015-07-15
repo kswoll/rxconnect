@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace RxConnect.Tests
+namespace SexyReact.Tests
 {
     [TestFixture]
     public class RxListTests

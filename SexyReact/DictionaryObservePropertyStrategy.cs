@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Reflection;
 
-namespace RxConnect
+namespace SexyReact
 {
     public class DictionaryObservePropertyStrategy : IObservePropertyStrategy
     {

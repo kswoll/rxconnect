@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace RxConnect.Tests
+namespace SexyReact.Tests
 {
     [TestFixture]
     public class RxObjectTests
