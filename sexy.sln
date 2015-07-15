@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxConnect.Tests", "RxConnect.Tests\RxConnect.Tests.csproj", "{C96B21DA-E150-46F3-85A5-B6AC7618224F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Tests", "SexyReact.Tests\SexyReact.Tests.csproj", "{C96B21DA-E150-46F3-85A5-B6AC7618224F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RxConnect", "RxConnect\RxConnect.shproj", "{6E53032B-F7D9-48DB-8485-0E3F22F351A2}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact", "SexyReact\SexyReact.shproj", "{6E53032B-F7D9-48DB-8485-0E3F22F351A2}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		RxConnect\RxConnect.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
-		RxConnect\RxConnect.projitems*{c96b21da-e150-46f3-85a5-b6ac7618224f}*SharedItemsImports = 4
+		SexyReact\SexyReact.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
+		SexyReact\SexyReact.projitems*{c96b21da-e150-46f3-85a5-b6ac7618224f}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
