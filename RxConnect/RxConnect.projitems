@@ -21,8 +21,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\IConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Views\" />
   </ItemGroup>
 </Project>
