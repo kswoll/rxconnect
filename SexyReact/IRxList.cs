@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RxConnect
+namespace SexyReact
 {
     public interface IRxList<T> : IList<T>, IDisposable
     {

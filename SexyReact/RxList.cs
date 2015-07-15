@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
-using RxConnect.Utils;
+using SexyReact.Utils;
 
-namespace RxConnect
+namespace SexyReact
 {
     /// <summary>
     /// A list that provides a number of observables for keeping track of its contents.

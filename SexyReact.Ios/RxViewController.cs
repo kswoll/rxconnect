@@ -1,10 +1,10 @@
 ﻿using System;
 using UIKit;
-using RxConnect.Views;
+using SexyReact.Views;
 using System.Reflection;
 using Foundation;
 
-namespace RxConnect.Ios
+namespace SexyReact.Ios
 {
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject

@@ -3,9 +3,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
-using RxConnect.Utils;
+using SexyReact.Utils;
 
-namespace RxConnect
+namespace SexyReact
 {
     public static class RxObjectExtensions
     {

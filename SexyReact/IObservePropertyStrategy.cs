@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace RxConnect
+namespace SexyReact
 {
     public interface IObservePropertyStrategy : IDisposable
     {

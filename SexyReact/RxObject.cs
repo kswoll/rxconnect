@@ -3,7 +3,7 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace RxConnect
+namespace SexyReact
 {
     public class RxObject : IRxObject
     {

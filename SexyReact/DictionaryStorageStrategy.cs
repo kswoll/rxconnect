@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace RxConnect
+namespace SexyReact
 {
     public class DictionaryStorageStrategy : IStorageStrategy
     {

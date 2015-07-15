@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RxConnect.Views
+namespace SexyReact.Views
 {
     public interface IRxViewObject<T> : IRxObject
         where T : IRxObject

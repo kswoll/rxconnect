@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RxConnect
+namespace SexyReact
 {
     public struct RxListChange<T>
     {

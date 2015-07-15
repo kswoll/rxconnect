@@ -1,4 +1,4 @@
-﻿namespace RxConnect
+﻿namespace SexyReact
 {
     public interface IPropertyChanged
     {

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace RxConnect
+namespace SexyReact
 {
     /// <summary>
     /// Structure to hold both the old value and the new value when a property has changed.

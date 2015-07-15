@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace RxConnect.Utils
+namespace SexyReact.Utils
 {
     internal static class TypeExtensions
     {
