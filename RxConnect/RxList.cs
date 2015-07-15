@@ -12,7 +12,7 @@ namespace RxConnect
     /// A list that provides a number of observables for keeping track of its contents.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the list</typeparam>
-    public class RxList<T> : IList<T>, IDisposable
+    public class RxList<T> : IRxList<T>
     {
         private List<T> storage;
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
@@ -179,6 +179,22 @@ namespace RxConnect
             OnChanged(new RxListChange<T>(added: items.Select((x, i) => new RxListItem<T>(initialIndex + i, x))));
         }
 
+        public void RemoveRange(IEnumerable<T> items)
+        {
+            var itemsArray = items.Select(x => new RxListItem<T>(storage.IndexOf(x), x)).ToArray();
+            foreach (var item in itemsArray.OrderByDescending(x => x.Index))
+                storage.RemoveAt(item.Index);
+            OnChanged(new RxListChange<T>(removed: itemsArray));
+        }
+
+        public void RemoveRange(int startIndex, int count)
+        {
+            var itemsArray = storage.Select((x, i) => new RxListItem<T>(startIndex + i, storage[startIndex + i]));
+            foreach (var item in itemsArray.OrderByDescending(x => x.Index))
+                storage.RemoveAt(item.Index);
+            OnChanged(new RxListChange<T>(removed: itemsArray));
+        }
+
         public void Clear()
         {
             var change = new RxListChange<T>(removed: storage.Select((x, i) => new RxListItem<T>(i, x)).ToArray());
@@ -255,6 +271,12 @@ namespace RxConnect
             storage.RemoveAt(fromIndex);
             storage.Insert(toIndex, item);
             OnChanged(new RxListChange<T>(moved: Enumerables.Return(new RxListMovedItem<T>(fromIndex, toIndex, item))));
+        }
+
+        public void Move(int toIndex, T item)
+        {
+            var fromIndex = storage.IndexOf(item);
+            Move(fromIndex, toIndex);
         }
     }
 }
