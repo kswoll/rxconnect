@@ -80,9 +80,41 @@ namespace RxConnect.Tests
             Assert.AreEqual("foo", value);
         }
 
+        [Test]
+        public void ObservePathChanged()
+        {
+            var obj = new ContainerObject();
+            string value = "error";
+            obj.ObserveProperty(x => x.Test.StringProperty).Subscribe(x => value = x);
+
+            Assert.IsNull(value);
+
+            var test = new TestObject();
+            obj.Test = test;
+            Assert.IsNull(value);
+
+            obj.Test.StringProperty = "foo";
+            Assert.AreEqual("foo", value);
+
+            value = "error";
+            obj.Test = null;
+
+            value = "pass";
+            test.StringProperty = "bar";
+            Assert.AreEqual("pass", value);
+
+            obj.Test = test;
+            Assert.AreEqual("bar", value);
+        }
+
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
+        }
+
+        public class ContainerObject : RxObject
+        {
+            public TestObject Test { get { return Get<TestObject>(); } set { Set(value); } }
         }
     }
 }

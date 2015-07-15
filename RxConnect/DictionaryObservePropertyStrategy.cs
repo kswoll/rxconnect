@@ -17,6 +17,9 @@ namespace RxConnect
 
         private ReplaySubject<TValue> SubjectForProperty<TValue>(PropertyInfo property)
         {
+            if (!property.DeclaringType.IsInstanceOfType(obj))
+                throw new ArgumentException("Property '" + property.Name + "' is a member of " + property.DeclaringType.FullName + " but is being invoked against " + obj.GetType().FullName, "property");
+
             return (ReplaySubject<TValue>)observables.GetOrAdd(property, x =>
             {
                 var result = new ReplaySubject<TValue>(1);
