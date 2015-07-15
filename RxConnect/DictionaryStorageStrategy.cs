@@ -18,5 +18,9 @@ namespace RxConnect
         {
             values[property] = value;
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

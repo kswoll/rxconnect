@@ -7,19 +7,22 @@ namespace RxConnect
 {
     public class RxObject : IRxObject
     {
-        private IStorageStrategy storage;
+        private IStorageStrategy storageStrategy;
         private Subject<IPropertyChanged> changed = new Subject<IPropertyChanged>();
         private Subject<IPropertyChanging> changing = new Subject<IPropertyChanging>();
+        private IObservePropertyStrategy observePropertyStrategy;
         private bool disposed;
 
         public RxObject()
         {
-            storage = new DictionaryStorageStrategy();
+            storageStrategy = new DictionaryStorageStrategy();
+            observePropertyStrategy = new DictionaryObservePropertyStrategy(this);
         }
 
-        public RxObject(IStorageStrategy storage)
+        public RxObject(IStorageStrategy storageStrategy, IObservePropertyStrategy observePropertyStrategy)
         {
-            this.storage = storage;
+            this.storageStrategy = storageStrategy;
+            this.observePropertyStrategy = observePropertyStrategy;
         }
 
         public IObservable<IPropertyChanging> Changing
@@ -41,7 +44,7 @@ namespace RxConnect
         /// <returns>The current value of the property</returns>
         protected TValue Get<TValue>(PropertyInfo property)
         {
-            return storage.Retrieve<TValue>(property);
+            return storageStrategy.Retrieve<TValue>(property);
         }
 
         /// <summary>
@@ -76,15 +79,17 @@ namespace RxConnect
         /// <param name="newValue">The new value of the property</param>
         protected void Set<TValue>(PropertyInfo property, TValue newValue)
         {
-            TValue oldValue = storage.Retrieve<TValue>(property);
+            TValue oldValue = storageStrategy.Retrieve<TValue>(property);
             
             var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
             changing.OnNext(propertyChanging);
             
-            storage.Store(property, newValue);
+            storageStrategy.Store(property, newValue);
 
             var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
             changed.OnNext(propertyChanged);
+
+            observePropertyStrategy.OnNext(property, newValue);
         }
 
         /// <summary>
@@ -108,6 +113,28 @@ namespace RxConnect
             Set(propertyInfo, newValue);
         }
 
+        /// <summary>
+        /// Returns an observable that emits the current value of the specified property as it changes.  This observable
+        /// will always immediately emit the current value of the property upon subscription.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the property</typeparam>
+        /// <param name="property">The property for which values should be observed.</param>
+        /// <returns></returns>
+        public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)
+        {
+            return observePropertyStrategy.ObservableForProperty<TValue>(property);
+        }
+
+        TValue IRxObject.Get<TValue>(PropertyInfo property)
+        {
+            return Get<TValue>(property);
+        }
+
+        void IRxObject.Set<TValue>(PropertyInfo property, TValue value)
+        {
+            Set(property, value);
+        }
+
         public void Dispose()
         {
             if (!disposed)
@@ -123,6 +150,8 @@ namespace RxConnect
             {
                 changed.Dispose();
                 changing.Dispose();
+                storageStrategy.Dispose();
+                observePropertyStrategy.Dispose();
             }
         }
     }

@@ -51,7 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DictionaryObservePropertyStrategy.cs" />
     <Compile Include="DictionaryStorageStrategy.cs" />
+    <Compile Include="IObservePropertyStrategy.cs" />
     <Compile Include="IPropertyChanged.cs" />
     <Compile Include="IPropertyChanging.cs" />
     <Compile Include="IRxObject.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="PropertyChanging.cs" />
     <Compile Include="RxObject.cs" />
     <Compile Include="RxObjectExtensions.cs" />
+    <Compile Include="Utils\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace RxConnect
 {
-    public interface IStorageStrategy
+    public interface IStorageStrategy : IDisposable
     {
         T Retrieve<T>(PropertyInfo property);
         void Store<T>(PropertyInfo property, T value);

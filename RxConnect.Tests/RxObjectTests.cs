@@ -47,6 +47,39 @@ namespace RxConnect.Tests
             Assert.AreEqual("testing", obj.StringProperty);
         }
 
+        [Test]
+        public void ObservePropertyInitialValue()
+        {
+            var obj = new TestObject();
+            string value = "error";
+            obj.ObserveProperty(x => x.StringProperty).Subscribe(x => value = x);
+            
+            Assert.IsNull(value);
+        }
+
+        [Test]
+        public void ObservePropertyInitialValueAlreadySet()
+        {
+            var obj = new TestObject();
+            obj.StringProperty = "foo";
+            string value = null;
+            obj.ObserveProperty(x => x.StringProperty).Subscribe(x => value = x);
+            
+            Assert.AreEqual("foo", value);
+        }
+
+        [Test]
+        public void ObservePropertyChanged()
+        {
+            var obj = new TestObject();
+            string value = "error";
+            obj.ObserveProperty(x => x.StringProperty).Subscribe(x => value = x);
+            Assert.IsNull(value);
+            
+            obj.StringProperty = "foo";
+            Assert.AreEqual("foo", value);
+        }
+
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
