@@ -31,6 +31,11 @@ namespace RxConnect
             storage = new List<T>(items);
         }
 
+        public RxList(params T[] items) : this((IEnumerable<T>)items)
+        {
+            storage = new List<T>(items);
+        }
+
         public void Dispose()
         {
             if (rangeAdded.IsValueCreated)
