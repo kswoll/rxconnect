@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using System.Reactive.Linq;
-using System.Reactive;
 
 namespace RxConnect.Tests
 {
