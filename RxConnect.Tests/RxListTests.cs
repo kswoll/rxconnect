@@ -12,7 +12,7 @@ namespace RxConnect.Tests
         public void Added()
         {
             var list = new RxList<string>();
-            RxListItem<string> item = new RxListItem<string>();
+            var item = new RxListItem<string>();
             list.Added.Subscribe(x => item = x);
             
             list.Add("1");
@@ -29,7 +29,7 @@ namespace RxConnect.Tests
         public void Removed()
         {
             var list = new RxList<string>(new[] { "1", "2" });
-            RxListItem<string> item = new RxListItem<string>();
+            var item = new RxListItem<string>();
             list.Removed.Subscribe(x => item = x);
             
             list.Remove("1");
@@ -57,13 +57,29 @@ namespace RxConnect.Tests
         {
             var list = new RxList<string>(new[] { "1a", "2a" });
 
-            RxListModifiedItem<string> item = new RxListModifiedItem<string>();
+            var item = new RxListModifiedItem<string>();
             list.Modified.Subscribe(x => item = x);
 
             list[1] = "2b";
             Assert.AreEqual(1, item.Index);
             Assert.AreEqual("2a", item.OldValue);
             Assert.AreEqual("2b", item.NewValue);
+        }
+
+        [Test]
+        public void Moved()
+        {
+            var list = new RxList<string>(new[] { "1a", "2a" });
+            
+            var item = new RxListMovedItem<string>();
+            list.Moved.Subscribe(x => item = x);
+
+            list.Move(0, 1);
+            Assert.AreEqual(0, item.FromIndex);
+            Assert.AreEqual(1, item.ToIndex);
+            Assert.AreEqual("1a", item.Value);
+            Assert.AreEqual("2a", list[0]);
+            Assert.AreEqual("1a", list[1]);
         }
     }
 }
