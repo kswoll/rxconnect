@@ -23,10 +23,30 @@ namespace SexyReact.Tests.Views
         {
             public string Text { get { return Get<string>(); } set { Set(value); } }
 
+            private NonRxTestLabel label;
+            private IDisposable subscription;
+
             public NonRxTestLabelWrapper(NonRxTestLabel label)
             {
-                this.ObserveProperty(x => x.Text).Subscribe(x => label.Text = x);
-                label.TextChanged += (sender, args) => Text = label.Text;
+                this.label = label;
+                subscription = this.ObserveProperty(x => x.Text).Subscribe(x => label.Text = x);
+                label.TextChanged += UpdateText;
+            }
+
+            private void UpdateText(object sender, EventArgs args)
+            {
+                Text = label.Text;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (isDisposing)
+                {
+                    subscription.Dispose();
+                    label.TextChanged -= UpdateText;
+                }
             }
         }
     }
