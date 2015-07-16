@@ -18,7 +18,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)IPropertyChanging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IStorageStrategy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PropertyChange.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChanging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListChange.cs" />
@@ -31,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChanged.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />
