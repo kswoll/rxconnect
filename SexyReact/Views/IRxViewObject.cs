@@ -4,10 +4,15 @@ using System.Reflection;
 
 namespace SexyReact.Views
 {
-    public interface IRxViewObject<T> : IRxObject
+    public interface IRxViewObject : IRxObject
+    {
+        object Model { get; set; }
+    }
+
+    public interface IRxViewObject<T> : IRxViewObject
         where T : IRxObject
     {
-        T Model { get; set; }
+        new T Model { get; set; }
     }
 }
 

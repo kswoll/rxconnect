@@ -35,6 +35,12 @@ namespace SexyReact.Ios
         {
         }
 
+        object IRxViewObject.Model
+        {
+            get { return Model; }
+            set { Model = (T)value; }
+        }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

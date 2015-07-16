@@ -6,7 +6,7 @@
     <SharedGUID>6e53032b-f7d9-48db-8485-0e3f22f351a2</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>RxConnect</Import_RootNamespace>
+    <Import_RootNamespace>SexyReact</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryObservePropertyStrategy.cs" />

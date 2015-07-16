@@ -6,10 +6,11 @@
     <SharedGUID>{1202DFF9-85B9-4C5B-819D-1ED16641B0F7}</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>RxConnect.Ios</Import_RootNamespace>
+    <Import_RootNamespace>SexyReact.Ios</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)RxViewController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxTableViewSource.cs" />
   </ItemGroup>
 </Project>
