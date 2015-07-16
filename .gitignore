@@ -5,3 +5,5 @@ RxConnect.Tests/obj/
 RxConnect.Tests/bin/
 *.user
 *.suo
+SexyReact.Tests/bin/
+SexyReact.Tests/obj/

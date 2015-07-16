@@ -9,16 +9,16 @@ namespace SexyReact.Views
 {
     public static class RxViewObjectExtensions
     {
-        public static IDisposable Connect<TView, TModel, TModelValue, TViewValue>(
+        public static IDisposable Connect<TView, TViewValue, TModel, TModelValue>(
             this TView view, 
-            Expression<Func<TModel, TModelValue>> modelProperty, 
             Expression<Func<TView, TViewValue>> viewProperty,
+            Expression<Func<TModel, TModelValue>> modelProperty,
             Func<TModelValue, TViewValue> converter = null
         )
             where TView : IRxViewObject<TModel>
             where TModel : IRxObject
         {
-            converter = converter ?? new Func<TModelValue, TViewValue>(x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
+            converter = converter ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
 
             var remainingPath = modelProperty.GetPropertyPath().ToArray();
             var propertyPath = new PropertyInfo[remainingPath.Length + 1];
@@ -67,7 +67,7 @@ namespace SexyReact.Views
 
             return result;
         }
-
+         
         private static class ReflectionCache<TModel>
             where TModel : IRxObject
         {
