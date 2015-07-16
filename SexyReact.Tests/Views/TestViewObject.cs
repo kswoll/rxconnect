@@ -8,7 +8,7 @@ namespace SexyReact.Tests.Views
     {
         private IRxViewObject<TestViewModel> mixin = new RxViewObject<TestViewModel>();
         public readonly TestLabel testLabel = new TestLabel();
-
+        public readonly NonRxTestLabel nonRxTestLabel = new NonRxTestLabel();
 
         public void Dispose()
         {

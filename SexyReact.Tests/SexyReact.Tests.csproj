@@ -60,6 +60,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RxListTests.cs" />
     <Compile Include="RxObjectTests.cs" />
+    <Compile Include="Views\NonRxTestLabel.cs" />
+    <Compile Include="Views\NonRxTestLabelConnection.cs" />
     <Compile Include="Views\RxViewObjectExtensionsTests.cs" />
     <Compile Include="Views\TestLabel.cs" />
     <Compile Include="Views\TestViewModel.cs" />

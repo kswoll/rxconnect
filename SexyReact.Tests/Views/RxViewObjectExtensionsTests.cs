@@ -33,5 +33,19 @@ namespace SexyReact.Tests.Views
             view.testLabel.Text = "foo";
             Assert.AreEqual("foo", model.StringProperty);
         }
+
+        [Test]
+        public void BiconnectViewTargetNotRx()
+        {
+            var view = new TestViewObject();
+            var model = new TestViewModel();
+            view.Model = model;
+
+            view.Biconnect(view.nonRxTestLabel, x => x.StringProperty);
+
+            Assert.IsNull(model.StringProperty);
+            view.nonRxTestLabel.Text = "foo";
+            Assert.AreEqual("foo", model.StringProperty);
+        }
     }
 }
