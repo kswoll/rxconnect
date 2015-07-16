@@ -12,3 +12,4 @@ C:\Dev\sexy-react\SexyReact.Tests\bin\Debug\System.Reactive.Linq.xml
 C:\Dev\sexy-react\SexyReact.Tests\bin\Debug\System.Reactive.PlatformServices.xml
 C:\Dev\sexy-react\SexyReact.Tests\obj\Debug\RxConnect.Tests.dll
 C:\Dev\sexy-react\SexyReact.Tests\obj\Debug\RxConnect.Tests.pdb
+C:\Dev\sexy-react\SexyReact.Tests\obj\Debug\SexyReact.Tests.csprojResolveAssemblyReference.cache

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -34,29 +35,25 @@ namespace SexyReact.Views
 
             Func<Action<TViewValue>> createSetValue = () =>
             {
-                var currentMember = setMainMember;
-                var currentTarget = currentMember.Expression;
-                Expression body = null;
-                do
+                Stack<MemberExpression> stack = new Stack<MemberExpression>();
+                MemberExpression member = setMainMember;
+                while (member != null)
                 {
-                    var currentTargetMemberAccess = currentTarget as MemberExpression;
-                    if (currentTargetMemberAccess == null)
-                    {
-                        var rootTarget = currentTarget as ParameterExpression;
-                        if (rootTarget == null)
-                            throw new ArgumentException("Root of lambda expression (" + viewProperty + ") must be a reference to the parameter passed into the lambda.");
-
-                        body = Expression.MakeMemberAccess(Expression.Constant(view), currentMember.Member);
-                        break;
-                    }
-                    else 
-                    {
-                        currentMember = currentTargetMemberAccess;
-                    }
+                    stack.Push(member);
+                    member = member.Expression as MemberExpression;
                 }
-                while (true);
 
-                var lambda = Expression.Lambda<Action<TViewValue>>(body);
+                Expression target = Expression.Constant(view);
+                while (stack.Any())
+                {
+                    var expression = stack.Pop();
+                    target = Expression.MakeMemberAccess(target, expression.Member);
+                }
+
+                var value = Expression.Parameter(typeof(TViewValue));
+
+                var body = Expression.Assign(target, value);
+                var lambda = Expression.Lambda<Action<TViewValue>>(body, value);
                 return lambda.Compile();
             };
             Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(createSetValue);

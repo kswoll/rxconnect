@@ -107,6 +107,33 @@ namespace SexyReact.Tests
             Assert.AreEqual("bar", value);
         }
 
+        [Test]
+        public void ObservePathChangedArray()
+        {
+            var obj = new ContainerObject();
+            string value = "error";
+            obj.ObserveProperty<ContainerObject, string>(new[] { typeof(ContainerObject).GetProperty("Test"), typeof(TestObject).GetProperty("StringProperty") }).Subscribe(x => value = x);
+
+            Assert.IsNull(value);
+
+            var test = new TestObject();
+            obj.Test = test;
+            Assert.IsNull(value);
+
+            obj.Test.StringProperty = "foo";
+            Assert.AreEqual("foo", value);
+
+            value = "error";
+            obj.Test = null;
+
+            value = "pass";
+            test.StringProperty = "bar";
+            Assert.AreEqual("pass", value);
+
+            obj.Test = test;
+            Assert.AreEqual("bar", value);
+        }
+
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }

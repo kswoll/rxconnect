@@ -18,29 +18,33 @@ namespace RxConnect.Tests.Tests
         public void Connect()
         {
             var view = new TestViewObject();
+            var model = new TestViewModel();
+            view.Model = model;
             view.BaseConnect();
+
+            Assert.IsNull(view.testLabel.Text);
+            model.StringProperty = "foo";
+            Assert.AreEqual("foo", view.testLabel.Text);
         }
 
-        private class TestLabel
+        private class TestLabel : RxObject
         {
-            public string Text { get; set; }
+            public string Text { get { return Get<string>(); } set { Set(value); } }
         }
 
         private class TestViewModel : RxObject
         {
-            public string StringProperty { get; set; }
+            public string StringProperty { get { return Get<string>(); } set { Set(value); } }
         }
 
         private class TestViewObject : IRxViewObject<TestViewModel>
         {
             private IRxViewObject<TestViewModel> mixin = new RxViewObject<TestViewModel>();
-            private TestLabel testLabel = new TestLabel();
+            public readonly TestLabel testLabel = new TestLabel();
 
             public void BaseConnect()
             {
-                var foo = this.Connect(x => x.testLabel.Text, From(x => x.StringProperty));
-//                var foo = this.Connect(x => x.testLabel.Text).To(x => x.StringProperty);
-//                return connect.To(x => x.StringProperty);
+                this.Connect(x => x.testLabel.Text, From(x => x.StringProperty));
             }
 
             public void Dispose()
@@ -74,7 +78,7 @@ namespace RxConnect.Tests.Tests
 
             public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)
             {
-                return mixin.ObserveProperty<TValue>(property);
+                return mixin.ObserveProperty<TValue>(mixin.GetType().GetProperty(property.Name));
             }
 
             public TestViewModel Model
