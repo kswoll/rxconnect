@@ -13,7 +13,7 @@ namespace SexyReact.Tests.Views
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Connect(x => x.testLabel.Text, view.From(x => x.StringProperty));
+            view.Connect(view.testLabel, x => x.Text, x => x.StringProperty);
 
             Assert.IsNull(view.testLabel.Text);
             model.StringProperty = "foo";

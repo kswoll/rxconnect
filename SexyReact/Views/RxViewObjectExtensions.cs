@@ -11,13 +11,13 @@ namespace SexyReact.Views
 {
     public static class RxViewObjectExtensions
     {
-        public static IDisposable Connect<TView, TViewValue, TModel, TModelValue>(
-            this TView view, 
-            Expression<Func<TView, TViewValue>> viewProperty,
+        public static IDisposable Connect<TViewTarget, TViewValue, TModel, TModelValue>(
+            this IRxViewObject<TModel> view, 
+            TViewTarget viewTarget, 
+            Expression<Func<TViewTarget, TViewValue>> viewProperty,
             Expression<Func<TModel, TModelValue>> modelProperty,
             Func<TModelValue, TViewValue> converter = null
         )
-            where TView : IRxViewObject<TModel>
             where TModel : IRxObject
         {
             converter = converter ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
@@ -44,7 +44,7 @@ namespace SexyReact.Views
                     member = member.Expression as MemberExpression;
                 }
 
-                Expression target = Expression.Constant(view);
+                Expression target = Expression.Constant(viewTarget);
                 while (stack.Any())
                 {
                     var expression = stack.Pop();
@@ -60,7 +60,7 @@ namespace SexyReact.Views
             Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(createSetValue);
 
             var result = view
-                .ObserveProperty<TView, TModelValue>(propertyPath)
+                .ObserveProperty<IRxViewObject<TModel>, TModelValue>(propertyPath)
                 .Subscribe(x => setValue.Value(converter(x)));
 
             return result;
@@ -78,7 +78,7 @@ namespace SexyReact.Views
         {
             toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
 
-            var connectDisposable = view.Connect(viewProperty, modelProperty, toViewValue);
+            var connectDisposable = (IDisposable)null;//view.Connect(viewProperty, modelProperty, toViewValue);
 
             var setMainMember = modelProperty.Body as MemberExpression;
             if (setMainMember == null)
