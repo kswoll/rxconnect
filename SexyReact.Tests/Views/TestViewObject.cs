@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using SexyReact.Views;
 
@@ -13,11 +12,6 @@ namespace SexyReact.Tests.Views
 
         public void Dispose()
         {
-        }
-
-        public Expression<Func<TestViewModel, TValue>> From<TValue>(Expression<Func<TestViewModel, TValue>> property)
-        {
-            return mixin.From(property);
         }
 
         public IObservable<IPropertyChanging> Changing

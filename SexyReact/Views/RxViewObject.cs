@@ -11,11 +11,6 @@ namespace SexyReact.Views
         protected override void Dispose(bool isDisposing)
         {
         }
-
-        public Expression<Func<T, TValue>> From<TValue>(Expression<Func<T, TValue>> property)
-        {
-            return property;
-        }
     }
 }
 

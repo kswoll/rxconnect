@@ -27,13 +27,11 @@ namespace SexyReact.Tests.Views
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Biconnect(x => x.testLabel.Text, view.From(x => x.StringProperty));
+            view.Biconnect(view.testLabel, x => x.Text, x => x.StringProperty);
 
             Assert.IsNull(model.StringProperty);
             view.testLabel.Text = "foo";
             Assert.AreEqual("foo", model.StringProperty);
         }
-
-
     }
 }

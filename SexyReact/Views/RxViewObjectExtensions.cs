@@ -24,7 +24,7 @@ namespace SexyReact.Views
 
             var remainingPath = modelProperty.GetPropertyPath().ToArray();
             var propertyPath = new PropertyInfo[remainingPath.Length + 1];
-            propertyPath[0] = ReflectionCache<TModel>.viewObjectModelProperty;
+            propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
             for (var i = 0; i < remainingPath.Length; i++)
             {
                 propertyPath[i + 1] = (PropertyInfo)remainingPath[i];
@@ -66,19 +66,20 @@ namespace SexyReact.Views
             return result;
         }
 
-        public static IDisposable Biconnect<TView, TViewValue, TModel, TModelValue>(
-            this TView view, 
-            Expression<Func<TView, TViewValue>> viewProperty,
+        public static IDisposable Biconnect<TViewTarget, TViewValue, TModel, TModelValue>(
+            this IRxViewObject<TModel> view, 
+            TViewTarget viewTarget, 
+            Expression<Func<TViewTarget, TViewValue>> viewProperty,
             Expression<Func<TModel, TModelValue>> modelProperty,
             Func<TModelValue, TViewValue> toViewValue = null,
             Func<TViewValue, TModelValue> toModelValue = null
         )
-            where TView : IRxViewObject<TModel>
+            where TViewTarget : IRxObject
             where TModel : IRxObject
         {
             toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
 
-            var connectDisposable = (IDisposable)null;//view.Connect(viewProperty, modelProperty, toViewValue);
+            var connectDisposable = view.Connect(viewTarget, viewProperty, modelProperty, toViewValue);
 
             var setMainMember = modelProperty.Body as MemberExpression;
             if (setMainMember == null)
@@ -95,6 +96,10 @@ namespace SexyReact.Views
                 }
 
                 Expression target = Expression.Constant(view);
+
+                // view.Model
+                target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);
+
                 while (stack.Any())
                 {
                     var expression = stack.Pop();
@@ -109,7 +114,7 @@ namespace SexyReact.Views
             };
             Lazy<Action<TModelValue>> setValue = new Lazy<Action<TModelValue>>(createSetValue);
 
-            var result = view
+            var result = viewTarget
                 .ObserveProperty(viewProperty)
                 .Subscribe(x => setValue.Value(toModelValue(x)));
 
@@ -119,7 +124,7 @@ namespace SexyReact.Views
         private static class ReflectionCache<TModel>
             where TModel : IRxObject
         {
-            public static readonly PropertyInfo viewObjectModelProperty = typeof(IRxViewObject<TModel>).GetProperty("Model");
+            public static readonly PropertyInfo ViewObjectModelProperty = typeof(IRxViewObject<TModel>).GetProperty("Model");
         }
     }
 }

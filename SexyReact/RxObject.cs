@@ -80,16 +80,18 @@ namespace SexyReact
         protected void Set<TValue>(PropertyInfo property, TValue newValue)
         {
             TValue oldValue = storageStrategy.Retrieve<TValue>(property);
+            if (!Equals(oldValue, newValue))
+            {
+                var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
+                changing.OnNext(propertyChanging);
             
-            var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
-            changing.OnNext(propertyChanging);
-            
-            storageStrategy.Store(property, newValue);
+                storageStrategy.Store(property, newValue);
 
-            var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
-            changed.OnNext(propertyChanged);
+                var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
+                changed.OnNext(propertyChanged);
 
-            observePropertyStrategy.OnNext(property, newValue);
+                observePropertyStrategy.OnNext(property, newValue);                
+            }
         }
 
         /// <summary>
