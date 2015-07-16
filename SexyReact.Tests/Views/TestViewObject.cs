@@ -10,6 +10,12 @@ namespace SexyReact.Tests.Views
         public readonly TestLabel testLabel = new TestLabel();
         public readonly NonRxTestLabel nonRxTestLabel = new NonRxTestLabel();
 
+        object IRxViewObject.Model
+        {
+            get { return Model; }
+            set { Model = (TestViewModel)value; }
+        }
+
         public void Dispose()
         {
         }
