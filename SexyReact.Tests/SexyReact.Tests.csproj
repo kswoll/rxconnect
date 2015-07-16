@@ -7,8 +7,8 @@
     <ProjectGuid>{C96B21DA-E150-46F3-85A5-B6AC7618224F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RxConnect.Tests</RootNamespace>
-    <AssemblyName>RxConnect.Tests</AssemblyName>
+    <RootNamespace>SexyReact.Tests</RootNamespace>
+    <AssemblyName>SexyReact.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -60,7 +60,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RxListTests.cs" />
     <Compile Include="RxObjectTests.cs" />
-    <Compile Include="Tests\RxViewObjectExtensionsTests.cs" />
+    <Compile Include="Views\RxViewObjectExtensionsTests.cs" />
+    <Compile Include="Views\TestLabel.cs" />
+    <Compile Include="Views\TestViewModel.cs" />
+    <Compile Include="Views\TestViewObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

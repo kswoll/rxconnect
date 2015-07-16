@@ -42,5 +42,27 @@ namespace SexyReact.Utils
         {
             return (PropertyInfo)expression.GetMemberInfo();
         }
+
+        public static Type GetMemberType(this MemberInfo member)
+        {
+            var property = member as PropertyInfo;
+            if (property != null)
+                return property.PropertyType;
+
+            var field = member as FieldInfo;
+            if (field != null)
+                return field.FieldType;
+
+            var method = member as MethodInfo;
+            if (method != null)
+                return method.ReturnType;
+
+            var @event = member as EventInfo;
+            if (@event != null)
+                return @event.EventHandlerType;
+
+            throw new ArgumentException("Member must be a property, field, method, or event", "member");
+
+        }
     }
 }

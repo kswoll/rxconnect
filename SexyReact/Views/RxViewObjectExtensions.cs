@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Linq;
+using System.Reactive.Disposables;
 using SexyReact.Utils;
 
 namespace SexyReact.Views
@@ -63,6 +64,56 @@ namespace SexyReact.Views
                 .Subscribe(x => setValue.Value(converter(x)));
 
             return result;
+        }
+
+        public static IDisposable Biconnect<TView, TViewValue, TModel, TModelValue>(
+            this TView view, 
+            Expression<Func<TView, TViewValue>> viewProperty,
+            Expression<Func<TModel, TModelValue>> modelProperty,
+            Func<TModelValue, TViewValue> toViewValue = null,
+            Func<TViewValue, TModelValue> toModelValue = null
+        )
+            where TView : IRxViewObject<TModel>
+            where TModel : IRxObject
+        {
+            toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
+
+            var connectDisposable = view.Connect(viewProperty, modelProperty, toViewValue);
+
+            var setMainMember = modelProperty.Body as MemberExpression;
+            if (setMainMember == null)
+                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "modelProperty");
+
+            Func<Action<TModelValue>> createSetValue = () =>
+            {
+                Stack<MemberExpression> stack = new Stack<MemberExpression>();
+                MemberExpression member = setMainMember;
+                while (member != null)
+                {
+                    stack.Push(member);
+                    member = member.Expression as MemberExpression;
+                }
+
+                Expression target = Expression.Constant(view);
+                while (stack.Any())
+                {
+                    var expression = stack.Pop();
+                    target = Expression.MakeMemberAccess(target, expression.Member);
+                }
+
+                var value = Expression.Parameter(typeof(TModelValue));
+
+                var body = Expression.Assign(target, value);
+                var lambda = Expression.Lambda<Action<TModelValue>>(body, value);
+                return lambda.Compile();
+            };
+            Lazy<Action<TModelValue>> setValue = new Lazy<Action<TModelValue>>(createSetValue);
+
+            var result = view
+                .ObserveProperty(viewProperty)
+                .Subscribe(x => setValue.Value(toModelValue(x)));
+
+            return new CompositeDisposable(connectDisposable, result);
         }
          
         private static class ReflectionCache<TModel>
