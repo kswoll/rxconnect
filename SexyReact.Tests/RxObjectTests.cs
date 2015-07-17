@@ -134,6 +134,21 @@ namespace SexyReact.Tests
             Assert.AreEqual("bar", value);
         }
 
+        [Test]
+        public void PropertyForObservable()
+        {
+            var testObject = new TestObject();
+            var stringPropertyObservable = testObject.ObserveProperty(x => x.StringProperty);
+
+            var observableObject = new PropertyForObservableObject();
+            observableObject.ObservableAsProperty(stringPropertyObservable, x => x.ProxyProperty);
+
+            Assert.IsNull(observableObject.ProxyProperty);
+
+            testObject.StringProperty = "foo";
+            Assert.AreEqual("foo", observableObject.ProxyProperty);
+        }
+
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
@@ -142,6 +157,11 @@ namespace SexyReact.Tests
         public class ContainerObject : RxObject
         {
             public TestObject Test { get { return Get<TestObject>(); } set { Set(value); } }
+        }
+
+        public class PropertyForObservableObject : RxObject
+        {
+            public string ProxyProperty { get { return Get<string>(); } }
         }
     }
 }

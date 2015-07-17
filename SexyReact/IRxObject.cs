@@ -11,5 +11,6 @@ namespace SexyReact
         TValue Get<TValue>(PropertyInfo property);
         void Set<TValue>(PropertyInfo property, TValue value);
         IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property);
+        void Register(IDisposable disposable);
     }
 }
