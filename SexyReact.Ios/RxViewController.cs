@@ -3,13 +3,14 @@ using UIKit;
 using SexyReact.Views;
 using System.Reflection;
 using Foundation;
+using System.Runtime.CompilerServices;
 
 namespace SexyReact.Ios
 {
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject
     {
-        private IRxViewObject<T> mixin = new RxViewObject<T>();
+        private RxViewObject<T> mixin = new RxViewObject<T>();
 
         public RxViewController() 
         {
@@ -51,9 +52,19 @@ namespace SexyReact.Ios
             return mixin.Get<TValue>(property);
         }
 
+        protected TValue Get<TValue>([CallerMemberName]string propertyName = null)
+        {
+            return mixin.Get<TValue>(propertyName);
+        }
+
         public void Set<TValue>(PropertyInfo property, TValue value)
         {
             mixin.Set(property, value);
+        }
+
+        public void Set<TValue>(TValue newValue, [CallerMemberName]string propertyName = null)
+        {
+            mixin.Set(newValue, propertyName);
         }
 
         public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)

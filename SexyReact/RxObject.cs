@@ -8,9 +8,9 @@ namespace SexyReact
     public class RxObject : IRxObject
     {
         private IStorageStrategy storageStrategy;
-        private Subject<IPropertyChanged> changed = new Subject<IPropertyChanged>();
-        private Subject<IPropertyChanging> changing = new Subject<IPropertyChanging>();
         private IObservePropertyStrategy observePropertyStrategy;
+        private Lazy<Subject<IPropertyChanged>> changed = new Lazy<Subject<IPropertyChanged>>(() => new Subject<IPropertyChanged>());
+        private Lazy<Subject<IPropertyChanging>> changing = new Lazy<Subject<IPropertyChanging>>(() => new Subject<IPropertyChanging>());
         private bool disposed;
 
         public RxObject()
@@ -27,12 +27,12 @@ namespace SexyReact
 
         public IObservable<IPropertyChanging> Changing
         {
-            get { return changing; }
+            get { return changing.Value; }
         }
 
         public IObservable<IPropertyChanged> Changed
         {
-            get { return changed; }
+            get { return changed.Value; }
         }
 
         /// <summary>
@@ -83,12 +83,14 @@ namespace SexyReact
             if (!Equals(oldValue, newValue))
             {
                 var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
-                changing.OnNext(propertyChanging);
+                if (changing.IsValueCreated)
+                    changing.Value.OnNext(propertyChanging);
             
                 storageStrategy.Store(property, newValue);
 
                 var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
-                changed.OnNext(propertyChanged);
+                if (changed.IsValueCreated)
+                    changed.Value.OnNext(propertyChanged);
 
                 observePropertyStrategy.OnNext(property, newValue);                
             }
@@ -150,8 +152,10 @@ namespace SexyReact
         {
             if (isDisposing)
             {
-                changed.Dispose();
-                changing.Dispose();
+                if (changed.IsValueCreated)
+                    changed.Value.Dispose();
+                if (changing.IsValueCreated)
+                    changing.Value.Dispose();
                 storageStrategy.Dispose();
                 observePropertyStrategy.Dispose();
             }

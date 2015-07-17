@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxViewController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxTableViewCell.cs" />
   </ItemGroup>
 </Project>

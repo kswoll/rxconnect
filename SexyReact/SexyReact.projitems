@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />
