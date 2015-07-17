@@ -20,9 +20,9 @@ namespace SexyReact
             {
                 var propertyInfo = memberInfo as PropertyInfo;
                 if (propertyInfo == null)
-                    throw new ArgumentException("Member '" + string.Join(".", propertyPath.TakeWhile(x => x != propertyInfo)) + "' must be a property.", "property");
+                    throw new ArgumentException("Member '" + string.Join(".", propertyPath.TakeWhile(x => x != propertyInfo)) + "' must be a property.", "propertyPath");
                 if (!typeof(IRxObject).IsAssignableFrom(propertyInfo.PropertyType))
-                    throw new ArgumentException("All properties leading up to the terminal property must represent an instance of IRxObject", "property");
+                    throw new ArgumentException("All properties leading up to the terminal property must represent an instance of IRxObject", "propertyPath");
             }
 
             var firstObserveProperty = observePropertyMethod.MakeGenericMethod(firstPropertyInfo.PropertyType);
@@ -51,7 +51,7 @@ namespace SexyReact
                 throw new ArgumentException("Member is not a property", "property");
 
             // Handle the trivial case of x.Property efficiently
-            if (memberExpression.Expression == null)
+            if (memberExpression.Expression == property.Parameters[0])
                 return obj.ObserveProperty<TValue>(initialPropertyInfo);
 
             var propertyPath = property.GetPropertyPath().ToArray();
@@ -64,15 +64,27 @@ namespace SexyReact
             return source
                 .Select(x => x == null ? Observable.Return(default(TValue)) : x.ObserveProperty<TValue>(property))
                 .Switch();
-                
-//                new[]
-//                {
-//                    source.Where(x => x == null).Select(x => (default(TValue))),
-//                    source.Where(x => x != null).SelectMany(x => x.ObserveProperty<TValue>(property))
-//                }
-//                .ToObservable()
-//                .Switch();
-//            return source.SelectMany(x => x == null ? Observable.Return(default(TValue)) : x.ObserveProperty<TValue>(property));
+        }
+
+        public static void ObservableAsProperty<TValue>(this IRxObject obj, IObservable<TValue> observable, PropertyInfo property)
+        {
+            obj.Register(observable.DistinctUntilChanged().Subscribe(x => obj.Set(property, x)));
+        }
+
+        public static void ObservableAsProperty<T, TValue>(this T obj, IObservable<TValue> observable, Expression<Func<T, TValue>> property) 
+            where T : IRxObject
+        {
+            var memberExpression = property.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new ArgumentException("Lambda should specify a property.", "property");
+
+            var propertyInfo = memberExpression.Member as PropertyInfo;
+            if (propertyInfo == null)
+                throw new ArgumentException("Member is not a property", "property");
+            if (memberExpression.Expression != property.Parameters[0])
+                throw new ArgumentException("Lambda should specify a property that exists directly on type " + typeof(T).FullName);
+
+            obj.ObservableAsProperty(observable, propertyInfo);
         }
     }
 }

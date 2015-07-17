@@ -7,10 +7,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Tests", "SexyReac
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact", "SexyReact\SexyReact.shproj", "{6E53032B-F7D9-48DB-8485-0E3F22F351A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody", "SexyReact.Fody\SexyReact.Fody.csproj", "{3B216673-01AB-4180-808A-29F6ACC4B185}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact.Fody.Helpers", "SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.shproj", "{BF71544B-EF83-4F28-8DF2-438C3403D15B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody.Helpers.Net45", "SexyReact.Fody.Helpers.Net45\SexyReact.Fody.Helpers.Net45.csproj", "{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SexyReact\SexyReact.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
 		SexyReact\SexyReact.projitems*{c96b21da-e150-46f3-85a5-b6ac7618224f}*SharedItemsImports = 4
+		SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.projitems*{bf71544b-ef83-4f28-8df2-438c3403d15b}*SharedItemsImports = 13
+		SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.projitems*{c4186d7b-553c-4f2d-97ac-e69bc7f7b106}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +29,14 @@ Global
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

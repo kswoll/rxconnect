@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -10,6 +12,7 @@ namespace SexyReact
         private IStorageStrategy storageStrategy;
         private Subject<IPropertyChanged> changed = new Subject<IPropertyChanged>();
         private Subject<IPropertyChanging> changing = new Subject<IPropertyChanging>();
+        private Lazy<List<IDisposable>> disposables = new Lazy<List<IDisposable>>();
         private IObservePropertyStrategy observePropertyStrategy;
         private bool disposed;
 
@@ -127,6 +130,11 @@ namespace SexyReact
             return observePropertyStrategy.ObservableForProperty<TValue>(property);
         }
 
+        public void Register(IDisposable disposable)
+        {
+            disposables.Value.Add(disposable);
+        }
+
         TValue IRxObject.Get<TValue>(PropertyInfo property)
         {
             return Get<TValue>(property);
@@ -154,6 +162,9 @@ namespace SexyReact
                 changing.Dispose();
                 storageStrategy.Dispose();
                 observePropertyStrategy.Dispose();
+                foreach (var disposable in disposables.Value)
+                    disposable.Dispose();
+                disposables.Value.Clear();
             }
         }
     }

@@ -20,6 +20,11 @@ namespace SexyReact.Tests.Views
         {
         }
 
+        public void Register(IDisposable disposable)
+        {
+            throw new NotImplementedException();
+        }
+
         public IObservable<IPropertyChanging> Changing
         {
             get { return mixin.Changing; }

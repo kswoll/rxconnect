@@ -7,3 +7,7 @@ RxConnect.Tests/bin/
 *.suo
 SexyReact.Tests/bin/
 SexyReact.Tests/obj/
+SexyReact.Fody.Helpers.Net45/bin/
+SexyReact.Fody.Helpers.Net45/obj/
+SexyReact.Fody/bin/
+SexyReact.Fody/obj/
