@@ -282,14 +282,14 @@ namespace SexyReact.Tests
         }
 
         [Test]
-        public async void CombineCommandWithFunction()
+        public async void CombineCommandWithFunctionInputFirstCommand()
         {
             string a = null;
             string b = null;
-            var commandA = RxCommand.CreateCommand(() =>
+            var commandA = RxCommand.CreateCommand<string>(x =>
             {
                 Assert.IsNull(b);
-                a = "foo";
+                a = x;
             });
             var commandB = RxCommand.CreateFunction(() =>
             {
@@ -298,9 +298,77 @@ namespace SexyReact.Tests
                 return "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync();
+            var result = await combinedCommand.ExecuteAsync("foo");
 
             Assert.AreEqual("bar", result);
+        }
+
+        [Test]
+        public async void CombineCommandWithFunctionInputSecondCommand()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand(() =>
+            {
+                Assert.IsNull(b);
+                a = "foo";
+            });
+            var commandB = RxFunction<string>.CreateFunction(x =>
+            {
+                Assert.AreEqual("foo", a);
+                b = "done";
+                return x;
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            var result = await combinedCommand.ExecuteAsync("bar");
+
+            Assert.AreEqual("bar", result);
+        }
+
+        [Test]
+        public async void CombineFunctionWithFunctionPipelineNoInput()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateFunction(() =>
+            {
+                Assert.IsNull(b);
+                a = "done";
+                return "foo";
+            });
+            var commandB = RxFunction<string>.CreateFunction(x =>
+            {
+                Assert.AreEqual("done", a);
+                b = "done";
+                return x + "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            var result = await combinedCommand.ExecuteAsync();
+
+            Assert.AreEqual("foobar", result);
+        }
+
+        [Test]
+        public async void CombineFunctionWithFunctionPipeline()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxFunction<string>.CreateFunction(x =>
+            {
+                Assert.IsNull(b);
+                a = "done";
+                return x;
+            });
+            var commandB = RxFunction<string>.CreateFunction(x =>
+            {
+                Assert.AreEqual("done", a);
+                b = "done";
+                return x + "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            var result = await combinedCommand.ExecuteAsync("foo");
+
+            Assert.AreEqual("foobar", result);
         }
     }
 }

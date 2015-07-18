@@ -261,14 +261,61 @@ namespace SexyReact
             });
         }
 
+        /// <summary>
+        /// Executes the first command and then when it completes executes the second command.  TInput is passed to the 
+        /// first command and the output of that command is fed in as the argument to the seond command. The returned command 
+        /// expects TInput and returns TSecondOutput when executed.
+        /// </summary>
+        /// <param name="first">The command to execute first</param>
+        /// <param name="second">The command to execute second</param>
+        /// <returns>The new command that executes both commands in turn.</returns>
+        public static IRxFunction<TInput, TSecondOutput> Combine<TInput, TFirstOutput, TSecondOutput>(this IRxFunction<TInput, TFirstOutput> first, IRxFunction<TFirstOutput, TSecondOutput> second)
+        {
+            return RxCommand.CreateFunction<TInput, TSecondOutput>(async x =>
+            {
+                var firstResult = await first.ExecuteAsync(x);
+                return await second.ExecuteAsync(firstResult);
+            });
+        }
+
+        /// <summary>
+        /// Converts an unparameterized command into a command parameterized by Unit.  This can be useful with methods such 
+        /// as Combine which expect particular types of commands that may not fit the command you have in order to
+        /// get the behavor you otherwise expect.  
+        /// </summary>
         public static IRxCommand<Unit> AsParameterized(this IRxCommand command)
         {
             return RxCommand.CreateCommand<Unit>(_ => command.ExecuteAsync());
         }
 
+        /// <summary>
+        /// Converts an unparameterized command into a command parameterized by Unit.  This can be useful with methods such 
+        /// as Combine which expect particular types of commands that may not fit the command you have in order to
+        /// get the behavor you otherwise expect.  
+        /// </summary>
         public static IRxFunction<Unit, TOutput> AsParameterized<TOutput>(this IRxFunction<TOutput> command)
         {
             return RxCommand.CreateFunction<Unit, TOutput>(_ => command.ExecuteAsync());
+        }
+
+        /// <summary>
+        /// Converts an IRxFunction&lt;TOutput&gt; into an IRxCommand.  This can be useful with methods such as 
+        /// Combine which expect particular types of commands that may not fit the command you have in order to
+        /// get the behavor you otherwise expect.  The value returned from the function is simply discarded.
+        /// </summary>
+        public static IRxCommand AsCommand<TOutput>(this IRxFunction<TOutput> function)
+        {
+            return RxCommand.CreateCommand(() => function.ExecuteAsync());
+        }
+
+        /// <summary>
+        /// Converts an IRxFunction&lt;TOutput&gt; into an IRxCommand.  This can be useful with methods such as 
+        /// Combine which expect particular types of commands that may not fit the command you have in order to
+        /// get the behavor you otherwise expect.  The value returned from the function is simply discarded.
+        /// </summary>
+        public static IRxCommand<TInput> AsCommand<TInput, TOutput>(this IRxFunction<TInput, TOutput> function)
+        {
+            return RxCommand.CreateCommand<TInput>(x => function.ExecuteAsync(x));
         }
     }
 }
