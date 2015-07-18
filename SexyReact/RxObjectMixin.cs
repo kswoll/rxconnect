@@ -13,12 +13,12 @@ namespace SexyReact
         {
         }
 
-        TValue IRxObjectMixin.Get<TValue>([CallerMemberName]string propertyName = null)
+        TValue IRxObjectMixin.Get<TValue>(string propertyName)
         {
             return Get<TValue>(propertyName);
         }
 
-        void IRxObjectMixin.Set<TValue>(TValue value, [CallerMemberName]string propertyName = null)
+        void IRxObjectMixin.Set<TValue>(TValue value, string propertyName)
         {
             Set(value, propertyName);
         }
