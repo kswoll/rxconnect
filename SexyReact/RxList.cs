@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using SexyReact.Utils;
+using System.Linq.Expressions;
 
 namespace SexyReact
 {

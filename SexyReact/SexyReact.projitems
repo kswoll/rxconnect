@@ -32,6 +32,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChanged.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxFunction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxCommandExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxObjectMixin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxObjectMixin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObjectMixin.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

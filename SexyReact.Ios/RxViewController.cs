@@ -4,13 +4,14 @@ using SexyReact.Views;
 using System.Reflection;
 using Foundation;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace SexyReact.Ios
 {
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject
     {
-        private RxViewObject<T> mixin = new RxViewObject<T>();
+        private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
 
         public RxViewController() 
         {
@@ -45,6 +46,11 @@ namespace SexyReact.Ios
             {
                 mixin.Dispose();
             }
+        }
+
+        public void Register(IDisposable disposable)
+        {
+            mixin.Register(disposable);
         }
 
         public TValue Get<TValue>(PropertyInfo property)

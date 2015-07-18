@@ -50,6 +50,11 @@ namespace SexyReact.Ios
             }
         }
 
+        public void Register(IDisposable disposable)
+        {
+            mixin.Register(disposable);
+        }
+
         public TValue Get<TValue>(PropertyInfo property)
         {
             return mixin.Get<TValue>(property);
