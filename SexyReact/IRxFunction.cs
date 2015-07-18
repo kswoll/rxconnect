@@ -8,7 +8,7 @@ namespace SexyReact
         Task<TOutput> ExecuteAsync();
     }
 
-    public interface IRxFunction<TInput, TOutput> : IObservable<TOutput>
+    public interface IRxFunction<in TInput, TOutput> : IObservable<TOutput>
     {
         Task<TOutput> ExecuteAsync(TInput input);
     }

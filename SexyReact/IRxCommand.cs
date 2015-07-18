@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace SexyReact
 {
-        public interface IRxCommand
+    public interface IRxCommand
     {
         Task ExecuteAsync();
     }
 
-    public interface IRxCommand<TInput>
+    public interface IRxCommand<in TInput>
     {
         Task ExecuteAsync(TInput input);
     }

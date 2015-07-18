@@ -8,14 +8,14 @@ namespace SexyReact
     public static class RxCommand
     {
         /// <summary>
-        /// Creates a command that consumes no input and produces no output.
+        /// Creates a command that consumes no input and produces no output.  Non async version.
         /// </summary>
         public static IRxCommand CreateCommand(Action action)
         {
             return CreateCommand(() => 
             {
                 action();
-                return Task.FromResult<Unit>(default(Unit));
+                return Task.FromResult(default(Unit));
             });
         }
 
@@ -32,6 +32,18 @@ namespace SexyReact
         }
 
         /// <summary>
+        /// Creates a command that consumes input, but produces no output.  Non async version.
+        /// </summary>
+        public static IRxCommand<TInput> CreateCommand<TInput>(Action<TInput> action)
+        {
+            return new RxCommand<TInput, Unit>(x =>
+            {
+                action(x);
+                return Task.FromResult(default(Unit));
+            });
+        }
+
+        /// <summary>
         /// Creates a command that consumes input, but produces no output.
         /// </summary>
         public static IRxCommand<TInput> CreateCommand<TInput>(Func<TInput, Task> action)
@@ -44,11 +56,27 @@ namespace SexyReact
         }
 
         /// <summary>
+        /// Creates a command that consumes no input, but produces output.  Non async version.
+        /// </summary>
+        public static IRxFunction<TOutput> CreateFunction<TOutput>(Func<TOutput> action)
+        {
+            return new RxCommand<Unit, TOutput>(x => Task.FromResult(action()));
+        }
+
+        /// <summary>
         /// Creates a command that consumes no input, but produces output.
         /// </summary>
-        public static IRxFunction<Unit, TOutput> CreateFunction<TOutput>(Func<Task<TOutput>> action)
+        public static IRxFunction<TOutput> CreateFunction<TOutput>(Func<Task<TOutput>> action)
         {
             return new RxCommand<Unit, TOutput>(x => action());
+        }
+
+        /// <summary>
+        /// Creates a command that consumes input and produces output.  Non async version.
+        /// </summary>
+        public static IRxFunction<TInput, TOutput> CreateFunction<TInput, TOutput>(Func<TInput, TOutput> action)
+        {
+            return new RxCommand<TInput, TOutput>(x => Task.FromResult(action(x)));
         }
 
         /// <summary>
@@ -60,7 +88,31 @@ namespace SexyReact
         }
     }
 
-    public class RxCommand<TInput, TOutput> : IObservable<TOutput>, 
+    /// <summary>
+    /// This class facilitates creation functions with lambdas so the compiler can still infer the output type even though
+    /// it can't infer the input type.
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    public static class RxFunction<TInput>
+    {
+        /// <summary>
+        /// Creates a command that consumes input and produces output.  Non async version.
+        /// </summary>
+        public static IRxFunction<TInput, TOutput> CreateFunction<TOutput>(Func<TInput, TOutput> action)
+        {
+            return RxCommand.CreateFunction(action);
+        }
+
+        /// <summary>
+        /// Creates a command that consumes input and produces output.
+        /// </summary>
+        public static IRxFunction<TInput, TOutput> CreateFunction<TOutput>(Func<TInput, Task<TOutput>> action)
+        {
+            return RxCommand.CreateFunction(action);
+        }
+    }
+
+    public class RxCommand<TInput, TOutput> : 
         IRxCommand, 
         IRxCommand<TInput>, 
         IRxFunction<TOutput>, 
@@ -76,7 +128,7 @@ namespace SexyReact
 
         public IDisposable Subscribe(IObserver<TOutput> observer)
         {
-            return subject.Value.Subscribe();
+            return subject.Value.Subscribe(observer);
         }
 
         public TOutput Execute(TInput input)
