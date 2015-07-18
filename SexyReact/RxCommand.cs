@@ -1,93 +1,10 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using System.Reactive;
+using System.Reactive.Linq;
 
 namespace SexyReact
 {
-    public static class RxCommand
-    {
-        /// <summary>
-        /// Creates a command that consumes no input and produces no output.  Non async version.
-        /// </summary>
-        public static IRxCommand CreateCommand(Action action)
-        {
-            return CreateCommand(() => 
-            {
-                action();
-                return Task.FromResult(default(Unit));
-            });
-        }
-
-        /// <summary>
-        /// Creates a command that consumes no input and produces no output.
-        /// </summary>
-        public static IRxCommand CreateCommand(Func<Task> action)
-        {
-            return new RxCommand<Unit, Unit>(async x => 
-            {
-                await action();
-                return default(Unit);
-            });
-        }
-
-        /// <summary>
-        /// Creates a command that consumes input, but produces no output.  Non async version.
-        /// </summary>
-        public static IRxCommand<TInput> CreateCommand<TInput>(Action<TInput> action)
-        {
-            return new RxCommand<TInput, Unit>(x =>
-            {
-                action(x);
-                return Task.FromResult(default(Unit));
-            });
-        }
-
-        /// <summary>
-        /// Creates a command that consumes input, but produces no output.
-        /// </summary>
-        public static IRxCommand<TInput> CreateCommand<TInput>(Func<TInput, Task> action)
-        {
-            return new RxCommand<TInput, Unit>(async x =>
-            {
-                await action(x);
-                return default(Unit);
-            });
-        }
-
-        /// <summary>
-        /// Creates a command that consumes no input, but produces output.  Non async version.
-        /// </summary>
-        public static IRxFunction<TOutput> CreateFunction<TOutput>(Func<TOutput> action)
-        {
-            return new RxCommand<Unit, TOutput>(x => Task.FromResult(action()));
-        }
-
-        /// <summary>
-        /// Creates a command that consumes no input, but produces output.
-        /// </summary>
-        public static IRxFunction<TOutput> CreateFunction<TOutput>(Func<Task<TOutput>> action)
-        {
-            return new RxCommand<Unit, TOutput>(x => action());
-        }
-
-        /// <summary>
-        /// Creates a command that consumes input and produces output.  Non async version.
-        /// </summary>
-        public static IRxFunction<TInput, TOutput> CreateFunction<TInput, TOutput>(Func<TInput, TOutput> action)
-        {
-            return new RxCommand<TInput, TOutput>(x => Task.FromResult(action(x)));
-        }
-
-        /// <summary>
-        /// Creates a command that consumes input and produces output.
-        /// </summary>
-        public static IRxFunction<TInput, TOutput> CreateFunction<TInput, TOutput>(Func<TInput, Task<TOutput>> action)
-        {
-            return new RxCommand<TInput, TOutput>(action);
-        }
-    }
-
     /// <summary>
     /// This class facilitates creation functions with lambdas so the compiler can still infer the output type even though
     /// it can't infer the input type.
@@ -118,12 +35,39 @@ namespace SexyReact
         IRxFunction<TOutput>, 
         IRxFunction<TInput, TOutput>
     {
+        private Lazy<IObservable<bool>> canExecute;
         private Func<TInput, Task<TOutput>> action;
         private Lazy<Subject<TOutput>> subject = new Lazy<Subject<TOutput>>(() => new Subject<TOutput>());
+        private Lazy<ReplaySubject<bool>> isExecuting = new  Lazy<ReplaySubject<bool>>(() => new ReplaySubject<bool>(1));
+        private object lockObject = new object();
+        private bool isSubscribedToCanExecute;
+        private bool isAllowedToExecute;
+        private bool requireOneAtATime = true;
 
-        public RxCommand(Func<TInput, Task<TOutput>> action)
+        /// <summary>
+        /// You are free to create commands using this constructor, but you may find it more convenient to use one of 
+        /// the factory methods in RxCommand and RxFunction.
+        /// </summary>
+        /// <param name="action">The action to execute when invoking the command.</param>
+        /// <param name="canExecute">An observable that dictates whether or not the command may execute. If not 
+        /// specified, an observable is created that produces true.</param>
+        public RxCommand(Func<TInput, Task<TOutput>> action, IObservable<bool> canExecute = null)
         {
             this.action = action;
+            if (canExecute == null)
+                this.canExecute = new Lazy<IObservable<bool>>(() => isExecuting.Value);
+            else
+                this.canExecute = new Lazy<IObservable<bool>>(() => canExecute.SelectMany(x => !isExecuting.IsValueCreated ? Observable.Return(x) : IsExecuting.Select(y => x && y)));
+        }
+
+        public IObservable<bool> CanExecute
+        {
+            get { return canExecute.Value; }
+        }
+
+        public IObservable<bool> IsExecuting
+        {
+            get { return isExecuting.Value; }
         }
 
         public IDisposable Subscribe(IObserver<TOutput> observer)
@@ -142,10 +86,43 @@ namespace SexyReact
         /// </summary>
         public async Task<TOutput> ExecuteAsync(TInput input) 
         {
+            if (requireOneAtATime)
+            {
+                lock (lockObject)
+                {
+                    if (!isSubscribedToCanExecute)
+                    {
+                        CanExecute.Subscribe(UpdateIsAllowedToExecute);
+                        isSubscribedToCanExecute = true;
+                    }
+                    if (!isAllowedToExecute)
+                    {
+                        return default(TOutput);
+                    }
+                    isAllowedToExecute = false;
+                }                
+            }
+
+            if (!await CanExecute.LastAsync())
+                return default(TOutput);
+
+            isExecuting.Value.OnNext(true);
+
             var result = await action(input);
             if (subject.IsValueCreated)
                 subject.Value.OnNext(result);
+
+            isExecuting.Value.OnNext(false);
+
             return result;
+        }
+
+        private void UpdateIsAllowedToExecute(bool value)
+        {
+            lock (lockObject)
+            {
+                isAllowedToExecute = value;
+            }
         }
 
         Task IRxCommand.ExecuteAsync()

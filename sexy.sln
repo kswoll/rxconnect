@@ -13,6 +13,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact.Fody.Helpers", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody.Helpers.Net45", "SexyReact.Fody.Helpers.Net45\SexyReact.Fody.Helpers.Net45.csproj", "{C4186D7B-553C-4F2D-97AC-E69BC7F7B106}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C579F5A8-4CF7-4FC3-8385-C6434222E65A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SexyReact\SexyReact.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
