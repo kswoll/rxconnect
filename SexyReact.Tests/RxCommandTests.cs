@@ -174,5 +174,133 @@ namespace SexyReact.Tests
             Assert.AreEqual("foofoo", s);
             Assert.AreEqual("foofoo", observed);
         }
+
+        [Test]
+        public async void CombineTwoNoInputCommands()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand(() =>
+            {
+                Assert.IsNull(b);
+                a = "foo";
+            });
+            var commandB = RxCommand.CreateCommand(() =>
+            {
+                Assert.AreEqual("foo", a);
+                b = "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            await combinedCommand.ExecuteAsync();
+
+            Assert.AreEqual("bar", b);
+        }
+
+        [Test]
+        public async void CombineTwoCommandsFirstNoInputSecondWithInput()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand(() =>
+            {
+                Assert.IsNull(b);
+                a = "foo";
+            });
+            var commandB = RxCommand.CreateCommand<string>(x =>
+            {
+                Assert.AreEqual("foo", a);
+                b = x;
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            await combinedCommand.ExecuteAsync("bar");
+
+            Assert.AreEqual("bar", b);
+        }
+
+        [Test]
+        public async void CombineTwoCommandsFirstWithInputSecondWithNoInput()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand<string>(x =>
+            {
+                Assert.IsNull(b);
+                a = x;
+            });
+            var commandB = RxCommand.CreateCommand(() =>
+            {
+                Assert.AreEqual("foo", a);
+                b = "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            await combinedCommand.ExecuteAsync("foo");
+
+            Assert.AreEqual("bar", b);
+        }
+
+        [Test]
+        public async void CombineTwoCommandsBothWithInput()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand<string>(x =>
+            {
+                Assert.IsNull(b);
+                a = x;
+            });
+            var commandB = RxCommand.CreateCommand<string>(x =>
+            {
+                Assert.AreEqual("foo", a);
+                b = x;
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            await combinedCommand.ExecuteAsync("foo");
+
+            Assert.AreEqual("foo", b);
+        }
+
+        [Test]
+        public async void CombineCommandWithFunctionNoInput()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand(() =>
+            {
+                Assert.IsNull(b);
+                a = "foo";
+            });
+            var commandB = RxCommand.CreateFunction(() =>
+            {
+                Assert.AreEqual("foo", a);
+                b = "done";
+                return "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            var result = await combinedCommand.ExecuteAsync();
+
+            Assert.AreEqual("bar", result);
+        }
+
+        [Test]
+        public async void CombineCommandWithFunction()
+        {
+            string a = null;
+            string b = null;
+            var commandA = RxCommand.CreateCommand(() =>
+            {
+                Assert.IsNull(b);
+                a = "foo";
+            });
+            var commandB = RxCommand.CreateFunction(() =>
+            {
+                Assert.AreEqual("foo", a);
+                b = "done";
+                return "bar";
+            });
+            var combinedCommand = commandA.Combine(commandB);
+            var result = await combinedCommand.ExecuteAsync();
+
+            Assert.AreEqual("bar", result);
+        }
     }
 }

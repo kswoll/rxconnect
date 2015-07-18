@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace SexyReact
 {
-    public interface IRxFunction<TOutput> : IObservable<TOutput>
+    public interface IRxFunction<TOutput> : IRxCommand, IObservable<TOutput>
     {
-        Task<TOutput> ExecuteAsync();
+        new Task<TOutput> ExecuteAsync();
     }
 
-    public interface IRxFunction<in TInput, TOutput> : IObservable<TOutput>
+    public interface IRxFunction<in TInput, TOutput> : IRxCommand<TInput>, IObservable<TOutput>
     {
-        Task<TOutput> ExecuteAsync(TInput input);
+        new Task<TOutput> ExecuteAsync(TInput input);
     }
 }
 
