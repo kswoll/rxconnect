@@ -5,30 +5,6 @@ using System.Reactive.Linq;
 
 namespace SexyReact
 {
-    /// <summary>
-    /// This class facilitates creation functions with lambdas so the compiler can still infer the output type even though
-    /// it can't infer the input type.
-    /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    public static class RxFunction<TInput>
-    {
-        /// <summary>
-        /// Creates a command that consumes input and produces output.  Non async version.
-        /// </summary>
-        public static IRxFunction<TInput, TOutput> CreateFunction<TOutput>(Func<TInput, TOutput> action)
-        {
-            return RxCommand.CreateFunction(action);
-        }
-
-        /// <summary>
-        /// Creates a command that consumes input and produces output.
-        /// </summary>
-        public static IRxFunction<TInput, TOutput> CreateFunction<TOutput>(Func<TInput, Task<TOutput>> action)
-        {
-            return RxCommand.CreateFunction(action);
-        }
-    }
-
     public class RxCommand<TInput, TOutput> : 
         IRxCommand, 
         IRxCommand<TInput>, 
@@ -38,11 +14,16 @@ namespace SexyReact
         private Lazy<IObservable<bool>> canExecute;
         private Func<TInput, Task<TOutput>> action;
         private Lazy<Subject<TOutput>> subject = new Lazy<Subject<TOutput>>(() => new Subject<TOutput>());
-        private Lazy<ReplaySubject<bool>> isExecuting = new  Lazy<ReplaySubject<bool>>(() => new ReplaySubject<bool>(1));
+        private Lazy<ReplaySubject<bool>> isExecuting = new  Lazy<ReplaySubject<bool>>(() => 
+        {
+            var subject = new ReplaySubject<bool>(1);
+            subject.OnNext(false);      // Initialize with a default value
+            return subject;
+        });
         private object lockObject = new object();
         private bool isSubscribedToCanExecute;
-        private bool isAllowedToExecute;
-        private bool requireOneAtATime = true;
+        private bool isAllowedToExecute = true;
+        private Func<TOutput> defaultValue;
 
         /// <summary>
         /// You are free to create commands using this constructor, but you may find it more convenient to use one of 
@@ -51,13 +32,31 @@ namespace SexyReact
         /// <param name="action">The action to execute when invoking the command.</param>
         /// <param name="canExecute">An observable that dictates whether or not the command may execute. If not 
         /// specified, an observable is created that produces true.</param>
-        public RxCommand(Func<TInput, Task<TOutput>> action, IObservable<bool> canExecute = null)
+        /// <param name="defaultValue">A factory function to provide the return value for when the method fails to execute.</param>
+        /// <param name="allowSimultaneousExecution">If true, multiple execution of this command may be performed.  If false, 
+        /// then subsequent calls to ExecuteAsync return the defaultValue until the execution of the initial invocation completes.</param>
+        public RxCommand(Func<TInput, Task<TOutput>> action, IObservable<bool> canExecute = null, Func<TOutput> defaultValue = null, bool allowSimultaneousExecution = false)
         {
             this.action = action;
-            if (canExecute == null)
-                this.canExecute = new Lazy<IObservable<bool>>(() => isExecuting.Value);
+            this.defaultValue = defaultValue ?? (() => default(TOutput));
+            
+            Func<IObservable<bool>> canExecuteFactory;
+            if (allowSimultaneousExecution)
+            {
+                if (canExecute == null)
+                    canExecuteFactory = () => Observable.Return(true);
+                else
+                    canExecuteFactory = () => canExecute;
+            }
             else
-                this.canExecute = new Lazy<IObservable<bool>>(() => canExecute.SelectMany(x => !isExecuting.IsValueCreated ? Observable.Return(x) : IsExecuting.Select(y => x && y)));
+            {
+                if (canExecute == null)
+                    canExecuteFactory = () => IsExecuting.Select(x => !x);
+                else
+                    canExecuteFactory = () => IsExecuting.SelectMany(x => canExecute.Select(y => !x && y));
+            }
+
+            this.canExecute = new Lazy<IObservable<bool>>(canExecuteFactory);
         }
 
         public IObservable<bool> CanExecute
@@ -86,25 +85,18 @@ namespace SexyReact
         /// </summary>
         public async Task<TOutput> ExecuteAsync(TInput input) 
         {
-            if (requireOneAtATime)
+            lock (lockObject)
             {
-                lock (lockObject)
+                if (!isSubscribedToCanExecute)
                 {
-                    if (!isSubscribedToCanExecute)
-                    {
-                        CanExecute.Subscribe(UpdateIsAllowedToExecute);
-                        isSubscribedToCanExecute = true;
-                    }
-                    if (!isAllowedToExecute)
-                    {
-                        return default(TOutput);
-                    }
-                    isAllowedToExecute = false;
-                }                
-            }
-
-            if (!await CanExecute.LastAsync())
-                return default(TOutput);
+                    CanExecute.Subscribe(UpdateIsAllowedToExecute);
+                    isSubscribedToCanExecute = true;
+                }
+                if (!isAllowedToExecute)
+                {
+                    return defaultValue();
+                }
+            }                
 
             isExecuting.Value.OnNext(true);
 
