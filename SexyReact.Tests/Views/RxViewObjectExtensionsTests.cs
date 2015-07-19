@@ -25,6 +25,25 @@ namespace SexyReact.Tests.Views
         }
 
         [Test]
+        public void ConnectSubInitiallyNull()
+        {
+            var view = new TestViewObject();
+            var model = new TestViewModel();
+            view.Model = model;
+
+            view.Connect(view, x => x.subViewObject.testLabel.Text, x => x.StringProperty);
+
+            var subObject = new TestSubViewObject();
+            Assert.IsNull(subObject.testLabel.Text);
+            model.StringProperty = "foo";
+            Assert.IsNull(subObject.testLabel.Text);
+
+            view.subViewObject = subObject;
+            model.StringProperty = "foo2";
+            Assert.AreEqual("foo2", subObject.testLabel.Text);
+        }
+
+        [Test]
         public void Biconnect()
         {
             var view = new TestViewObject();

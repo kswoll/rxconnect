@@ -66,6 +66,7 @@
     <Compile Include="Views\NonRxTestLabelConnection.cs" />
     <Compile Include="Views\RxViewObjectExtensionsTests.cs" />
     <Compile Include="Views\TestLabel.cs" />
+    <Compile Include="Views\TestSubViewObject.cs" />
     <Compile Include="Views\TestViewModel.cs" />
     <Compile Include="Views\TestViewObject.cs" />
   </ItemGroup>
