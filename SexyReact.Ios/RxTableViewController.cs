@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace SexyReact.Ios
 {
+    [RxIos]
     public class RxTableViewController<T> : UITableViewController, IRxViewObject<T>
         where T : IRxObject
     {

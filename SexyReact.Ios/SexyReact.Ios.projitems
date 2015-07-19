@@ -13,5 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxTableViewCell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxIos.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IosUiScheduler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IosViewObjectExtensions.cs" />
   </ItemGroup>
 </Project>

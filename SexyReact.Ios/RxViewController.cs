@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace SexyReact.Ios
 {
+    [RxIos]
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject
     {
