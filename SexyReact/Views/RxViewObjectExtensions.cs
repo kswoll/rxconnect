@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using SexyReact.Utils;
 
@@ -29,7 +28,7 @@ namespace SexyReact.Views
             return view.ObserveProperty<IRxViewObject<TModel>, TModelValue>(propertyPath).ObserveOn(Rx.UiScheduler);
         }
 
-        public static Action<TViewValue> CreateValueSetter<TViewTarget, TViewValue, TModel>(
+        public static Action<TViewValue> CreateViewPropertySetter<TViewTarget, TViewValue, TModel>(
             this IRxViewObject<TModel> view, 
             TViewTarget viewTarget, 
             Expression<Func<TViewTarget, TViewValue>> viewProperty
@@ -73,13 +72,50 @@ namespace SexyReact.Views
         {
             converter = converter ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
 
-            Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(() => CreateValueSetter(view, viewTarget, viewProperty));
+            Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(() => CreateViewPropertySetter(view, viewTarget, viewProperty));
 
             var result = view
-                .ObserveModelProperty<TModel, TModelValue>(modelProperty)
+                .ObserveModelProperty(modelProperty)
                 .Subscribe(x => setValue.Value(converter(x)));
 
             return result;
+        }
+
+        public static Action<TModelValue> CreateModelPropertySetter<TViewTarget, TModel, TModelValue>(
+            IRxViewObject<TModel> view, 
+            TViewTarget viewTarget, 
+            Expression<Func<TModel, TModelValue>> modelProperty
+        )
+            where TModel : IRxObject
+        {
+            var setMainMember = modelProperty.Body as MemberExpression;
+            if (setMainMember == null)
+                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "modelProperty");
+
+            Stack<MemberExpression> stack = new Stack<MemberExpression>();
+            MemberExpression member = setMainMember;
+            while (member != null)
+            {
+                stack.Push(member);
+                member = member.Expression as MemberExpression;
+            }
+
+            Expression target = Expression.Constant(view);
+
+            // view.Model
+            target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);
+
+            while (stack.Any())
+            {
+                var expression = stack.Pop();
+                target = Expression.MakeMemberAccess(target, expression.Member);
+            }
+
+            var value = Expression.Parameter(typeof(TModelValue));
+
+            var body = Expression.Assign(target, value);
+            var lambda = Expression.Lambda<Action<TModelValue>>(body, value);
+            return lambda.Compile();
         }
 
         public static IDisposable Biconnect<TViewTarget, TViewValue, TModel, TModelValue>(
@@ -96,39 +132,7 @@ namespace SexyReact.Views
             toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
 
             var connectDisposable = view.Connect(viewTarget, viewProperty, modelProperty, toViewValue);
-
-            var setMainMember = modelProperty.Body as MemberExpression;
-            if (setMainMember == null)
-                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "modelProperty");
-
-            Func<Action<TModelValue>> createSetValue = () =>
-            {
-                Stack<MemberExpression> stack = new Stack<MemberExpression>();
-                MemberExpression member = setMainMember;
-                while (member != null)
-                {
-                    stack.Push(member);
-                    member = member.Expression as MemberExpression;
-                }
-
-                Expression target = Expression.Constant(view);
-
-                // view.Model
-                target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);
-
-                while (stack.Any())
-                {
-                    var expression = stack.Pop();
-                    target = Expression.MakeMemberAccess(target, expression.Member);
-                }
-
-                var value = Expression.Parameter(typeof(TModelValue));
-
-                var body = Expression.Assign(target, value);
-                var lambda = Expression.Lambda<Action<TModelValue>>(body, value);
-                return lambda.Compile();
-            };
-            Lazy<Action<TModelValue>> setValue = new Lazy<Action<TModelValue>>(createSetValue);
+            Lazy<Action<TModelValue>> setValue = new Lazy<Action<TModelValue>>(() => CreateModelPropertySetter(view, viewTarget, modelProperty));
 
             var result = viewTarget
                 .ObserveProperty(viewProperty)
