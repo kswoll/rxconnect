@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICanExecute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListItem.cs" />

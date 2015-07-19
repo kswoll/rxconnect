@@ -61,6 +61,7 @@
     <Compile Include="RxCommandTests.cs" />
     <Compile Include="RxListTests.cs" />
     <Compile Include="RxObjectTests.cs" />
+    <Compile Include="RxTestSetup.cs" />
     <Compile Include="Views\NonRxTestLabel.cs" />
     <Compile Include="Views\NonRxTestLabelConnection.cs" />
     <Compile Include="Views\RxViewObjectExtensionsTests.cs" />

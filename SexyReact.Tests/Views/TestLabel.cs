@@ -8,6 +8,24 @@ namespace SexyReact.Tests.Views
 {
     public class TestLabel : RxObject
     {
-        public string Text { get { return Get<string>(); } set { Set(value); } }
+        public Action TextSetHandler { get; set; }
+
+        public TestLabel()
+        {
+            TextSetHandler = () => {};
+        }
+
+        public string Text
+        {
+            get
+            {
+                return Get<string>();
+            }
+            set
+            {
+                Set(value);
+                TextSetHandler();
+            }
+        }
     }
 }

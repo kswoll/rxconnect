@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using SexyReact.Utils;
 
@@ -61,6 +62,7 @@ namespace SexyReact.Views
 
             var result = view
                 .ObserveProperty<IRxViewObject<TModel>, TModelValue>(propertyPath)
+                .ObserveOn(Rx.UiScheduler)
                 .Subscribe(x => setValue.Value(converter(x)));
 
             return result;
