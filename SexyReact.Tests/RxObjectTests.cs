@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace SexyReact.Tests
@@ -105,6 +106,17 @@ namespace SexyReact.Tests
 
             obj.Test = test;
             Assert.AreEqual("bar", value);
+        }
+
+        [Test]
+        public void ObservePropertyIsDistinct()
+        {
+            var testObject = new TestObject();
+            var containerObject = new ContainerObject();
+            var list = new List<string>();
+            containerObject.ObserveProperty(x => x.Test.StringProperty).Subscribe(x => list.Add(x));
+            containerObject.Test = testObject;
+            Assert.AreEqual(1, list.Count);
         }
 
         [Test]

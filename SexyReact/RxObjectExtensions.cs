@@ -47,7 +47,7 @@ namespace SexyReact
             }
 
             var lastObservable = (IObservable<TValue>)currentObservable;
-            return lastObservable;
+            return lastObservable.DistinctUntilChanged();
         }
 
         /// <summary>
@@ -110,6 +110,7 @@ namespace SexyReact
         /// <typeparam name="T">The type of the object that contains the property.</typeparam>
         /// <typeparam name="TValue">The property type of the properyt.</typeparam>
         public static void ObservableAsProperty<T, TValue>(this T obj, IObservable<TValue> observable, Expression<Func<T, TValue>> property) 
+            where T : IRxObject
         {
             var memberExpression = property.Body as MemberExpression;
             if (memberExpression == null)
