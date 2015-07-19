@@ -5,18 +5,20 @@ namespace SexyReact
 {
     public class DictionaryStorageStrategy : IStorageStrategy
     {
-        private Dictionary<PropertyInfo, object> values = new Dictionary<PropertyInfo, object>();
+        private Dictionary<string, object> values = new Dictionary<string, object>();
 
         public T Retrieve<T>(PropertyInfo property)
         {
             object result;
-            values.TryGetValue(property, out result);
-            return (T)result;
+            if (values.TryGetValue(property.Name, out result))
+                return (T)result;
+            else
+                return default(T);
         }
 
         public void Store<T>(PropertyInfo property, T value)
         {
-            values[property] = value;
+            values[property.Name] = value;
         }
 
         public void Dispose()

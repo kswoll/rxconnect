@@ -8,7 +8,7 @@ namespace SexyReact
     public class DictionaryObservePropertyStrategy : IObservePropertyStrategy
     {
         private IRxObject obj;
-        private ConcurrentDictionary<PropertyInfo, object> observables = new ConcurrentDictionary<PropertyInfo, object>();
+        private ConcurrentDictionary<string, object> observables = new ConcurrentDictionary<string, object>();
 
         public DictionaryObservePropertyStrategy(IRxObject obj)
         {
@@ -20,7 +20,7 @@ namespace SexyReact
             if (!property.DeclaringType.IsInstanceOfType(obj))
                 throw new ArgumentException("Property '" + property.Name + "' is a member of " + property.DeclaringType.FullName + " but is being invoked against " + obj.GetType().FullName, "property");
 
-            return (ReplaySubject<TValue>)observables.GetOrAdd(property, x =>
+            return (ReplaySubject<TValue>)observables.GetOrAdd(property.Name, x =>
             {
                 var result = new ReplaySubject<TValue>(1);
                 result.OnNext(obj.Get<TValue>(property));
