@@ -13,6 +13,13 @@ using CoreFoundation;
 
 namespace SexyReact.Ios
 {
+    /// <summary>
+    /// A table view source that works with RX lists.  The underlying data structure expects an RxList<RxList<T>>, but there are 
+    /// facilities for easily working with just RxList<T>.  While you may create an instance of this class on your own, it is easier
+    /// to use the Connect extension method defined in IosViewObjectExtensions.  Usage would be (in your UIViewController):
+    /// 
+    /// this.Connect(TableView, vm => vm.Items, () => new ItemCell());
+    /// </summary>
     public class RxTableViewSource<TSection, TItem, TCell> : UITableViewSource
         where TItem : IRxObject
         where TCell : RxTableViewCell<TItem>
