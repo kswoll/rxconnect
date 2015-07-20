@@ -9,10 +9,13 @@ using CoreAnimation;
 using SexyReact.Utils;
 using SexyReact.Views;
 using CoreGraphics;
+using CoreFoundation;
 
 namespace SexyReact.Ios
 {
-    public class RxTableViewSource<TSection, TItem> : UITableViewSource
+    public class RxTableViewSource<TSection, TItem, TCell> : UITableViewSource
+        where TItem : IRxObject
+        where TCell : RxTableViewCell<TItem>
     {
         private UITableView tableView;
         private RxList<TSection> data;
@@ -25,18 +28,15 @@ namespace SexyReact.Ios
         private IDisposable itemsRemoved;
         private Dictionary<TSection, IDisposable[]> sectionSubscriptions = new Dictionary<TSection, IDisposable[]>();
         private List<Tuple<TSection, List<TItem>>> localCopy = new List<Tuple<TSection, List<TItem>>>();
-        private Action<TItem> itemSelectedSetter;
 
         public RxTableViewSource(
             UITableView tableView, 
             Func<TSection, RxList<TItem>> itemsInSection,
-            Func<TSection, TItem, UITableViewCell> cellFactory,
-            Action<TItem> itemSelectedSetter = null)
+            Func<TSection, TItem, UITableViewCell> cellFactory)
         {
             this.tableView = tableView;
             this.itemsInSection = itemsInSection;
             this.cellFactory = cellFactory;
-            this.itemSelectedSetter = itemSelectedSetter;
         }
 
         public UITableView TableView
@@ -75,6 +75,7 @@ namespace SexyReact.Ios
             var localItems = new List<TItem>();
             var sectionIndex = data.IndexOf(section);
             localCopy.Insert(sectionIndex, Tuple.Create(section, localItems));
+            tableView.InsertSections(NSIndexSet.FromIndex(data.IndexOf(section)), UITableViewRowAnimation.Automatic);
             var subscriptions = new[]
             {
                 items.Changed.Where(x => x.Added.Any() || x.Removed.Any()).Subscribe(_ =>
@@ -92,8 +93,6 @@ namespace SexyReact.Ios
 
             if (items.Any())
                 OnItemsAdded(section, items.Select((x, i) => Tuple.Create(i, x)));
-
-            tableView.InsertSections(NSIndexSet.FromIndex(data.IndexOf(section)), UITableViewRowAnimation.Automatic);
         }
 
         protected virtual void OnSectionRemoved(TSection section)
@@ -148,6 +147,11 @@ namespace SexyReact.Ios
             CATransaction.DisableActions = false;
         }
 
+        public override nint NumberOfSections(UITableView tableView)
+        {
+            return localCopy.Count;
+        }
+
         public override nint RowsInSection(UITableView tableview, nint sectionIndex)
         {
             var section = localCopy[(int)sectionIndex];
@@ -173,39 +177,14 @@ namespace SexyReact.Ios
         public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = GetCell(tableView, indexPath);
-//            if (cell is ViewCell) 
-//            {
-//                return ((ViewCell)cell).Height;
-//            }
-//            else if (cell is BaseTableViewCell)
-//            {
-//                return ((BaseTableViewCell)cell).Height;
-//            }
-//            else 
-//            {
-                return cell.SizeThatFits(new CGSize(float.MaxValue, float.MaxValue)).Height;
-//            }
+            return cell.SizeThatFits(new CGSize(float.MaxValue, float.MaxValue)).Height;
         }
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = GetCell(tableView, indexPath);
-            if (itemSelectedSetter != null)
-            {
-                var section = localCopy[indexPath.Section];
-                var item = section.Item2[indexPath.Row];
-                itemSelectedSetter(item);
-            }
-//            var viewCell = cell as ViewCell;
-//            if (viewCell != null) 
-//            {
-//                viewCell.OnTouched();
-//            }
-//            var reactiveCell = cell as BaseTableViewCell;
-//            if (reactiveCell != null)
-//            {
-//                reactiveCell.NotifyOnTouched();
-//            }
+            var cell = (RxTableViewCell<TCell>)GetCell(tableView, indexPath);
+            if (cell.Command != null)
+                cell.Command.ExecuteAsync();
         }
 
         public override bool CanMoveRow(UITableView tableView, NSIndexPath indexPath)
@@ -244,7 +223,5 @@ namespace SexyReact.Ios
                     break;
             }
         }
-
     }
 }
-
