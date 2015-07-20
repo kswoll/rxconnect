@@ -8,11 +8,15 @@ using System.Collections.Generic;
 
 namespace SexyReact.Ios
 {
-    [RxIos]
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject
     {
         private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
+
+        static RxViewController() 
+        {
+            RxIos.RegisterDependency();
+        }
 
         public RxViewController() 
         {

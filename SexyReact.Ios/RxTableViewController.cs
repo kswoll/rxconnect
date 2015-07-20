@@ -6,11 +6,15 @@ using System.Reflection;
 
 namespace SexyReact.Ios
 {
-    [RxIos]
     public class RxTableViewController<T> : UITableViewController, IRxViewObject<T>
         where T : IRxObject
     {
         private IRxViewObject<T> mixin = new RxViewObject<T>();
+
+        static RxTableViewController()
+        {
+            RxIos.RegisterDependency();
+        }
 
         public RxTableViewController()
         {
