@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Foundation;
 
 namespace SexyReact.Ios
 {
-    public class RxIos : Attribute
+    public class RxIos 
     {
-        static RxIos()
+        static RxIos() 
         {
             Rx.UiScheduler = IosUiScheduler.Instance;
+        }
+
+        [Preserve]
+        public static void RegisterDependency()
+        {
         }
     }
 }
