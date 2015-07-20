@@ -1,11 +1,4 @@
-﻿/// <summary>
-/// Taken from: 
-/// https://github.com/reactiveui/ReactiveUI/blob/bdb3c792b8c9033751b887615add11acc42475e7/ReactiveUI/Cocoa/NSRunloopScheduler.cs
-/// 
-/// License: https://raw.githubusercontent.com/reactiveui/ReactiveUI/bdb3c792b8c9033751b887615add11acc42475e7/COPYING
-/// </summary>
-
-using System;
+﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using Foundation;
@@ -28,14 +21,22 @@ namespace SexyReact.Ios
 
         public IDisposable Schedule<TState>(TState state, Func<IScheduler, TState, IDisposable> action)
         {
-            var innerDisp = new SingleAssignmentDisposable();
-
-            DispatchQueue.MainQueue.DispatchAsync(() => 
+            if (NSThread.Current.IsMainThread)
             {
-                if (!innerDisp.IsDisposed) innerDisp.Disposable = action(this, state);
-            });
-
-            return innerDisp;
+                // If we're already on the main thread, there's no reason to enlist the DispatchQueue.  Instead, invoke
+                // the action immediately.
+                return action(this, state);
+            }
+            else
+            {
+                // We're on some other thread, so dispatch the work to be done on the main thread.
+                var innerDisp = new SingleAssignmentDisposable();
+                DispatchQueue.MainQueue.DispatchAsync(() => 
+                {
+                    if (!innerDisp.IsDisposed) innerDisp.Disposable = action(this, state);
+                });
+                return innerDisp;
+            }
         }
 
         public IDisposable Schedule<TState>(TState state, DateTimeOffset dueTime, Func<IScheduler, TState, IDisposable> action)
