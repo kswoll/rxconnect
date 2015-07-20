@@ -7,7 +7,7 @@ namespace SexyReact.Ios
 {
     public static class IosViewObjectExtensions
     {
-        public static IDisposable Connect<TViewTarget, TModel, TModelItem, TCell>(
+        public static IDisposable ConnectTableView<TModel, TModelItem, TCell>(
             this IRxViewObject<TModel> view, 
             UITableView tableView, 
             Expression<Func<TModel, RxList<TModelItem>>> modelProperty,
@@ -17,10 +17,11 @@ namespace SexyReact.Ios
             where TModelItem : IRxObject
             where TCell : RxTableViewCell<TModelItem>
         {
-            var tableSource = new RxTableViewSource<RxList<TModelItem>, TModelItem>(tableView, x => x, (section, item) => cellFactory(item));
+            var tableSource = new RxTableViewSource<RxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item));
             var result = view
                 .ObserveModelProperty(modelProperty)
-                .Subscribe(x => tableSource.Data = new RxList<RxList<TModelItem>>(x));
+                .Subscribe(x => tableSource.Data = x == null ? null : new RxList<RxList<TModelItem>>(x));
+            tableView.Source = tableSource;
             return result;
         }
     }
