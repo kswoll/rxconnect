@@ -9,6 +9,8 @@ namespace SexyReact.Ios
     public class RxTableViewCell<T> : UITableViewCell, IRxViewObject<T>
         where T : IRxObject
     {
+        public IRxCommand Command { get; set; }
+
         private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
 
         public RxTableViewCell()
