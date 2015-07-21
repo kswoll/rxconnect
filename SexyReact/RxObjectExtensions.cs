@@ -58,7 +58,7 @@ namespace SexyReact
         /// </summary>
         /// <returns>The property path that identifies the value of the property for the observable.</returns>
         /// <param name="obj">The IRxObject that contains the initial property in the path.</param>
-        /// <param name="propertyPath">The sequence of properties that leads to the value.</param>
+        /// <param name="property">The property whose value should be observed.</param>
         /// <typeparam name="T">The type that contains the initial property in the path.</typeparam>
         /// <typeparam name="TValue">The value of the terminal property in the path.</typeparam>
         public static IObservable<TValue> ObserveProperty<T, TValue>(this T obj, Expression<Func<T, TValue>> property)
@@ -80,6 +80,454 @@ namespace SexyReact
             return ObserveProperty<T, TValue>(obj, propertyPath);
         }
 
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Func<TValue1, TValue2, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            return property1Observable.CombineLatest(property2Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Func<TValue1, TValue2, TValue3, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue>(
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue11, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Expression<Func<T, TValue11>> property11,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue11, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            var property11Observable = obj.ObserveProperty(property11);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
+                property11Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue11, TValue12, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Expression<Func<T, TValue11>> property11,
+            Expression<Func<T, TValue12>> property12,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue11, TValue12, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            var property11Observable = obj.ObserveProperty(property11);
+            var property12Observable = obj.ObserveProperty(property12);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
+                property11Observable, property12Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue11, TValue12, TValue13, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Expression<Func<T, TValue11>> property11,
+            Expression<Func<T, TValue12>> property12,
+            Expression<Func<T, TValue13>> property13,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue11, TValue12, TValue13, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            var property11Observable = obj.ObserveProperty(property11);
+            var property12Observable = obj.ObserveProperty(property12);
+            var property13Observable = obj.ObserveProperty(property13);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
+                property11Observable, property12Observable, property13Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue11, TValue12, TValue13, TValue14, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Expression<Func<T, TValue11>> property11,
+            Expression<Func<T, TValue12>> property12,
+            Expression<Func<T, TValue13>> property13,
+            Expression<Func<T, TValue14>> property14,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue11, TValue12, TValue13, TValue14, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            var property11Observable = obj.ObserveProperty(property11);
+            var property12Observable = obj.ObserveProperty(property12);
+            var property13Observable = obj.ObserveProperty(property13);
+            var property14Observable = obj.ObserveProperty(property14);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
+                property11Observable, property12Observable, property13Observable, property14Observable, resultSelector);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<TValue> ObserveProperties<T, TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, 
+            TValue9, TValue10, TValue11, TValue12, TValue13, TValue14, TValue15, TValue>
+        (
+            this T obj, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Expression<Func<T, TValue3>> property3,
+            Expression<Func<T, TValue4>> property4,
+            Expression<Func<T, TValue5>> property5,
+            Expression<Func<T, TValue6>> property6,
+            Expression<Func<T, TValue7>> property7,
+            Expression<Func<T, TValue8>> property8,
+            Expression<Func<T, TValue9>> property9,
+            Expression<Func<T, TValue10>> property10,
+            Expression<Func<T, TValue11>> property11,
+            Expression<Func<T, TValue12>> property12,
+            Expression<Func<T, TValue13>> property13,
+            Expression<Func<T, TValue14>> property14,
+            Expression<Func<T, TValue15>> property15,
+            Func<TValue1, TValue2, TValue3, TValue4, TValue5, TValue6, TValue7, TValue8, TValue9, TValue10, TValue11, TValue12, TValue13, TValue14, TValue15, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = obj.ObserveProperty(property1);
+            var property2Observable = obj.ObserveProperty(property2);
+            var property3Observable = obj.ObserveProperty(property3);
+            var property4Observable = obj.ObserveProperty(property4);
+            var property5Observable = obj.ObserveProperty(property5);
+            var property6Observable = obj.ObserveProperty(property6);
+            var property7Observable = obj.ObserveProperty(property7);
+            var property8Observable = obj.ObserveProperty(property8);
+            var property9Observable = obj.ObserveProperty(property9);
+            var property10Observable = obj.ObserveProperty(property10);
+            var property11Observable = obj.ObserveProperty(property11);
+            var property12Observable = obj.ObserveProperty(property12);
+            var property13Observable = obj.ObserveProperty(property13);
+            var property14Observable = obj.ObserveProperty(property14);
+            var property15Observable = obj.ObserveProperty(property15);
+            return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
+                property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
+                property11Observable, property12Observable, property13Observable, property14Observable, property15Observable, resultSelector);
+        }
+
         private static IObservable<TValue> Combine<T, TValue>(IObservable<T> source, PropertyInfo property)
             where T : IRxObject
         {
@@ -94,7 +542,6 @@ namespace SexyReact
         /// <param name="obj">The object whose property should be updated.</param>
         /// <param name="observable">The observable whose sequence of values will be used to update the value of the property.</param>
         /// <param name="property">The property whose value should be updated by the observabe.</param>
-        /// <typeparam name="T">The type of the object that contains the property.</typeparam>
         /// <typeparam name="TValue">The property type of the properyt.</typeparam>
         public static void ObservableAsProperty<TValue>(this IRxObject obj, IObservable<TValue> observable, PropertyInfo property)
         {

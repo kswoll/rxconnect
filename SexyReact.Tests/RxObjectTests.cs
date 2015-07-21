@@ -161,6 +161,61 @@ namespace SexyReact.Tests
             Assert.AreEqual("foo", observableObject.ProxyProperty);
         }
 
+        [Test]
+        public void ObserveTwoProperties()
+        {
+            var obj = new LotsOfProperties();
+            Tuple<int, string> current = null;
+            obj.ObserveProperties(x => x.IntProperty, x => x.StringProperty, (x, y) => Tuple.Create(x, y)).Subscribe(x => current = x);
+
+            Assert.AreEqual(0, current.Item1);
+            Assert.AreEqual(null, current.Item2);
+
+            obj.IntProperty = 1;
+            Assert.AreEqual(1, current.Item1);
+            Assert.AreEqual(null, current.Item2);
+
+            obj.StringProperty = "foo";
+            Assert.AreEqual(1, current.Item1);
+            Assert.AreEqual("foo", current.Item2);
+        }
+
+        [Test]
+        public void ObserveThreeProperties()
+        {
+            var obj = new LotsOfProperties();
+            Tuple<int, string, string> current = null;
+            obj.ObserveProperties(x => x.IntProperty, x => x.StringProperty, x => x.TestObjectProperty.StringProperty, (x, y, z) => Tuple.Create(x, y, z)).Subscribe(x => current = x);
+
+            Assert.AreEqual(0, current.Item1);
+            Assert.AreEqual(null, current.Item2);
+            Assert.AreEqual(null, current.Item3);
+
+            obj.IntProperty = 1;
+            Assert.AreEqual(1, current.Item1);
+            Assert.AreEqual(null, current.Item2);
+            Assert.AreEqual(null, current.Item3);
+
+            obj.StringProperty = "foo";
+            Assert.AreEqual(1, current.Item1);
+            Assert.AreEqual("foo", current.Item2);
+            Assert.AreEqual(null, current.Item3);
+
+            obj.TestObjectProperty = new TestObject();
+            obj.TestObjectProperty.StringProperty = "bar";
+            Assert.AreEqual(1, current.Item1);
+            Assert.AreEqual("foo", current.Item2);
+            Assert.AreEqual("bar", current.Item3);
+        }
+
+        public class LotsOfProperties : RxObject
+        {
+            public int IntProperty { get { return Get<int>(); } set { Set(value); } }
+            public string StringProperty { get { return Get<string>(); } set { Set(value); } }
+            public TestObject TestObjectProperty { get { return Get<TestObject>(); } set { Set(value); } }
+            public float FloatProperty { get { return Get<float>(); } set { Set(value); } }
+        }
+
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
