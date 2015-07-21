@@ -208,6 +208,21 @@ namespace SexyReact.Tests
             Assert.AreEqual("bar", current.Item3);
         }
 
+        [Test]
+        public void ObserveNonObservable() 
+        {
+            var container = new ContainerObject();
+            string s = null;
+            container.ObserveProperty(x => x.Test.NonObservableStringProperty).Subscribe(x =>
+            {
+                s = x;
+            });
+            var testObject = new TestObject();
+            testObject.NonObservableStringProperty = "foo";
+            container.Test = testObject;
+            Assert.AreEqual("foo", s);
+        }
+
         public class LotsOfProperties : RxObject
         {
             public int IntProperty { get { return Get<int>(); } set { Set(value); } }
@@ -219,6 +234,7 @@ namespace SexyReact.Tests
         public class TestObject : RxObject
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
+            public string NonObservableStringProperty { get; set; }
         }
 
         public class ContainerObject : RxObject
