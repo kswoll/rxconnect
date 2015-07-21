@@ -189,7 +189,7 @@ namespace SexyReact.Ios
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = (RxTableViewCell<TCell>)GetCell(tableView, indexPath);
+            var cell = (RxTableViewCell<TItem>)GetCell(tableView, indexPath);
             if (cell.Command != null)
                 cell.Command.ExecuteAsync();
         }

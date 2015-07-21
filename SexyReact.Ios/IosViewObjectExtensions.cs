@@ -37,13 +37,32 @@ namespace SexyReact.Ios
             return result;
         }
 
-        public static IDisposable ConnectButton<TModel, TCommand>(
+        public static IDisposable ConnectButton<TModel>(
             this IRxViewObject<TModel> view,
             UIButton button,
-            Expression<Func<TModel, TCommand>> modelProperty
+            Expression<Func<TModel, IRxCommand>> modelProperty
         )
             where TModel : IRxObject
-            where TCommand : IRxCommand
+        {
+            return null;
+        }
+
+        public static IDisposable ConnectButton<TModel>(
+            this IRxViewObject<TModel> view,
+            UIBarButtonItem button,
+            Expression<Func<TModel, IRxCommand>> modelProperty
+        )
+            where TModel : IRxObject
+        {
+            return null;
+        }
+
+        public static IDisposable ConnectTextField<TModel, TModelValue>(
+            this IRxViewObject<TModel> view,
+            UITextField textField,
+            Expression<Func<TModel, TModelValue>> modelProperty
+        )
+            where TModel : IRxObject
         {
             return null;
         }

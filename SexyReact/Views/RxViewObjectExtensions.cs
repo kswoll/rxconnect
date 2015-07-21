@@ -73,7 +73,13 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            converter = converter ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
+            if (converter == null)
+            {
+                if (typeof(TViewValue).IsAssignableFrom(typeof(TModelValue)))
+                    converter = x => (TViewValue)(object)x;
+                else 
+                    converter = x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue));
+            }
 
             Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(() => CreateViewPropertySetter(view, viewTarget, viewProperty));
 
