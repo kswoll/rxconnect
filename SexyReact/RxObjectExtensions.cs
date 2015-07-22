@@ -12,7 +12,13 @@ namespace SexyReact
     public static class RxObjectExtensions
     {
         private static readonly MethodInfo observePropertyMethod = typeof(IRxObject).GetMethod("ObserveProperty");
+        private static readonly MethodInfo observePropertyAsObjectMethod = typeof(RxObjectExtensions).GetMethod("ObservePropertyAsObject");
         private static readonly MethodInfo combineMethod = typeof(RxObjectExtensions).GetMethod("Combine", BindingFlags.Static | BindingFlags.NonPublic);
+
+        public static IObservable<object> ObservePropertyAsObject<TValue>(this IRxObject obj, PropertyInfo property)
+        {
+            return obj.ObserveProperty<TValue>(property).Select(x => (object)x);
+        }
 
         /// <summary>
         /// Produces an observable that returns the current value of the specified property as its value changes.  This handles
@@ -48,10 +54,12 @@ namespace SexyReact
 //                Type observableT = typeof(IObservable<>).MakeGenericType(propertyInfo.DeclaringType);
 //                Type observableTValue = typeof(IObservable<>).MakeGenericType(propertyInfo.PropertyType);
 //                Type observableObservableTValue = typeof(IObservable<>).MakeGenericType(observableTValue);
+//                Type selectorDelegateType = typeof(Func<,>).MakeGenericType(propertyInfo.DeclaringType, observableTValue);
+
 //                var select = ObservableSelect.MakeGenericMethod(propertyInfo.DeclaringType, observableTValue);
 //                currentObservable = select.Invoke(null, new[] { currentObservable, selector });
 
-                currentObservable = Combine((IObservable<IRxObject>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
+                currentObservable = Combine((IObservable<object>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
 #else
                 var combine = combineMethod.MakeGenericMethod(propertyInfo.DeclaringType, propertyInfo.PropertyType);
                 currentObservable = combine.Invoke(null, new[] { currentObservable, propertyInfo });
@@ -70,10 +78,10 @@ namespace SexyReact
 //        private static MethodInfo ObservableSelect = typeof(Observable).GetMethods().Single(x => x.Name == "Select" && x.GetParameters().Length == 2);
 //        private static MethodInfo ObservableSwitch = typeof(Observable).GetMethods().Single(x => x.Name == "Switch" && x.GetParameters().Length == 1);
 
-        private static IObservable<object> Combine(IObservable<IRxObject> source, PropertyInfo property, object defaultValue)
+        private static IObservable<object> Combine(IObservable<object> source, PropertyInfo property, object defaultValue)
         {
             return source
-                .Select(x => x == null ? Observable.Return(defaultValue) : (IObservable<object>)observePropertyMethod.MakeGenericMethod(property.PropertyType).Invoke(x, new[] { property }))
+                .Select(x => x == null ? Observable.Return(defaultValue) : (IObservable<object>)observePropertyAsObjectMethod.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { x, property }))
                 .Switch();
         }
 
