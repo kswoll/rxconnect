@@ -64,6 +64,8 @@ namespace SexyReact
         public static IObservable<TValue> ObserveProperty<T, TValue>(this T obj, Expression<Func<T, TValue>> property)
             where T : IRxObject
         {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
             var memberExpression = property.Body as MemberExpression;
             if (memberExpression == null)
                 throw new ArgumentException("Lambda should specify a property.", "property");
