@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define MONOTOUCH
+
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
@@ -42,13 +44,57 @@ namespace SexyReact
 
             foreach (PropertyInfo propertyInfo in propertyPath.Skip(1))
             {
+#if MONOTOUCH
+//                Type observableT = typeof(IObservable<>).MakeGenericType(propertyInfo.DeclaringType);
+//                Type observableTValue = typeof(IObservable<>).MakeGenericType(propertyInfo.PropertyType);
+//                Type observableObservableTValue = typeof(IObservable<>).MakeGenericType(observableTValue);
+//                var select = ObservableSelect.MakeGenericMethod(propertyInfo.DeclaringType, observableTValue);
+//                currentObservable = select.Invoke(null, new[] { currentObservable, selector });
+
+                currentObservable = Combine((IObservable<IRxObject>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
+#else
                 var combine = combineMethod.MakeGenericMethod(propertyInfo.DeclaringType, propertyInfo.PropertyType);
                 currentObservable = combine.Invoke(null, new[] { currentObservable, propertyInfo });
+#endif
             }
 
+#if MONOTOUCH
+            var lastObservable = ((IObservable<object>)currentObservable).Cast<TValue>();
+#else
             var lastObservable = (IObservable<TValue>)currentObservable;
+#endif
             return lastObservable.DistinctUntilChanged();
         }
+
+#if MONOTOUCH
+//        private static MethodInfo ObservableSelect = typeof(Observable).GetMethods().Single(x => x.Name == "Select" && x.GetParameters().Length == 2);
+//        private static MethodInfo ObservableSwitch = typeof(Observable).GetMethods().Single(x => x.Name == "Switch" && x.GetParameters().Length == 1);
+
+        private static IObservable<object> Combine(IObservable<IRxObject> source, PropertyInfo property, object defaultValue)
+        {
+            return source
+                .Select(x => x == null ? Observable.Return(defaultValue) : (IObservable<object>)observePropertyMethod.MakeGenericMethod(property.PropertyType).Invoke(x, new[] { property }))
+                .Switch();
+        }
+
+        private static object GetDefaultValue(Type type)
+        {
+            return typeof(DefaultValue<>).MakeGenericType(type).GetField("Value").GetValue(null);
+        }
+
+        private static class DefaultValue<T>
+        {
+            public static readonly T Value = default(T);
+        }
+#else
+        private static IObservable<TValue> Combine<T, TValue>(IObservable<T> source, PropertyInfo property)
+            where T : IRxObject
+        {
+            return source
+                .Select(x => x == null ? Observable.Return(default(TValue)) : x.ObserveProperty<TValue>(property))
+                .Switch();
+        }
+#endif
 
         /// <summary>
         /// Produces an observable that returns the current value of the specified property as its value changes.  This handles
@@ -528,14 +574,6 @@ namespace SexyReact
             return property1Observable.CombineLatest(property2Observable, property3Observable, property4Observable, property5Observable, 
                 property6Observable, property7Observable, property8Observable, property9Observable, property10Observable, 
                 property11Observable, property12Observable, property13Observable, property14Observable, property15Observable, resultSelector);
-        }
-
-        private static IObservable<TValue> Combine<T, TValue>(IObservable<T> source, PropertyInfo property)
-            where T : IRxObject
-        {
-            return source
-                .Select(x => x == null ? Observable.Return(default(TValue)) : x.ObserveProperty<TValue>(property))
-                .Switch();
         }
 
         /// <summary>
