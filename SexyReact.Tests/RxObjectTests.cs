@@ -223,6 +223,22 @@ namespace SexyReact.Tests
             Assert.AreEqual("foo", s);
         }
 
+        [Test]
+        public void ObservablePathInt()
+        {
+            var container = new ContainerObject();
+            int i = 0;
+            container.ObserveProperty(x => x.Test.IntProperty).Subscribe(x =>
+            {
+                i = x;
+            });
+            var testObject = new TestObject();
+            container.Test = testObject;
+            testObject.IntProperty = 5;
+
+            Assert.AreEqual(5, i);
+        }
+
         public class LotsOfProperties : RxObject
         {
             public int IntProperty { get { return Get<int>(); } set { Set(value); } }
@@ -235,6 +251,7 @@ namespace SexyReact.Tests
         {
             public string StringProperty { get { return Get<string>(); } set { Set(value); } }
             public string NonObservableStringProperty { get; set; }
+            public int IntProperty { get { return Get<int>(); } set { Set(value); } }
         }
 
         public class ContainerObject : RxObject
