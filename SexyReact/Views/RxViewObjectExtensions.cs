@@ -49,17 +49,22 @@ namespace SexyReact.Views
 
             Expression target = Expression.Constant(viewTarget);
             Expression predicate = Expression.Equal(Expression.Constant(viewTarget), Expression.Constant(null));
+            Expression set = null;
+            var value = Expression.Parameter(typeof(TViewValue));
             while (stack.Any())
             {
                 var expression = stack.Pop();
+                var oldTarget = target;
                 target = Expression.MakeMemberAccess(target, expression.Member);
 
                 var memberType = expression.Member is FieldInfo ? ((FieldInfo)expression.Member).FieldType : ((PropertyInfo)expression.Member).PropertyType;
+                if (!stack.Any())
+                    set = expression.Member is FieldInfo ? (Expression)Expression.Assign(target, value) : Expression.Call(oldTarget, ((PropertyInfo)expression.Member).SetMethod, value);
                 if (!memberType.IsValueType && stack.Any())
                     predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
             }
-            var value = Expression.Parameter(typeof(TViewValue));
-            var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
+            var body = Expression.IfThen(Expression.Not(predicate), set);
+//            var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
             var lambda = Expression.Lambda<Action<TViewValue>>(body, value);
             return lambda.Compile();
         }
