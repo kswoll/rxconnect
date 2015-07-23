@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectMixin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxObjectMixin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObjectMixin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\ObservableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

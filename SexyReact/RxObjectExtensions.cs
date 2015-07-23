@@ -12,12 +12,49 @@ namespace SexyReact
     public static class RxObjectExtensions
     {
         private static readonly MethodInfo observePropertyMethod = typeof(IRxObject).GetMethod("ObserveProperty");
+#if MONOTOUCH
         private static readonly MethodInfo observePropertyAsObjectMethod = typeof(RxObjectExtensions).GetMethod("ObservePropertyAsObject");
+#else
         private static readonly MethodInfo combineMethod = typeof(RxObjectExtensions).GetMethod("Combine", BindingFlags.Static | BindingFlags.NonPublic);
-
+#endif
         public static IObservable<object> ObservePropertyAsObject<TValue>(this IRxObject obj, PropertyInfo property)
         {
             return obj.ObserveProperty<TValue>(property).Select(x => (object)x);
+        }
+
+        public static IObservable<TValue> ObserveProperty<T, TValue>(this IObservable<T> observable, params MemberInfo[] propertyPath)
+        {
+            return ObserveProperty<TValue>(observable, propertyPath);
+        }
+
+        private static IObservable<TValue> ObserveProperty<TValue>(object observable, params MemberInfo[] propertyPath)
+        {
+            object currentObservable = observable;
+
+            for (var i = 0; i < propertyPath.Length; i++)
+            {
+                var memberInfo = propertyPath[i];
+                var propertyInfo = memberInfo as PropertyInfo;
+                if (propertyInfo == null)
+                    throw new ArgumentException("Member '" + string.Join(".", propertyPath.TakeWhile(x => x != propertyInfo)) + "' must be a property.", "propertyPath");
+                if (i < propertyPath.Length - 1 && !typeof(IRxObject).IsAssignableFrom(propertyInfo.PropertyType))
+                    throw new ArgumentException("All properties leading up to the terminal property must represent an instance of IRxObject", "propertyPath");
+
+                #if MONOTOUCH
+                currentObservable = Combine((IObservable<object>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
+                #else
+                var combine = combineMethod.MakeGenericMethod(propertyInfo.DeclaringType, propertyInfo.PropertyType);
+                currentObservable = combine.Invoke(null, new[] { currentObservable, propertyInfo });
+                #endif
+            }
+
+            #if MONOTOUCH
+            var lastObservable = ((IObservable<object>)currentObservable).Cast<TValue>();
+            #else
+            var lastObservable = (IObservable<TValue>)currentObservable;
+            #endif
+
+            return lastObservable.DistinctUntilChanged();
         }
 
         /// <summary>
@@ -34,50 +71,13 @@ namespace SexyReact
         public static IObservable<TValue> ObserveProperty<T, TValue>(this T obj, params MemberInfo[] propertyPath)
             where T : IRxObject
         {
-            var firstPropertyInfo = (PropertyInfo)propertyPath.First();
-            foreach (var memberInfo in propertyPath.Take(propertyPath.Length - 1))
-            {
-                var propertyInfo = memberInfo as PropertyInfo;
-                if (propertyInfo == null)
-                    throw new ArgumentException("Member '" + string.Join(".", propertyPath.TakeWhile(x => x != propertyInfo)) + "' must be a property.", "propertyPath");
-                if (!typeof(IRxObject).IsAssignableFrom(propertyInfo.PropertyType))
-                    throw new ArgumentException("All properties leading up to the terminal property must represent an instance of IRxObject", "propertyPath");
-            }
-
+            var firstPropertyInfo = (PropertyInfo)propertyPath[0];
             var firstObserveProperty = observePropertyMethod.MakeGenericMethod(firstPropertyInfo.PropertyType);
             var firstObservable = firstObserveProperty.Invoke(obj, new[] { firstPropertyInfo });
-            var currentObservable = firstObservable;
-
-            foreach (PropertyInfo propertyInfo in propertyPath.Skip(1))
-            {
-#if MONOTOUCH
-//                Type observableT = typeof(IObservable<>).MakeGenericType(propertyInfo.DeclaringType);
-//                Type observableTValue = typeof(IObservable<>).MakeGenericType(propertyInfo.PropertyType);
-//                Type observableObservableTValue = typeof(IObservable<>).MakeGenericType(observableTValue);
-//                Type selectorDelegateType = typeof(Func<,>).MakeGenericType(propertyInfo.DeclaringType, observableTValue);
-
-//                var select = ObservableSelect.MakeGenericMethod(propertyInfo.DeclaringType, observableTValue);
-//                currentObservable = select.Invoke(null, new[] { currentObservable, selector });
-
-                currentObservable = Combine((IObservable<object>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
-#else
-                var combine = combineMethod.MakeGenericMethod(propertyInfo.DeclaringType, propertyInfo.PropertyType);
-                currentObservable = combine.Invoke(null, new[] { currentObservable, propertyInfo });
-#endif
-            }
-
-#if MONOTOUCH
-            var lastObservable = ((IObservable<object>)currentObservable).Cast<TValue>();
-#else
-            var lastObservable = (IObservable<TValue>)currentObservable;
-#endif
-            return lastObservable.DistinctUntilChanged();
+            return ObserveProperty<TValue>(firstObservable, propertyPath.Skip(1).ToArray());
         }
 
 #if MONOTOUCH
-//        private static MethodInfo ObservableSelect = typeof(Observable).GetMethods().Single(x => x.Name == "Select" && x.GetParameters().Length == 2);
-//        private static MethodInfo ObservableSwitch = typeof(Observable).GetMethods().Single(x => x.Name == "Switch" && x.GetParameters().Length == 1);
-
         private static IObservable<object> Combine(IObservable<object> source, PropertyInfo property, object defaultValue)
         {
             return source

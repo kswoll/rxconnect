@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Linq;
 using System.Reactive.Disposables;
 using SexyReact.Utils;
+using System.Reactive;
+using System.Collections.Concurrent;
 
 namespace SexyReact.Views
 {
@@ -18,14 +20,7 @@ namespace SexyReact.Views
             where TModel : IRxObject
         {
             var remainingPath = modelProperty.GetPropertyPath().ToArray();
-            var propertyPath = new PropertyInfo[remainingPath.Length + 1];
-            propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
-            for (var i = 0; i < remainingPath.Length; i++)
-            {
-                propertyPath[i + 1] = (PropertyInfo)remainingPath[i];
-            }
-
-            return view.ObserveProperty<IRxViewObject<TModel>, TModelValue>(propertyPath).ObserveOn(Rx.UiScheduler);
+            return view.ObserveProperty(x => x.Model).ObserveProperty<TModel, TModelValue>(remainingPath);
         }
 
         public static Action<TViewValue> CreateViewPropertySetter<TViewTarget, TViewValue, TModel>(
@@ -49,22 +44,17 @@ namespace SexyReact.Views
 
             Expression target = Expression.Constant(viewTarget);
             Expression predicate = Expression.Equal(Expression.Constant(viewTarget), Expression.Constant(null));
-            Expression set = null;
-            var value = Expression.Parameter(typeof(TViewValue));
             while (stack.Any())
             {
                 var expression = stack.Pop();
-                var oldTarget = target;
                 target = Expression.MakeMemberAccess(target, expression.Member);
 
                 var memberType = expression.Member is FieldInfo ? ((FieldInfo)expression.Member).FieldType : ((PropertyInfo)expression.Member).PropertyType;
-                if (!stack.Any())
-                    set = expression.Member is FieldInfo ? (Expression)Expression.Assign(target, value) : Expression.Call(oldTarget, ((PropertyInfo)expression.Member).SetMethod, value);
                 if (!memberType.IsValueType && stack.Any())
                     predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
             }
-            var body = Expression.IfThen(Expression.Not(predicate), set);
-//            var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
+            var value = Expression.Parameter(typeof(TViewValue));
+            var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
             var lambda = Expression.Lambda<Action<TViewValue>>(body, value);
             return lambda.Compile();
         }
@@ -74,23 +64,59 @@ namespace SexyReact.Views
             TViewTarget viewTarget, 
             Expression<Func<TViewTarget, TViewValue>> viewProperty,
             Expression<Func<TModel, TModelValue>> modelProperty,
-            Func<TModelValue, TViewValue> converter = null
+            Func<TModelValue, TViewValue> converter
         )
             where TModel : IRxObject
         {
-            if (converter == null)
-            {
-                if (typeof(TViewValue).IsAssignableFrom(typeof(TModelValue)))
-                    converter = x => (TViewValue)(object)x;
-                else 
-                    converter = x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue));
-            }
-
-            Lazy<Action<TViewValue>> setValue = new Lazy<Action<TViewValue>>(() => CreateViewPropertySetter(view, viewTarget, viewProperty));
-
+            Action<TViewValue> setValue = CreateViewPropertySetter(view, viewTarget, viewProperty);
             var result = view
                 .ObserveModelProperty(modelProperty)
-                .Subscribe(x => setValue.Value(converter(x)));
+                .SubscribeOnUiThread(x => setValue(converter(x)));
+
+            return result;
+        }
+                
+        public static IDisposable Connect<TViewTarget, TModel, TValue>(
+            this IRxViewObject<TModel> view, 
+            TViewTarget viewTarget, 
+            Expression<Func<TViewTarget, TValue>> viewProperty,
+            Expression<Func<TModel, TValue>> modelProperty
+        )
+            where TModel : IRxObject
+        {
+            Action<TValue> setValue = CreateViewPropertySetter(view, viewTarget, viewProperty);
+            var result = view
+                .ObserveModelProperty(modelProperty)
+                .SubscribeOnUiThread(x => setValue(x));
+
+            return result;
+        }
+
+        public static IDisposable Connect<TViewValue, TModel, TModelValue>(
+            this IRxViewObject<TModel> view, 
+            Action<TViewValue> viewSetter,
+            Expression<Func<TModel, TModelValue>> modelProperty,
+            Func<TModelValue, TViewValue> converter
+        )
+            where TModel : IRxObject
+        {
+            var result = view
+                .ObserveModelProperty(modelProperty)
+                .SubscribeOnUiThread(x => viewSetter(converter(x)));
+
+            return result;
+        }
+
+        public static IDisposable Connect<TModel, TValue>(
+            this IRxViewObject<TModel> view, 
+            Action<TValue> viewSetter,
+            Expression<Func<TModel, TValue>> modelProperty
+        )
+            where TModel : IRxObject
+        {
+            var result = view
+                .ObserveModelProperty(modelProperty)
+                .SubscribeOnUiThread(x => viewSetter(x));
 
             return result;
         }
