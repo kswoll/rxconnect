@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Linq;
 using System.Reactive.Disposables;
 using SexyReact.Utils;
-using System.Reactive;
-using System.Collections.Concurrent;
 
 namespace SexyReact.Views
 {
@@ -19,8 +16,14 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var remainingPath = modelProperty.GetPropertyPath().ToArray();
-            return view.ObserveProperty(x => x.Model).ObserveProperty<TModel, TModelValue>(remainingPath);
+            var remainingPath = modelProperty.GetPropertyPath();
+            var propertyPath = new PropertyInfo[remainingPath.Length + 1];
+            propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
+            for (var i = 0; i < remainingPath.Length; i++)
+            {
+                propertyPath[i + 1] = remainingPath[i];
+            }
+            return new RxPropertyObservable<TModelValue>(view, propertyPath);
         }
 
         public static Action<TViewValue> CreateViewPropertySetter<TViewTarget, TViewValue, TModel>(
@@ -169,6 +172,7 @@ namespace SexyReact.Views
             where TViewTarget : IRxObject
             where TModel : IRxObject
         {
+            toViewValue = toViewValue ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
             toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
 
             var connectDisposable = view.Connect(viewTarget, viewProperty, modelProperty, toViewValue);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Reflection;
 
@@ -26,7 +27,7 @@ namespace SexyReact
                 var currentValue = (TValue)property.GetValue(obj);
                 result.OnNext(currentValue);
                 return result;
-            });
+            });                
         }
 
         public IObservable<TValue> ObservableForProperty<TValue>(PropertyInfo property)

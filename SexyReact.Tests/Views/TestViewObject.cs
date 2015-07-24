@@ -46,9 +46,11 @@ namespace SexyReact.Tests.Views
             mixin.Set(property, value);
         }
 
+        private static PropertyInfo modelProperty = typeof(RxViewObject<TestViewModel>).GetProperty("Model");
+
         public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)
         {
-            return mixin.ObserveProperty<TValue>(mixin.GetType().GetProperty(property.Name));
+            return mixin.ObserveProperty<TValue>(modelProperty);
         }
 
         public TestViewModel Model

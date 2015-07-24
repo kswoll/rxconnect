@@ -29,6 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxListMovedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxPropertyObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\Enumerables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />

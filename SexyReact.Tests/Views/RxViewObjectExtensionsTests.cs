@@ -1,8 +1,14 @@
-﻿using System.Reactive;
+﻿using System;
+using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SexyReact.Utils;
 using SexyReact.Views;
 
 namespace SexyReact.Tests.Views
@@ -94,6 +100,41 @@ namespace SexyReact.Tests.Views
             await completionSource.Task;
 
             Rx.UiScheduler = originalScheduler;
+        }
+
+        [Test]
+        public void ConnectPerformance()
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (var i = 0; i < 10000; i++)
+            {
+                var viewObject = new TestViewObject();
+                viewObject.Connect(x => viewObject.testLabel.Text = x, x => x.StringProperty);
+
+//                var model = new TestViewModel();
+//                model.StringProperty = "foo";
+//                viewObject.Model = model;
+            }
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed);
+        }
+
+        [Test]
+        public void ReplaySubjectPerformance()
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Expression<Func<TestViewObject, string>> expression = x => x.Model.StringProperty;
+            for (var i = 0; i < 10000; i++)
+            {
+                var rxObject = new TestViewObject();
+                rxObject
+                    .ObserveProperty(expression)
+                    .SubscribeOnUiThread(_ => {});
+            }
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed);
         }
     }
 }

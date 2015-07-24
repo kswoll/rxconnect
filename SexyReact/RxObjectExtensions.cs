@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -9,50 +8,9 @@ namespace SexyReact
 {
     public static class RxObjectExtensions
     {
-        private static readonly MethodInfo observePropertyMethod = typeof(IRxObject).GetMethod("ObserveProperty");
-#if MONOTOUCH
-        private static readonly MethodInfo observePropertyAsObjectMethod = typeof(RxObjectExtensions).GetMethod("ObservePropertyAsObject");
-#else
-        private static readonly MethodInfo combineMethod = typeof(RxObjectExtensions).GetMethod("Combine", BindingFlags.Static | BindingFlags.NonPublic);
-#endif
         public static IObservable<object> ObservePropertyAsObject<TValue>(this IRxObject obj, PropertyInfo property)
         {
             return obj.ObserveProperty<TValue>(property).Select(x => (object)x);
-        }
-
-        public static IObservable<TValue> ObserveProperty<T, TValue>(this IObservable<T> observable, params MemberInfo[] propertyPath)
-        {
-            return ObserveProperty<TValue>(observable, propertyPath);
-        }
-
-        private static IObservable<TValue> ObserveProperty<TValue>(object observable, params MemberInfo[] propertyPath)
-        {
-            object currentObservable = observable;
-
-            for (var i = 0; i < propertyPath.Length; i++)
-            {
-                var memberInfo = propertyPath[i];
-                var propertyInfo = memberInfo as PropertyInfo;
-                if (propertyInfo == null)
-                    throw new ArgumentException("Member '" + string.Join(".", propertyPath.TakeWhile(x => x != propertyInfo)) + "' must be a property.", "propertyPath");
-                if (i < propertyPath.Length - 1 && !typeof(IRxObject).IsAssignableFrom(propertyInfo.PropertyType))
-                    throw new ArgumentException("All properties leading up to the terminal property must represent an instance of IRxObject", "propertyPath");
-
-                #if MONOTOUCH
-                currentObservable = Combine((IObservable<object>)currentObservable, propertyInfo, GetDefaultValue(propertyInfo.PropertyType));
-                #else
-                var combine = combineMethod.MakeGenericMethod(propertyInfo.DeclaringType, propertyInfo.PropertyType);
-                currentObservable = combine.Invoke(null, new[] { currentObservable, propertyInfo });
-                #endif
-            }
-
-            #if MONOTOUCH
-            var lastObservable = ((IObservable<object>)currentObservable).Cast<TValue>();
-            #else
-            var lastObservable = (IObservable<TValue>)currentObservable;
-            #endif
-
-            return lastObservable.DistinctUntilChanged();
         }
 
         /// <summary>
@@ -66,41 +24,11 @@ namespace SexyReact
         /// <param name="propertyPath">The sequence of properties that leads to the value.</param>
         /// <typeparam name="T">The type that contains the initial property in the path.</typeparam>
         /// <typeparam name="TValue">The value of the terminal property in the path.</typeparam>
-        public static IObservable<TValue> ObserveProperty<T, TValue>(this T obj, params MemberInfo[] propertyPath)
+        public static IObservable<TValue> ObserveProperty<T, TValue>(this T obj, params PropertyInfo[] propertyPath)
             where T : IRxObject
         {
-            var firstPropertyInfo = (PropertyInfo)propertyPath[0];
-            var firstObserveProperty = observePropertyMethod.MakeGenericMethod(firstPropertyInfo.PropertyType);
-            var firstObservable = firstObserveProperty.Invoke(obj, new[] { firstPropertyInfo });
-            return ObserveProperty<TValue>(firstObservable, propertyPath.Skip(1).ToArray());
+            return new RxPropertyObservable<TValue>(obj, propertyPath);
         }
-
-#if MONOTOUCH
-        private static IObservable<object> Combine(IObservable<object> source, PropertyInfo property, object defaultValue)
-        {
-            return source
-                .Select(x => x == null ? Observable.Return(defaultValue) : (IObservable<object>)observePropertyAsObjectMethod.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { x, property }))
-                .Switch();
-        }
-
-        private static object GetDefaultValue(Type type)
-        {
-            return typeof(DefaultValue<>).MakeGenericType(type).GetField("Value").GetValue(null);
-        }
-
-        private static class DefaultValue<T>
-        {
-            public static readonly T Value = default(T);
-        }
-#else
-        private static IObservable<TValue> Combine<T, TValue>(IObservable<T> source, PropertyInfo property)
-            where T : IRxObject
-        {
-            return source
-                .Select(x => x == null ? Observable.Return(default(TValue)) : x.ObserveProperty<TValue>(property))
-                .Switch();
-        }
-#endif
 
         /// <summary>
         /// Produces an observable that returns the current value of the specified property as its value changes.  This handles
@@ -126,12 +54,8 @@ namespace SexyReact
             if (initialPropertyInfo == null)
                 throw new ArgumentException("Member is not a property", "property");
 
-            // Handle the trivial case of x.Property efficiently
-            if (memberExpression.Expression == property.Parameters[0])
-                return obj.ObserveProperty<TValue>(initialPropertyInfo);
-
-            var propertyPath = property.GetPropertyPath().ToArray();
-            return ObserveProperty<T, TValue>(obj, propertyPath);
+            var propertyPath = property.GetPropertyPath();
+            return new RxPropertyObservable<TValue>(obj, propertyPath);
         }
 
         /// <summary>
