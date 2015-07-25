@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\Enumerables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxEventBindExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxPropertyBindExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxActionBindExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObject.cs" />

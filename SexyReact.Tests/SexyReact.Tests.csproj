@@ -64,6 +64,7 @@
     <Compile Include="RxTestSetup.cs" />
     <Compile Include="Views\NonRxTestLabel.cs" />
     <Compile Include="Views\NonRxTestLabelConnection.cs" />
+    <Compile Include="Views\RxEventBindExtensionsTests.cs" />
     <Compile Include="Views\RxViewObjectExtensionsTests.cs" />
     <Compile Include="Views\TestLabel.cs" />
     <Compile Include="Views\TestSubViewObject.cs" />
