@@ -1,14 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SexyReact.Utils;
 using SexyReact.Views;
 
 namespace SexyReact.Tests.Views
@@ -17,13 +11,13 @@ namespace SexyReact.Tests.Views
     public class RxViewObjectExtensionsTests 
     {
         [Test]
-        public void Connect()
+        public void Bind()
         {
             var view = new TestViewObject();
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Connect(view.testLabel, x => x.Text, x => x.StringProperty);
+            view.Bind(x => x.StringProperty).To(view.testLabel, x => x.Text);
 
             Assert.IsNull(view.testLabel.Text);
             model.StringProperty = "foo";
@@ -37,7 +31,7 @@ namespace SexyReact.Tests.Views
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Connect(view, x => x.subViewObject.testLabel.Text, x => x.StringProperty);
+            view.Bind(x => x.StringProperty).To(view, x => x.subViewObject.testLabel.Text);
 
             var subObject = new TestSubViewObject();
             Assert.IsNull(subObject.testLabel.Text);
@@ -56,7 +50,7 @@ namespace SexyReact.Tests.Views
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Biconnect(view.testLabel, x => x.Text, x => x.StringProperty);
+            view.Bind(x => x.StringProperty).Mate(view.testLabel, x => x.Text);
 
             Assert.IsNull(model.StringProperty);
             view.testLabel.Text = "foo";
@@ -70,7 +64,7 @@ namespace SexyReact.Tests.Views
             var model = new TestViewModel();
             view.Model = model;
 
-            view.Biconnect(view.nonRxTestLabel, x => x.StringProperty);
+            view.Bind(x => x.StringProperty).Mate(view.nonRxTestLabel);
 
             Assert.IsNull(model.StringProperty);
             view.nonRxTestLabel.Text = "foo";
@@ -95,12 +89,13 @@ namespace SexyReact.Tests.Views
                 Assert.AreNotEqual(originalThread, thread);
                 completionSource.SetResult(default(Unit));
             };
-            view.Connect(view.testLabel, x => x.Text, x => x.StringProperty);
+            view.Bind(x => x.StringProperty).To(view.testLabel, x => x.Text);
 
             await completionSource.Task;
 
             Rx.UiScheduler = originalScheduler;
         }
+/*
 
         [Test]
         public void ConnectPerformance()
@@ -136,5 +131,6 @@ namespace SexyReact.Tests.Views
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed);
         }
+*/
     }
 }
