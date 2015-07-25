@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxPropertyBindExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxActionBindExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxViewObjectExtensions.cs" />

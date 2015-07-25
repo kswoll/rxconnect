@@ -42,18 +42,6 @@ namespace SexyReact.Views
             return result;
         }
 
-        public static IDisposable To<TModel, TModelValue>(
-            this RxViewObjectBinder<TModel, TModelValue> binder,
-            Action<TModelValue> setter
-        )
-            where TModel : IRxObject
-        {
-            var result = binder.ViewObject
-                .ObserveModelProperty(binder.ModelProperty)
-                .SubscribeOnUiThread(x => setter(x));
-            return result;
-        }
-
         public static IDisposable Mate<TModel, TModelValue, TView, TViewValue>(
             this RxViewObjectBinder<TModel, TModelValue> binder,
             TView view, 
