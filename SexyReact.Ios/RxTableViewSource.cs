@@ -13,6 +13,11 @@ using CoreFoundation;
 
 namespace SexyReact.Ios
 {
+    public enum RxTableViewCellCachingPolicy
+    {
+        Reuse, Cache, GlobalCache
+    }
+
     /// <summary>
     /// A table view source that works with RX lists.  The underlying data structure expects an RxList<RxList<T>>, but there are 
     /// facilities for easily working with just RxList<T>.  While you may create an instance of this class on your own, it is easier
@@ -27,28 +32,52 @@ namespace SexyReact.Ios
         private UITableView tableView;
         private RxList<TSection> data;
         private Func<TSection, RxList<TItem>> itemsInSection;
-        private Dictionary<Tuple<int, int>, UITableViewCell> cellsByIndexPath = new Dictionary<Tuple<int, int>, UITableViewCell>();
-        private Func<TSection, TItem, UITableViewCell> cellFactory;
+        private Dictionary<TItem, TCell> cellsByItem = new Dictionary<TItem, TCell>();
+        private List<TCell> globalCellCache = new List<TCell>();
+        private Func<TSection, TItem, TCell> cellFactory;
         private IDisposable sectionAdded;
         private IDisposable sectionRemoved;
         private IDisposable itemsAdded;
         private IDisposable itemsRemoved;
         private Dictionary<TSection, IDisposable[]> sectionSubscriptions = new Dictionary<TSection, IDisposable[]>();
         private List<Tuple<TSection, List<TItem>>> localCopy = new List<Tuple<TSection, List<TItem>>>();
+        private NSString cellKey;
+        private RxTableViewCellCachingPolicy cachingPolicy = RxTableViewCellCachingPolicy.GlobalCache;
 
         public RxTableViewSource(
             UITableView tableView, 
             Func<TSection, RxList<TItem>> itemsInSection,
-            Func<TSection, TItem, UITableViewCell> cellFactory)
+            Func<TSection, TItem, TCell> cellFactory)
         {
             this.tableView = tableView;
             this.itemsInSection = itemsInSection;
             this.cellFactory = cellFactory;
+
+            cellKey = new NSString(typeof(TItem).FullName);
         }
 
         public UITableView TableView
         {
             get { return tableView; }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                cellKey.Dispose();
+                if (data != null)
+                {
+                    sectionAdded.Dispose();
+                    sectionRemoved.Dispose();
+                    if (itemsAdded != null)
+                        itemsAdded.Dispose();
+                    if (itemsRemoved != null)
+                        itemsRemoved.Dispose();
+                }
+            }
         }
 
         public RxList<TSection> Data
@@ -60,8 +89,14 @@ namespace SexyReact.Ios
                 {
                     sectionAdded.Dispose();
                     sectionRemoved.Dispose();
-                    itemsAdded.Dispose();
-                    itemsRemoved.Dispose();
+                    if (itemsAdded != null)
+                        itemsAdded.Dispose();
+                    if (itemsRemoved != null)
+                        itemsRemoved.Dispose();
+                    foreach (var section in data)
+                    {
+                        OnSectionRemoved(section);
+                    }
                 }
                 data = value;
                 if (value != null)
@@ -102,11 +137,33 @@ namespace SexyReact.Ios
                 OnItemsAdded(section, items.Select((x, i) => Tuple.Create(i, x)));
         }
 
+        private void ReleaseCell(TItem item)
+        {
+            var cell = cellsByItem[item];
+            cellsByItem.Remove(item);
+            if (cachingPolicy == RxTableViewCellCachingPolicy.GlobalCache)
+            {
+                globalCellCache.Add(cell);
+                cell.Model = default(TItem);
+            }
+        }
+
         protected virtual void OnSectionRemoved(TSection section)
         {
             var sectionIndex = localCopy.IndexOf(x => Equals(x.Item1, section));
             var items = localCopy[sectionIndex].Item2;
+            if (items.Any())
+            {
+                var localItems = localCopy[sectionIndex];
+                foreach (var item in items)
+                {
+                    ReleaseCell(item);
+                }
+                items.Clear();
+            }
+
             localCopy.RemoveAt(sectionIndex);
+            tableView.DeleteSections(NSIndexSet.FromIndex(data.IndexOf(section)), UITableViewRowAnimation.Automatic);
 
             IDisposable[] subscriptions;
             if (sectionSubscriptions.TryGetValue(section, out subscriptions))
@@ -116,9 +173,6 @@ namespace SexyReact.Ios
                     subscription.Dispose();
                 }
             }
-
-            if (items.Any())
-                OnItemsRemoved(section, items.Select((x, i) => Tuple.Create(i, x)));
         }
 
         protected virtual void OnItemsAdded(TSection section, IEnumerable<Tuple<int, TItem>> items)
@@ -146,7 +200,7 @@ namespace SexyReact.Ios
             foreach (var item in items.OrderByDescending(x => x.Item1))
             {
                 localItems.Item2.RemoveAt(item.Item1);
-                cellsByIndexPath.Remove(Tuple.Create(sectionIndex, item.Item1));
+                ReleaseCell(item.Item2);
             }
             tableView.DeleteRows(items.Select(x => NSIndexPath.FromItemSection(x.Item1, sectionIndex)).ToArray(),
                 UITableViewRowAnimation.None);
@@ -169,15 +223,30 @@ namespace SexyReact.Ios
         {
             var section = localCopy[indexPath.Section];
             var item = section.Item2[indexPath.Row];
-            var key = Tuple.Create(indexPath.Section, indexPath.Row);
-
-            UITableViewCell cell;
-            if (!cellsByIndexPath.TryGetValue(key, out cell))
+            TCell cell;
+            if (cachingPolicy == RxTableViewCellCachingPolicy.Reuse)
             {
-                cell = cellFactory(section.Item1, item);
-                cellsByIndexPath[key] = cell;
+                cell = (TCell)tableView.DequeueReusableCell(cellKey);
                 ((IRxViewObject)cell).Model = item;
             }
+            else
+            {
+                if (!cellsByItem.TryGetValue(item, out cell))
+                {
+                    if (globalCellCache.Count > 0)
+                    {
+                        cell = globalCellCache[globalCellCache.Count - 1];
+                        globalCellCache.RemoveAt(globalCellCache.Count - 1);
+                    }
+                    else 
+                    {
+                        cell = cellFactory(section.Item1, item);
+                    }
+                    cellsByItem[item] = cell;
+                    ((IRxViewObject)cell).Model = item;
+                }
+            }
+
             return cell;
         }
 

@@ -3,6 +3,7 @@ using UIKit;
 using SexyReact.Views;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Foundation;
 
 namespace SexyReact.Ios
 {
@@ -13,11 +14,15 @@ namespace SexyReact.Ios
 
         private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
 
-        public RxTableViewCell()
+        public RxTableViewCell() : base(UITableViewCellStyle.Default, typeof(T).FullName)
         {
         }
 
         public RxTableViewCell(IntPtr handle)
+        {
+        }
+
+        public RxTableViewCell(NSString reuseIdentifier) : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
         }
 
