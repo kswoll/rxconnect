@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SexyReact
 {
-    public static class Rx
+    public static class RxApp
     {
         public static IScheduler UiScheduler { get; set; }
     }

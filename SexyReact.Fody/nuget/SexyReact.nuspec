@@ -1,0 +1,18 @@
+<package>
+  <metadata>
+    <id>SexyReact.Fody</id>
+    <version>1.0.18</version>
+    <authors>kirk</authors>
+    <owners>kirk</owners>
+    <projectUrl>https://github.com/kswoll/sexy-react</projectUrl>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+	  <releaseNotes>Initial release.</releaseNotes>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Fody extension to auto implement rx properties for sexy-react.</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>sexy-react fody</tags>
+    <dependencies>
+      <dependency id="Fody" version="1.29" />
+    </dependencies>
+  </metadata>
+</package>

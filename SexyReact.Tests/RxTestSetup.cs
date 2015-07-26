@@ -9,7 +9,7 @@ namespace SexyReact.Tests
         [SetUp]
         public void SetUp()
         {
-            Rx.UiScheduler = CurrentThreadScheduler.Instance;
+            RxApp.UiScheduler = CurrentThreadScheduler.Instance;
         }
     }
 }

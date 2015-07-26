@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -75,9 +76,9 @@ namespace SexyReact.Tests.Views
         public async void ConnectRunsOnUiScheduler()
         {
             var originalThread = Thread.CurrentThread;
-            var originalScheduler = Rx.UiScheduler;
+            var originalScheduler = RxApp.UiScheduler;
             var completionSource = new TaskCompletionSource<Unit>();
-            Rx.UiScheduler = NewThreadScheduler.Default;
+            RxApp.UiScheduler = NewThreadScheduler.Default;
 
             var view = new TestViewObject();
             var model = new TestViewModel();
@@ -93,7 +94,7 @@ namespace SexyReact.Tests.Views
 
             await completionSource.Task;
 
-            Rx.UiScheduler = originalScheduler;
+            RxApp.UiScheduler = originalScheduler;
         }
 /*
 

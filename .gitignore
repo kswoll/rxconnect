@@ -11,3 +11,8 @@ SexyReact.Fody.Helpers.Net45/bin/
 SexyReact.Fody.Helpers.Net45/obj/
 SexyReact.Fody/bin/
 SexyReact.Fody/obj/
+SexyReact.Tester/bin/
+SexyReact.Net45/obj/
+SexyReact.Net45/bin/
+SexyReact.Tester/obj/
+*.nupkg

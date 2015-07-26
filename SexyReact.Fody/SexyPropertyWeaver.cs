@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using FieldAttributes = Mono.Cecil.FieldAttributes;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+using MethodBody = Mono.Cecil.Cil.MethodBody;
 
 namespace SexyReact.Fody
 {
@@ -16,24 +21,49 @@ namespace SexyReact.Fody
         // Will log an error message to MSBuild. OPTIONAL
         public Action<string> LogError { get; set; }
 
+/*
+        private AssemblyNameReference FindSexyReactAssembly()
+        {
+            var sexyReact = ModuleDefinition.FindAssembly("SexyReact");
+            if (sexyReact != null)
+                return sexyReact;
+
+            var assemblies = ModuleDefinition.AssemblyReferences.ToArray();
+            foreach (var assembly in assemblies)
+            {
+                var reactiveObject = new TypeReference("SexyReact", "IRxObject", ModuleDefinition, assembly);
+                if (reactiveObject.Resolve() != null)
+                {
+                    return assembly;
+                }
+            }
+            return null;
+        }
+*/
+
         public void Execute()
         {
             var sexyReact = ModuleDefinition.FindAssembly("SexyReact");
             if (sexyReact == null)
             {
-                LogInfo("Could not find assembly: SexyReact (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
+                LogError("Could not find assembly: SexyReact (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
                 return;
             }
-            LogInfo(string.Format("{0} {1}", sexyReact.Name, sexyReact.Version));
+            LogInfo($"{sexyReact.Name} {sexyReact.Version}");
             var helpers = ModuleDefinition.FindAssembly("SexyReact.Fody.Helpers");
             if (helpers == null)
             {
-                LogInfo("Could not find assembly: SexyReact.Fody.Helpers (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
+                LogError("Could not find assembly: SexyReact.Fody.Helpers (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
                 return;
             }
-            LogInfo(string.Format("{0} {1}", helpers.Name, helpers.Version));
+            LogInfo($"{helpers.Name} {helpers.Version}");
             var reactiveObject = new TypeReference("SexyReact", "IRxObject", ModuleDefinition, sexyReact);
             var targetTypes = ModuleDefinition.GetAllTypes().Where(x => x.BaseType != null && reactiveObject.IsAssignableFrom(x.BaseType)).ToArray();
+            var propertyInfoType = ModuleDefinition.Import(typeof(PropertyInfo));
+            LogInfo($"propertyInfoType: {propertyInfoType}");
+            var getMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.Single(x => x.Name == "Get"));
+            if (getMethod == null)
+                throw new Exception("getMethod is null");
 
             var setMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.Single(x => x.Name == "Set"));
             if (setMethod == null)
@@ -43,71 +73,93 @@ namespace SexyReact.Fody
             if (reactiveAttribute == null)
                 throw new Exception("reactiveAttribute is null");
 
+            var typeType = ModuleDefinition.Import(typeof(Type));
+            var getPropertyByName = ModuleDefinition.Import(typeType.Resolve().Methods.Single(x => x.Name == "GetProperty" && x.Parameters.Count == 1));
+            var getTypeFromTypeHandle = ModuleDefinition.Import(typeType.Resolve().Methods.Single(x => x.Name == "GetTypeFromHandle"));
             foreach (var targetType in targetTypes)
             {
-                foreach (var property in targetType.Properties.Where(x => x.IsDefined(reactiveAttribute)).ToArray())
+                LogInfo(targetType.ToString());
+                var properties = targetType.Properties.Where(x => x.IsDefined(reactiveAttribute)).ToArray();
+                if (properties.Any())
                 {
-                    // Declare a field to store the property value
-                    var field = new FieldDefinition("$" + property.Name, FieldAttributes.Private, property.PropertyType);
-                    targetType.Fields.Add(field);
-
-                    // Remove old field (the generated backing field for the auto property)
-                    var oldField = (FieldReference)property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).Single().Operand;
-                    var oldFieldDefinition = oldField.Resolve();
-                    targetType.Fields.Remove(oldFieldDefinition);
-
-                    // See if there exists an initializer for the auto-property
-                    var constructors = targetType.Methods.Where(x => x.IsConstructor);
-                    foreach (var constructor in constructors)
+                    var staticConstructor = targetType.GetStaticConstructor();
+                    if (staticConstructor == null)
                     {
-                        var fieldAssignment = constructor.Body.Instructions.SingleOrDefault(x => Equals(x.Operand, oldFieldDefinition) || Equals(x.Operand, oldField));
-                        if (fieldAssignment != null)
-                        {
-                            // Replace field assignment with a property set (the stack semantics are the same for both, 
-                            // so happily we don't have to manipulate the bytecode any further.)
-                            var setterCall = constructor.Body.GetILProcessor().Create(property.SetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, property.SetMethod);
-                            constructor.Body.GetILProcessor().Replace(fieldAssignment, setterCall);
-                        }
+                        LogInfo("Creating static constructor");
+                        staticConstructor = new MethodDefinition(".cctor", MethodAttributes.Static | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, ModuleDefinition.TypeSystem.Void);
+//                        staticConstructor.CallingConvention = MethodCallingConvention.C;
+                        staticConstructor.Body = new MethodBody(staticConstructor);
+                        targetType.Methods.Add(staticConstructor);
                     }
-
-                    // Build out the getter which simply returns the value of the generated field
-                    property.GetMethod.Body = new MethodBody(property.GetMethod);
-                    property.GetMethod.Body.Emit(il =>
+                    else
                     {
-                        il.Emit(OpCodes.Ldarg_0);                                   // this
-                        il.Emit(OpCodes.Ldfld, field.BindDefinition(targetType));   // pop -> this.$PropertyName
-                        il.Emit(OpCodes.Ret);                                       // Return the field value that is lying on the stack
-                    });
-
-                    TypeReference genericTargetType = targetType;
-                    if (targetType.HasGenericParameters)
-                    {
-                        var genericDeclaration = new GenericInstanceType(targetType);
-                        foreach (var parameter in targetType.GenericParameters)
-                        {
-                            genericDeclaration.GenericArguments.Add(parameter);
-                        }
-                        genericTargetType = genericDeclaration;
+                        staticConstructor.Body.Instructions.RemoveAt(staticConstructor.Body.Instructions.Count - 1);
                     }
+                    foreach (var property in properties)
+                    {
+                        LogInfo($"{targetType}.{property}");
+
+                        // Remove old field (the generated backing field for the auto property)
+                        var oldField = (FieldReference)property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).Single().Operand;
+                        var oldFieldDefinition = oldField.Resolve();
+                        targetType.Fields.Remove(oldFieldDefinition);
+
+                        // See if there exists an initializer for the auto-property
+                        var constructors = targetType.Methods.Where(x => x.IsConstructor);                    foreach (var constructor in constructors)
+                        {
+                            var fieldAssignment = constructor.Body.Instructions.SingleOrDefault(x => Equals(x.Operand, oldFieldDefinition) || Equals(x.Operand, oldField));
+                            if (fieldAssignment != null)
+                            {
+                                // Replace field assignment with a property set (the stack semantics are the same for both, 
+                                // so happily we don't have to manipulate the bytecode any further.)
+                                var setterCall = constructor.Body.GetILProcessor().Create(property.SetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, property.SetMethod);
+                                constructor.Body.GetILProcessor().Replace(fieldAssignment, setterCall);
+                            }
+                        }
+
+                        // Add a static field for the property's property info
+                        var propertyInfoField = new FieldDefinition(property.Name + "$PropertyInfo", FieldAttributes.Private | FieldAttributes.Static, propertyInfoType);
+                        targetType.Fields.Add(propertyInfoField);
+
+                        staticConstructor.Body.Emit(il =>
+                        {
+                            il.Emit(OpCodes.Ldtoken, targetType);
+                            il.Emit(OpCodes.Call, getTypeFromTypeHandle);
+                            il.Emit(OpCodes.Ldstr, property.Name);
+                            il.Emit(OpCodes.Call, getPropertyByName);
+                            il.Emit(OpCodes.Stsfld, propertyInfoField);
+                        });
+
+                        // Build out the getter which returns Get<TValue>(property.Name$PropertyInfo);
+                        property.GetMethod.Body = new MethodBody(property.GetMethod);
+                        var getMethodReference = getMethod.MakeGenericMethod(property.PropertyType);
+                        property.GetMethod.Body.Emit(il =>
+                        {
+                            il.Emit(OpCodes.Ldarg_0);                                   // this
+                            il.Emit(OpCodes.Ldsfld, propertyInfoField);                 // property.Name$PropertyInfo
+                            il.Emit(OpCodes.Callvirt, getMethodReference);              // pop * 2 -> this.Get(property.Name$PropertyName)
+                            il.Emit(OpCodes.Ret);                                       // Return the field value that is lying on the stack
+                        });
                     
-                    var methodReference = setMethod.MakeGenericMethod(genericTargetType, property.PropertyType);
+                        var setMethodReference = setMethod.MakeGenericMethod(property.PropertyType);
 
-                    // Build out the setter which fires the RaiseAndSetIfChanged method
-                    property.SetMethod.Body = new MethodBody(property.SetMethod);
-                    property.SetMethod.Body.Emit(il =>
+                        // Build out the setter which fires the RaiseAndSetIfChanged method
+                        property.SetMethod.Body = new MethodBody(property.SetMethod);
+                        property.SetMethod.Body.Emit(il =>
+                        {
+                            il.Emit(OpCodes.Ldarg_0);                                   // this
+                            il.Emit(OpCodes.Ldsfld, propertyInfoField);                 // property.Name$PropertyInfo
+                            il.Emit(OpCodes.Ldarg_1);                                   // value
+                            il.Emit(OpCodes.Callvirt, setMethodReference);              // pop * 2 -> this.Get(property.Name$PropertyName)
+                            il.Emit(OpCodes.Ret);                                       // return out of the method
+                        });
+                    }                    
+                    staticConstructor.Body.Emit(il =>
                     {
-                        il.Emit(OpCodes.Ldarg_0);                                   // this
-                        il.Emit(OpCodes.Ldarg_0);                                   // this
-                        il.Emit(OpCodes.Ldflda, field.BindDefinition(targetType));  // pop -> this.$PropertyName
-                        il.Emit(OpCodes.Ldarg_1);                                   // value
-                        il.Emit(OpCodes.Ldstr, property.Name);                      // "PropertyName"
-                        il.Emit(OpCodes.Call, methodReference);                     // pop * 4 -> this.RaiseAndSetIfChanged(this.$PropertyName, value, "PropertyName")
-                        il.Emit(OpCodes.Pop);                                       // We don't care about the result of RaiseAndSetIfChanged, so pop it off the stack (stack is now empty)
-                        il.Emit(OpCodes.Ret);                                       // Return out of the function
+                        il.Emit(OpCodes.Ret);
                     });
                 }
             }
         }         
-         
     }
 }
