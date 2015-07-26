@@ -25,8 +25,8 @@ namespace SexyReact.Views
                 throw new ArgumentNullException(nameof(converter));
 
             var setValue = binder.CreateViewPropertySetter(view, viewProperty);
-            var result = binder.ViewObject
-                .ObserveModelProperty(binder.ModelProperty)
+            var result = binder
+                .ObserveModelProperty()
                 .SubscribeOnUiThread(x => setValue(converter(x)));
             return result;
         }
@@ -39,8 +39,8 @@ namespace SexyReact.Views
             where TModel : IRxObject
         {
             var setValue = binder.CreateViewPropertySetter(view, viewProperty);
-            var result = binder.ViewObject
-                .ObserveModelProperty(binder.ModelProperty)
+            var result = binder
+                .ObserveModelProperty()
                 .SubscribeOnUiThread(x => setValue(x));
             return result;
         }

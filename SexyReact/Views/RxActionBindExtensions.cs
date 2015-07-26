@@ -11,8 +11,8 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var result = binder.ViewObject
-                .ObserveModelProperty(binder.ModelProperty)
+            var result = binder
+                .ObserveModelProperty()
                 .SubscribeOnUiThread(setter);
             return result;
         }
@@ -24,8 +24,8 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var result = binder.ViewObject
-                .ObserveModelProperty(binder.ModelProperty)
+            var result = binder
+                .ObserveModelProperty()
                 .SubscribeOnUiThread(x => setter(view, x));
             return result;
         }
