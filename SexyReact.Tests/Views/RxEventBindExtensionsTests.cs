@@ -8,19 +8,29 @@ namespace SexyReact.Tests.Views
     public class RxEventBindExtensionsTests
     {
         [Test]
-        public void Event()
+        public void Mate()
         {
             var view = new ViewClass();
-            view.Bind(x => x.StringProperty).Mate<TestViewModel, ViewClass, string, EventHandler>(view, x => x.Value, (x, l) => x.ValueChanged += l, (x, l) => x.ValueChanged -= l);
+            view.Bind(x => x.StringProperty)
+                .Mate(view,
+                    x => x.Value,
+                    (x, value) => x.Value = value,
+                    x => new EventHandler((sender, args) => x()),
+                    (x, l) => x.ValueChanged += l, 
+                    (x, l) => x.ValueChanged -= l);
 
-            view.Model = new ModelClass();
+            view.Model = new TestViewModel();
+            view.Model.StringProperty = "foo";
 
+            Assert.AreEqual("foo", view.Value);
 
+            view.Value = "bar";
+            Assert.AreEqual("bar", view.Model.StringProperty);
         }
 
         public class ViewClass : RxViewObject<TestViewModel>
         {
-            public EventHandler ValueChanged;
+            public event EventHandler ValueChanged;
 
             private string value;
 

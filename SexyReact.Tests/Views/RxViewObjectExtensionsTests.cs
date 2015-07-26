@@ -72,7 +72,7 @@ namespace SexyReact.Tests.Views
         }
 
         [Test]
-        public async void ConnectRunsOnUIScheduler()
+        public async void ConnectRunsOnUiScheduler()
         {
             var originalThread = Thread.CurrentThread;
             var originalScheduler = Rx.UiScheduler;

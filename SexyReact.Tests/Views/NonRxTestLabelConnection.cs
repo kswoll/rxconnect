@@ -5,11 +5,21 @@ namespace SexyReact.Tests.Views
 {
     public static class NonRxTestLabelConnection
     {
+        public static IDisposable Mate<TModel>(
+            this RxViewObjectBinder<TModel, string> binder,
+            NonRxTestLabel label
+        )
+            where TModel : IRxObject
+        {
+            var rxifiedLabel = new NonRxTestLabelWrapper(label);
+            return binder.Mate(rxifiedLabel, x => x.Text, x => x, x => x);
+        }
+
         public static IDisposable Mate<TModel, TModelValue>(
             this RxViewObjectBinder<TModel, TModelValue> binder,
             NonRxTestLabel label, 
-            Func<TModelValue, string> toViewValue = null,
-            Func<string, TModelValue> toModelValue = null
+            Func<TModelValue, string> toViewValue,
+            Func<string, TModelValue> toModelValue
         )
             where TModel : IRxObject
         {

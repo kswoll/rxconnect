@@ -21,6 +21,9 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
+            if (converter == null)
+                throw new ArgumentNullException(nameof(converter));
+
             var setValue = binder.CreateViewPropertySetter(view, viewProperty);
             var result = binder.ViewObject
                 .ObserveModelProperty(binder.ModelProperty)
@@ -46,17 +49,19 @@ namespace SexyReact.Views
             this RxViewObjectBinder<TModel, TModelValue> binder,
             TView view, 
             Expression<Func<TView, TViewValue>> viewProperty,
-            Func<TModelValue, TViewValue> toViewValue = null,
-            Func<TViewValue, TModelValue> toModelValue = null
+            Func<TModelValue, TViewValue> toViewValue,
+            Func<TViewValue, TModelValue> toModelValue
         )
             where TView : IRxObject
             where TModel : IRxObject
         {
-            toViewValue = toViewValue ?? (x => (TViewValue)Convert.ChangeType(x, typeof(TViewValue)));
-            toModelValue = toModelValue ?? (x => (TModelValue)Convert.ChangeType(x, typeof(TModelValue)));
+            if (toViewValue == null)
+                throw new ArgumentNullException(nameof(toViewValue));
+            if (toModelValue == null)
+                throw new ArgumentNullException(nameof(toModelValue));
 
             var connectDisposable = binder.To(view, viewProperty, toViewValue);
-            Lazy<Action<TModelValue>> setValue = new Lazy<Action<TModelValue>>(() => binder.ViewObject.CreateModelPropertySetter(view, binder.ModelProperty));
+            var setValue = new Lazy<Action<TModelValue>>(() => binder.CreateModelPropertySetter());
 
             var result = view
                 .ObserveProperty(viewProperty)
@@ -73,14 +78,7 @@ namespace SexyReact.Views
             where TView : IRxObject
             where TModel : IRxObject
         {
-            var connectDisposable = binder.To(view, viewProperty);
-            Lazy<Action<TValue>> setValue = new Lazy<Action<TValue>>(() => binder.ViewObject.CreateModelPropertySetter(view, binder.ModelProperty));
-
-            var result = view
-                .ObserveProperty(viewProperty)
-                .Subscribe(x => setValue.Value(x));
-
-            return new CompositeDisposable(connectDisposable, result);
+            return binder.Mate(view, viewProperty, x => x, x => x);
         }
 
         public static IObservable<TModelValue> ObserveModelProperty<TModel, TModelValue>(
@@ -135,14 +133,12 @@ namespace SexyReact.Views
             return lambda.Compile();
         }
 
-        public static Action<TModelValue> CreateModelPropertySetter<TViewTarget, TModel, TModelValue>(
-            this IRxViewObject<TModel> view, 
-            TViewTarget viewTarget, 
-            Expression<Func<TModel, TModelValue>> modelProperty
+        public static Action<TModelValue> CreateModelPropertySetter<TModel, TModelValue>(
+            this RxViewObjectBinder<TModel, TModelValue> binder
         )
             where TModel : IRxObject
         {
-            var setMainMember = modelProperty.Body as MemberExpression;
+            var setMainMember = binder.ModelProperty.Body as MemberExpression;
             if (setMainMember == null)
                 throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "modelProperty");
 
@@ -154,7 +150,7 @@ namespace SexyReact.Views
                 member = member.Expression as MemberExpression;
             }
 
-            Expression target = Expression.Constant(view);
+            Expression target = Expression.Constant(binder.ViewObject);
 
             // view.Model
             target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);

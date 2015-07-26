@@ -13,7 +13,20 @@ namespace SexyReact.Views
         {
             var result = binder.ViewObject
                 .ObserveModelProperty(binder.ModelProperty)
-                .SubscribeOnUiThread(x => setter(x));
+                .SubscribeOnUiThread(setter);
+            return result;
+        }
+
+        public static IDisposable To<TModel, TModelValue, TView>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
+            TView view,
+            Action<TView, TModelValue> setter
+        )
+            where TModel : IRxObject
+        {
+            var result = binder.ViewObject
+                .ObserveModelProperty(binder.ModelProperty)
+                .SubscribeOnUiThread(x => setter(view, x));
             return result;
         }
     }

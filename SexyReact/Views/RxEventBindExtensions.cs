@@ -1,31 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
-using System.Text;
 
 namespace SexyReact.Views
 {
     public static class RxEventBindExtensions
     {
-        public static IDisposable Mate<TModel, TView, TValue, TEventHandler>(
-            this RxViewObjectBinder<TModel, TValue> binder,
+        public static IDisposable Mate<TModel, TModelValue, TView, TEventHandler>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
             TView view, 
-            Expression<Func<TView, TValue>> viewProperty,
+            Func<TView, TModelValue> getter,
+            Action<TView, TModelValue> setter,
+            Func<Action, TEventHandler> eventHandlerFactory,
             Action<TView, TEventHandler> add,
             Action<TView, TEventHandler> remove
         )
-            where TView : IRxObject
             where TModel : IRxObject
         {
-            var connectDisposable = binder.To(view, viewProperty);
-            Lazy<Action<TValue>> setValue = new Lazy<Action<TValue>>(() => binder.ViewObject.CreateModelPropertySetter(view, binder.ModelProperty));
+            var toSubscription = binder.To(view, setter);
 
-            var result = view
-                .ObserveProperty(viewProperty)
-                .Subscribe(x => setValue.Value(x));
+            var modelSetter = binder.CreateModelPropertySetter();
+            var propagate = new Action(() => modelSetter(getter(view)));
+            var listener = eventHandlerFactory(propagate);
+            add(view, listener);
 
-            return new CompositeDisposable(connectDisposable, result);
+            return new CompositeDisposable(toSubscription, new Unsubscribe<TView, TEventHandler>(view, remove, listener));
+        }
+
+        public static IDisposable Mate<TModel, TView, TValue, TEventHandler>(
+            this RxViewObjectBinder<TModel, TValue> binder,
+            TView view, 
+            Expression<Func<TView, TValue>> viewProperty,            
+            Func<Action, TEventHandler> eventHandlerFactory,
+            Action<TView, TEventHandler> add,
+            Action<TView, TEventHandler> remove
+        )
+            where TModel : IRxObject
+        {
+            return binder.Mate(view, viewProperty, eventHandlerFactory, add, remove, x => x, x => x);
+        }
+
+        public static IDisposable Mate<TModel, TModelValue, TView, TViewValue, TEventHandler>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
+            TView view, 
+            Expression<Func<TView, TViewValue>> viewProperty,            
+            Func<Action, TEventHandler> eventHandlerFactory,
+            Action<TView, TEventHandler> add,
+            Action<TView, TEventHandler> remove,
+            Func<TModelValue, TViewValue> toViewValue,
+            Func<TViewValue, TModelValue> toModelValue
+        )
+            where TModel : IRxObject
+        {
+            var toSubscription = binder.To(view, viewProperty, toViewValue);
+
+            var viewGetter = viewProperty.Compile();
+            var modelSetter = binder.CreateModelPropertySetter();
+            var propagate = new Action(() => modelSetter(toModelValue(viewGetter(view))));
+            var listener = eventHandlerFactory(propagate);
+            add(view, listener);
+
+            return new CompositeDisposable(toSubscription, new Unsubscribe<TView, TEventHandler>(view, remove, listener));
+        }
+
+        private struct Unsubscribe<TView, TEventHandler> : IDisposable
+        {
+            private readonly TView view;
+            private readonly Action<TView, TEventHandler> remove;
+            private readonly TEventHandler listener;
+
+            public Unsubscribe(TView view, Action<TView, TEventHandler> remove, TEventHandler listener)
+            {
+                this.view = view;
+                this.remove = remove;
+                this.listener = listener;
+            }
+
+            public void Dispose()
+            {
+                remove(view, listener);
+            }
         }
     }
 }
