@@ -8,7 +8,7 @@ namespace SexyReact.Ios
     {
         static RxIos() 
         {
-            Rx.UiScheduler = IosUiScheduler.Instance;
+            RxApp.UiScheduler = IosUiScheduler.Instance;
         }
 
         [Preserve]

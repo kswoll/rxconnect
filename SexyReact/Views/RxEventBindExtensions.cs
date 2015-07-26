@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using SexyReact.Utils;
 
 namespace SexyReact.Views
 {
@@ -61,6 +62,29 @@ namespace SexyReact.Views
             add(view, listener);
 
             return new CompositeDisposable(toSubscription, new Unsubscribe<TView, TEventHandler>(view, remove, listener));
+        }
+
+
+        public static IDisposable To<TModel, TModelValue, TView, TEventHandler>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
+            TView view, 
+            Func<Action, TEventHandler> eventHandlerFactory,
+            Action<TView, TEventHandler> add,
+            Action<TView, TEventHandler> remove
+        )
+            where TModel : IRxObject
+            where TModelValue : IRxCommand
+        {
+            IRxCommand command = null;
+            Action propagate = () => command.ExecuteAsync();
+            TEventHandler listener = eventHandlerFactory(propagate);
+            add(view, listener);
+            var buttonDisposable = new ActionDisposable(() => remove(view, listener));
+            var subscription = binder.ObserveModelProperty().Subscribe(x => 
+            {
+                command = x;
+            });
+            return new CompositeDisposable(subscription, buttonDisposable);
         }
 
         private struct Unsubscribe<TView, TEventHandler> : IDisposable

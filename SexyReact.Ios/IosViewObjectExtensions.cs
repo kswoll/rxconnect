@@ -21,10 +21,9 @@ namespace SexyReact.Ios
         /// <typeparam name="TModel">The type of your model (should be inferred).</typeparam>
         /// <typeparam name="TModelItem">The type of each item in your list (should be inferred).</typeparam>
         /// <typeparam name="TCell">The type of the cell (should be inferred).</typeparam>
-        public static IDisposable ConnectTableView<TModel, TModelItem, TCell>(
-            this IRxViewObject<TModel> view, 
+        public static IDisposable To<TModel, TModelItem, TCell>(
+            this RxViewObjectBinder<TModel, RxList<TModelItem>> binder,
             UITableView tableView, 
-            Expression<Func<TModel, RxList<TModelItem>>> modelProperty,
             Func<TModelItem, TCell> cellFactory
         )
             where TModel : IRxObject
@@ -32,8 +31,8 @@ namespace SexyReact.Ios
             where TCell : RxTableViewCell<TModelItem>
         {
             var tableSource = new RxTableViewSource<RxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item));
-            var result = view
-                .ObserveModelProperty(modelProperty)
+            var result = binder
+                .ObserveModelProperty()
                 .Subscribe(x => tableSource.Data = x == null ? null : new RxList<RxList<TModelItem>>(x));
             tableView.Source = tableSource;
             return result;
@@ -46,39 +45,26 @@ namespace SexyReact.Ios
             where TModel : IRxObject
             where TModelValue : IRxCommand
         {
-            IRxCommand command = null;
-            EventHandler listener = (sender, args) =>
-            {
-                if (command != null)
-                    command.ExecuteAsync();
-            };
-            button.TouchUpInside += listener;
-            var buttonDisposable = new ActionDisposable(() => button.TouchUpInside -= listener);
-            var subscription = binder.ObserveModelProperty().Subscribe(x => 
-            {
-                command = x;
-            });
-            return new CompositeDisposable(subscription, buttonDisposable);
+            return binder.To(button, x => new EventHandler((sender, e) => x()), (x, l) => x.TouchUpInside += l, (x, l) => x.TouchUpInside -= l);
         }
 
-        public static IDisposable ConnectButton<TModel>(
-            this IRxViewObject<TModel> view,
-            UIBarButtonItem button,
-            Expression<Func<TModel, IRxCommand>> modelProperty
+        public static IDisposable To<TModel, TModelValue>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
+            UIBarButtonItem button
+        )
+            where TModel : IRxObject
+            where TModelValue : IRxCommand
+        {
+            return binder.To(button, x => new EventHandler((sender, e) => x()), (x, l) => x.Clicked += l, (x, l) => x.Clicked -= l);
+        }
+
+        public static IDisposable Mate<TModel>(
+            this RxViewObjectBinder<TModel, string> binder,
+            UITextField textField
         )
             where TModel : IRxObject
         {
-            return null;
-        }
-
-        public static IDisposable ConnectTextField<TModel, TModelValue>(
-            this IRxViewObject<TModel> view,
-            UITextField textField,
-            Expression<Func<TModel, TModelValue>> modelProperty
-        )
-            where TModel : IRxObject
-        {
-            return null;
+            return binder.Mate(textField, x => x.Text, x => new EventHandler((sender, args) => x()), (x, l) => x.Ended += l, (x, l) => x.Ended -= l);
         }
     }
 }
