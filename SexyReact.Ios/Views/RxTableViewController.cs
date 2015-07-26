@@ -4,7 +4,7 @@ using SexyReact.Views;
 using Foundation;
 using System.Reflection;
 
-namespace SexyReact.Ios
+namespace SexyReact.Views
 {
     public class RxTableViewController<T> : UITableViewController, IRxViewObject<T>
         where T : IRxObject

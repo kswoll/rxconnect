@@ -2,39 +2,27 @@
 using UIKit;
 using SexyReact.Views;
 using System.Reflection;
-using Foundation;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
+using Foundation;
 
-namespace SexyReact.Ios
+namespace SexyReact.Views
 {
-    public class RxViewController<T> : UIViewController, IRxViewObject<T>
+    public class RxTableViewCell<T> : UITableViewCell, IRxViewObject<T>
         where T : IRxObject
     {
+        public IRxCommand Command { get; set; }
+
         private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
 
-        static RxViewController() 
-        {
-            RxIos.RegisterDependency();
-        }
-
-        public RxViewController() 
+        public RxTableViewCell() : base(UITableViewCellStyle.Default, typeof(T).FullName)
         {
         }
 
-        public RxViewController(string nibName, NSBundle bundle) : base(nibName, bundle)
+        public RxTableViewCell(IntPtr handle)
         {
         }
 
-        public RxViewController(NSCoder coder) : base(coder)
-        {
-        }
-
-        public RxViewController(NSObjectFlag t) : base(t)
-        {
-        }
-
-        public RxViewController(IntPtr handle) : base(handle)
+        public RxTableViewCell(NSString reuseIdentifier) : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
         }
 
@@ -100,4 +88,3 @@ namespace SexyReact.Ios
         }
     }
 }
-

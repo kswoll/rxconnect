@@ -57,7 +57,10 @@ namespace SexyReact.Views
 
             var viewGetter = viewProperty.Compile();
             var modelSetter = binder.CreateModelPropertySetter();
-            var propagate = new Action(() => modelSetter(toModelValue(viewGetter(view))));
+            var propagate = new Action(() => 
+            {
+                modelSetter(toModelValue(viewGetter(view)));
+            });
             var listener = eventHandlerFactory(propagate);
             add(view, listener);
 

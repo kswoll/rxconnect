@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -6,9 +6,9 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{804822D9-AC57-40E1-8921-1CD236A77DCE}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SexyReact.Ios</RootNamespace>
+    <RootNamespace>SexyReact</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>SexyReact.Ios</AssemblyName>
+    <AssemblyName>SexyReact</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,16 +48,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IosUiScheduler.cs" />
-    <Compile Include="IosViewObjectExtensions.cs" />
     <Compile Include="RxIos.cs" />
-    <Compile Include="RxTableViewCell.cs" />
-    <Compile Include="RxTableViewController.cs" />
-    <Compile Include="RxTableViewSource.cs" />
-    <Compile Include="RxViewController.cs" />
+    <Compile Include="Views\IosViewObjectExtensions.cs" />
+    <Compile Include="Views\RxTableViewCell.cs" />
+    <Compile Include="Views\RxTableViewController.cs" />
+    <Compile Include="Views\RxTableViewSource.cs" />
+    <Compile Include="Views\RxViewController.cs" />
+    <Compile Include="IosUiScheduler.cs" />
   </ItemGroup>
   <Import Project="..\SexyReact\SexyReact.projitems" Label="Shared" Condition="Exists('..\SexyReact\SexyReact.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

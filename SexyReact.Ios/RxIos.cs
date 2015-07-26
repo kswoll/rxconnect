@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Foundation;
 
-namespace SexyReact.Ios
+namespace SexyReact
 {
     public class RxIos 
     {

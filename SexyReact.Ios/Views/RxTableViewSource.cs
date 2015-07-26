@@ -11,7 +11,7 @@ using SexyReact.Views;
 using CoreGraphics;
 using CoreFoundation;
 
-namespace SexyReact.Ios
+namespace SexyReact.Views
 {
     public enum RxTableViewCellCachingPolicy
     {

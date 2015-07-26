@@ -27,7 +27,10 @@ namespace SexyReact.Views
             var setValue = binder.CreateViewPropertySetter(view, viewProperty);
             var result = binder
                 .ObserveModelProperty()
-                .SubscribeOnUiThread(x => setValue(converter(x)));
+                .SubscribeOnUiThread(x => 
+                {
+                    setValue(converter(x));
+                });
             return result;
         }
                 

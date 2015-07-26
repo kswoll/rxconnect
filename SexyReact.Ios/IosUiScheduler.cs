@@ -4,7 +4,7 @@ using System.Reactive.Disposables;
 using Foundation;
 using CoreFoundation;
 
-namespace SexyReact.Ios
+namespace SexyReact
 {
     public class IosUiScheduler : IScheduler
     {

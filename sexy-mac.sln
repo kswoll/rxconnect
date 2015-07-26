@@ -1,0 +1,90 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact", "SexyReact\SexyReact.shproj", "{6E53032B-F7D9-48DB-8485-0E3F22F351A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody", "SexyReact.Fody\SexyReact.Fody.csproj", "{3B216673-01AB-4180-808A-29F6ACC4B185}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact.Fody.Helpers", "SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.shproj", "{BF71544B-EF83-4F28-8DF2-438C3403D15B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C579F5A8-4CF7-4FC3-8385-C6434222E65A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Ios", "SexyReact.Ios\SexyReact.Ios.csproj", "{804822D9-AC57-40E1-8921-1CD236A77DCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody.Helpers.Ios", "SexyReact.Fody.Helpers.Ios\SexyReact.Fody.Helpers.Ios.csproj", "{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Ios.Samples", "SexyReact.Ios.Samples\SexyReact.Ios.Samples.csproj", "{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|iPhone.Build.0 = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhone.Build.0 = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhone.Build.0 = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|iPhone.Build.0 = Debug|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|Any CPU.Build.0 = Release|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|iPhone.ActiveCfg = Release|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|iPhone.Build.0 = Release|iPhone
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SexyReact\SexyReact.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
+		SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.projitems*{bf71544b-ef83-4f28-8df2-438c3403d15b}*SharedItemsImports = 13
+		SexyReact\SexyReact.projitems*{effc73fa-4329-4139-b9dc-bad35e5db0dc}*SharedItemsImports = 4
+		SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.projitems*{c4186d7b-553c-4f2d-97ac-e69bc7f7b106}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

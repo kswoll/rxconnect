@@ -5,7 +5,7 @@ using UIKit;
 using SexyReact.Utils;
 using System.Reactive.Disposables;
 
-namespace SexyReact.Ios
+namespace SexyReact.Views
 {
     public static class IosViewObjectExtensions
     {
@@ -64,7 +64,7 @@ namespace SexyReact.Ios
         )
             where TModel : IRxObject
         {
-            return binder.Mate(textField, x => x.Text, x => new EventHandler((sender, args) => x()), (x, l) => x.Ended += l, (x, l) => x.Ended -= l);
+            return binder.Mate(textField, x => x.Text, x => new EventHandler((sender, args) => x()), (x, l) => x.AddTarget(l, UIControlEvent.EditingChanged), (x, l) => x.RemoveTarget(l, UIControlEvent.EditingChanged));
         }
     }
 }

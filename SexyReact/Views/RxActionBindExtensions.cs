@@ -13,7 +13,10 @@ namespace SexyReact.Views
         {
             var result = binder
                 .ObserveModelProperty()
-                .SubscribeOnUiThread(setter);
+                .SubscribeOnUiThread(x => 
+                {
+                    setter(x);
+                });
             return result;
         }
 
