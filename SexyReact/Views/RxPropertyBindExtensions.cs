@@ -82,19 +82,18 @@ namespace SexyReact.Views
         }
 
         public static IObservable<TModelValue> ObserveModelProperty<TModel, TModelValue>(
-            this IRxViewObject<TModel> view,
-            Expression<Func<TModel, TModelValue>> modelProperty
+            this RxViewObjectBinder<TModel, TModelValue> binder
         )
             where TModel : IRxObject
         {
-            var remainingPath = modelProperty.GetPropertyPath();
+            var remainingPath = binder.ModelProperty.GetPropertyPath();
             var propertyPath = new PropertyInfo[remainingPath.Length + 1];
             propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
             for (var i = 0; i < remainingPath.Length; i++)
             {
                 propertyPath[i + 1] = remainingPath[i];
             }
-            return new RxPropertyObservable<TModelValue>(view, propertyPath);
+            return new RxPropertyObservable<TModelValue>(binder.ViewObject, propertyPath);
         }
 
         public static Action<TViewValue> CreateViewPropertySetter<TModel, TModelValue, TView, TViewValue>(

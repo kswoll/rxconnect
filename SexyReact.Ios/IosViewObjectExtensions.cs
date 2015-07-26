@@ -2,6 +2,8 @@
 using SexyReact.Views;
 using System.Linq.Expressions;
 using UIKit;
+using SexyReact.Utils;
+using System.Reactive.Disposables;
 
 namespace SexyReact.Ios
 {
@@ -37,14 +39,26 @@ namespace SexyReact.Ios
             return result;
         }
 
-        public static IDisposable ConnectButton<TModel>(
-            this IRxViewObject<TModel> view,
-            UIButton button,
-            Expression<Func<TModel, IRxCommand>> modelProperty
+        public static IDisposable To<TModel, TModelValue>(
+            this RxViewObjectBinder<TModel, TModelValue> binder,
+            UIButton button
         )
             where TModel : IRxObject
+            where TModelValue : IRxCommand
         {
-            return null;
+            IRxCommand command = null;
+            EventHandler listener = (sender, args) =>
+            {
+                if (command != null)
+                    command.ExecuteAsync();
+            };
+            button.TouchUpInside += listener;
+            var buttonDisposable = new ActionDisposable(() => button.TouchUpInside -= listener);
+            var subscription = binder.ObserveModelProperty().Subscribe(x => 
+            {
+                command = x;
+            });
+            return new CompositeDisposable(subscription, buttonDisposable);
         }
 
         public static IDisposable ConnectButton<TModel>(
