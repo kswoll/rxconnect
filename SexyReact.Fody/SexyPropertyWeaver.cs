@@ -87,7 +87,6 @@ namespace SexyReact.Fody
                     {
                         LogInfo("Creating static constructor");
                         staticConstructor = new MethodDefinition(".cctor", MethodAttributes.Static | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, ModuleDefinition.TypeSystem.Void);
-//                        staticConstructor.CallingConvention = MethodCallingConvention.C;
                         staticConstructor.Body = new MethodBody(staticConstructor);
                         targetType.Methods.Add(staticConstructor);
                     }
