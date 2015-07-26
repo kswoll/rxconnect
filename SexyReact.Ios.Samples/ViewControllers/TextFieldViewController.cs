@@ -9,15 +9,46 @@ namespace SexyReact.Ios.Samples.ViewControllers
 {
     public class TextFieldViewController : RxViewController<TextFieldViewModel>
     {
+        private UITextField textField;
+
         public TextFieldViewController()
         {
-            var label = new UILabel();
-            var textField = new UITextField();
+            Title = "UITextField Binding";
+
+            var label = new UILabel 
+            {
+                Font = Fonts.DefaultFont
+            };
+            textField = new UITextField
+            {
+                Font = Fonts.DefaultFont
+            };
+
+            var codePanel = AlignmentPanel.LeftFill(new UILabel 
+            {
+                Text = "Sample"
+            });
+            codePanel.Padding = 15;
+
+            var labelPanel = AlignmentPanel.LeftFill(label);
+
+            var labelContainer = new BorderPanel();
+            labelContainer.Padding = 15;
+            labelContainer.AddSubview(new UILabel { Text = "UILabel", Font = Fonts.DefaultFontBold }, BorderConstraint.Top);
+            labelContainer.AddSubview(labelPanel);
+
+            var textFieldPanel = AlignmentPanel.LeftFill(textField);
+
+            var textFieldContainer = new BorderPanel();
+            textFieldContainer.Padding = 15;
+            textFieldContainer.AddSubview(new UILabel { Text = "UITextField", Font = Fonts.DefaultFontBold }, BorderConstraint.Top);
+            textFieldContainer.AddSubview(textFieldPanel);
 
             var view = new VerticalFlowPanel();
             view.BackgroundColor = UIColor.White;
-            view.AddSubview(label);
-            view.AddSubview(textField);
+            view.AddSubview(codePanel);
+            view.AddSubview(labelContainer);
+            view.AddSubview(textFieldContainer);
 
             var model = new TextFieldViewModel();
             model.StringProperty = "Initial Value";
@@ -32,6 +63,13 @@ namespace SexyReact.Ios.Samples.ViewControllers
             this.Bind(x => x.StringProperty).Mate(textField);
 
             View = new ContentPanel(() => TopLayoutGuide, () => BottomLayoutGuide, view);
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            textField.BecomeFirstResponder();
         }
     }
 }

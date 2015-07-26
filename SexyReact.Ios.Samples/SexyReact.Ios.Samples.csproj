@@ -107,6 +107,8 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="ViewControllers\TextFieldViewController.cs" />
     <Compile Include="ViewModels\TextFieldViewModel.cs" />
+    <Compile Include="Fonts.cs" />
+    <Compile Include="Utils\UIFontExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.0\build\Fody.targets" Condition="Exists('..\packages\Fody.1.29.0\build\Fody.targets')" />
@@ -119,5 +121,6 @@
   <ItemGroup>
     <Folder Include="ViewModels\" />
     <Folder Include="ViewControllers\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>
