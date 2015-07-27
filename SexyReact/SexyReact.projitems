@@ -50,6 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObjectMixin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\ObservableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\ActionDisposable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxListViewAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

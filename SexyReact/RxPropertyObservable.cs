@@ -25,7 +25,6 @@ namespace SexyReact
         private class RxPropertyObserver : IObserver<TValue>, IDisposable
         {
             private IObserver<TValue> observer;
-            private readonly IRxObject source;
             private readonly IReadOnlyList<PropertyInfo> propertyPath;
             private TValue lastValue;
             private bool hasEmittedInitialValue;
@@ -34,7 +33,6 @@ namespace SexyReact
 
             public RxPropertyObserver(IRxObject source, IReadOnlyList<PropertyInfo> propertyPath, IObserver<TValue> observer)
             {
-                this.source = source;
                 this.propertyPath = propertyPath;
                 this.observer = observer;
 

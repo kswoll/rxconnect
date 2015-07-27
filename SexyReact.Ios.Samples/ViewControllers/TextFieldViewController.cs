@@ -23,13 +23,7 @@ namespace SexyReact.Ios.Samples.ViewControllers
             {
                 Font = Fonts.DefaultFont
             };
-
-            var codePanel = AlignmentPanel.LeftFill(new UILabel 
-            {
-                Text = "Sample"
-            });
-            codePanel.Padding = 15;
-
+                    
             var labelPanel = AlignmentPanel.LeftFill(label);
 
             var labelContainer = new BorderPanel();
@@ -46,7 +40,6 @@ namespace SexyReact.Ios.Samples.ViewControllers
 
             var view = new VerticalFlowPanel();
             view.BackgroundColor = UIColor.White;
-            view.AddSubview(codePanel);
             view.AddSubview(labelContainer);
             view.AddSubview(textFieldContainer);
 
