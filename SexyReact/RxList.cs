@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using SexyReact.Utils;
-using System.Linq.Expressions;
+using System.Reactive;
 
 namespace SexyReact
 {
@@ -21,6 +21,7 @@ namespace SexyReact
         private Lazy<Subject<IEnumerable<RxListMovedItem<T>>>> rangeMoved = new Lazy<Subject<IEnumerable<RxListMovedItem<T>>>>();
         private Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>> rangeModified = new Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>>();
         private Lazy<Subject<RxListChange<T>>> changed = new Lazy<Subject<RxListChange<T>>>();
+        private Lazy<Subject<Unit>> disposed = new Lazy<Subject<Unit>>();
 
         public RxList()
         {
@@ -49,6 +50,16 @@ namespace SexyReact
                 rangeModified.Value.Dispose();
             if (changed.IsValueCreated)
                 changed.Value.Dispose();
+            if (disposed.IsValueCreated)
+            {
+                disposed.Value.OnNext(default(Unit));
+                disposed.Value.Dispose();
+            }
+        }
+
+        public IObservable<Unit> Disposed
+        {
+            get { return disposed.Value; }
         }
 
         public IObservable<IEnumerable<RxListItem<T>>> RangeAdded
@@ -185,6 +196,16 @@ namespace SexyReact
             OnChanged(new RxListChange<T>(added: items.Select((x, i) => new RxListItem<T>(initialIndex + i, x))));
         }
 
+        public void InsertRange(IEnumerable<RxListItem<T>> items)
+        {
+            var itemsArray = items.ToArray();
+            foreach (var item in itemsArray.OrderByDescending(x => x.Index))
+            {
+                storage.Insert(item.Index, item.Value);
+            }
+            OnChanged(new RxListChange<T>(added: itemsArray));
+        }
+
         public void RemoveRange(IEnumerable<T> items)
         {
             var itemsArray = items.Select(x => new RxListItem<T>(storage.IndexOf(x), x)).ToArray();
@@ -199,6 +220,33 @@ namespace SexyReact
             foreach (var item in itemsArray.OrderByDescending(x => x.Index))
                 storage.RemoveAt(item.Index);
             OnChanged(new RxListChange<T>(removed: itemsArray));
+        }
+
+        public void ModifyRange(IEnumerable<RxListItem<T>> items)
+        {
+            var itemsArray = items.ToArray();
+            var modified = new List<RxListModifiedItem<T>>();
+            foreach (var item in itemsArray)
+            {
+                var oldValue = storage[item.Index];
+                storage[item.Index] = item.Value;
+                modified.Add(new RxListModifiedItem<T>(item.Index, oldValue, item.Value));
+            }
+            OnChanged(new RxListChange<T>(modified: modified));
+        }
+
+        public void MoveRange(IEnumerable<RxListMovedItem<T>> items)
+        {
+            var itemsArray = items.ToArray();
+            foreach (var item in itemsArray)
+            {
+                storage.RemoveAt(item.FromIndex);
+            }
+            foreach (var item in itemsArray.OrderBy(x => x.ToIndex))
+            {
+                storage.Insert(item.ToIndex, item.Value);
+            }
+            OnChanged(new RxListChange<T>(moved: itemsArray));
         }
 
         public void Clear()

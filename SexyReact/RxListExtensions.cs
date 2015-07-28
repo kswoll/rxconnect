@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 
@@ -13,12 +14,27 @@ namespace SexyReact
 //            return list.Select(_ => merge()).ToObservable().Merge(list.Changed.Select(_ => merge())).Switch();
 //        }
 
-        public static RxList<T> Derive<TSource, T>(this RxList<TSource> source, Func<TSource, T> selector, 
-            Func<TSource, IObservable<bool>> filter
-        )
-            where TSource : IRxObject
+        public static RxDerivedList<T> Derive<TSource, T>(this IRxList<TSource> source, Func<TSource, T> selector)
         {
-            return null;
+            var storage = new RxList<T>(source.Select(selector));
+            var result = new RxDerivedList<T>(storage);
+
+            var subscription = source.Changed.Subscribe(changes =>
+            {
+                if (changes.Added.Any())
+                    storage.InsertRange(changes.Added.Select(x => new RxListItem<T>(x.Index, selector(x.Value))));
+                if (changes.Removed.Any())
+                    storage.RemoveRange(changes.Removed.Select(x => storage[x.Index]));
+                if (changes.Modified.Any())
+                    storage.ModifyRange(changes.Modified.Select(x => new RxListItem<T>(x.Index, selector(x.NewValue))));
+                if (changes.Moved.Any())
+                    storage
+            });
+
+            // When the returned list is disposed, make sure to unsubscribe from the source list
+            result.Disposed.Subscribe(_ => subscription.Dispose());
+
+            return result;
         }
     }
 }
