@@ -74,7 +74,23 @@ namespace SexyReact.Fody
             foreach (var targetType in targetTypes)
             {
                 LogInfo(targetType.ToString());
-                var properties = targetType.Properties.Where(x => x.IsDefined(reactiveAttribute)).ToArray();
+
+                var rxForClass = targetType.IsDefined(reactiveAttribute);
+
+                PropertyDefinition[] properties;
+
+                // If [Rx] has been applied to a class, then all of its properties are considered Rx
+                if (rxForClass)
+                {
+                    var mostAncestralClassWithRx = targetType.GetEarliestAncestorThatDeclares(reactiveAttribute);
+                    properties = targetType.Properties.Where(x => mostAncestralClassWithRx.IsAssignableFrom(x.DeclaringType)).ToArray();
+                }
+                // Otherwise, only properties decorated with [Rx] are considered
+                else
+                {
+                    properties = targetType.Properties.Where(x => x.IsDefined(reactiveAttribute)).ToArray();
+                }
+
                 if (properties.Any())
                 {
                     var staticConstructor = targetType.GetStaticConstructor();

@@ -61,9 +61,29 @@ namespace SexyReact.Fody
             return false;
         }
 
-        public static bool IsDefined(this IMemberDefinition member, TypeReference attributeType)
+        public static TypeDefinition GetEarliestAncestorThatDeclares(this TypeDefinition type, TypeReference attributeType)
         {
-            return member.HasCustomAttributes && member.CustomAttributes.Any(x => x.AttributeType.FullName == attributeType.FullName);
+            var current = type;
+            TypeDefinition result = null;
+            while (current != null)
+            {
+                if (current.IsDefined(attributeType))
+                {
+                    result = current;
+                }
+                current = current.BaseType.Resolve();
+            }
+            return result;
+        }
+
+        public static bool IsDefined(this IMemberDefinition member, TypeReference attributeType, bool inherit = false)
+        {
+            var typeIsDefined = member.HasCustomAttributes && member.CustomAttributes.Any(x => x.AttributeType.FullName == attributeType.FullName);
+            if (inherit && member.DeclaringType.BaseType != null)
+            {
+                typeIsDefined = member.DeclaringType.BaseType.Resolve().IsDefined(attributeType, true);
+            }
+            return typeIsDefined;
         }
 
         public static MethodReference Bind(this MethodReference method, GenericInstanceType genericType)
