@@ -21,6 +21,8 @@ namespace SexyReact.Fody
         // Will log an error message to MSBuild. OPTIONAL
         public Action<string> LogError { get; set; }
 
+        public Action<string> LogWarning { get; set; }
+
 /*
         private AssemblyNameReference FindSexyReactAssembly()
         {
@@ -61,11 +63,11 @@ namespace SexyReact.Fody
             var targetTypes = ModuleDefinition.GetAllTypes().Where(x => x.BaseType != null && reactiveObject.IsAssignableFrom(x.BaseType)).ToArray();
             var propertyInfoType = ModuleDefinition.Import(typeof(PropertyInfo));
             LogInfo($"propertyInfoType: {propertyInfoType}");
-            var getMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.Single(x => x.Name == "Get"));
+            var getMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.SingleOrDefault(x => x.Name == "Get"));
             if (getMethod == null)
                 throw new Exception("getMethod is null");
 
-            var setMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.Single(x => x.Name == "Set"));
+            var setMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.SingleOrDefault(x => x.Name == "Set"));
             if (setMethod == null)
                 throw new Exception("setMethod is null");
 
@@ -98,7 +100,19 @@ namespace SexyReact.Fody
                     {
                         LogInfo($"{targetType}.{property}");
 
+                        if (property.GetMethod == null || property.SetMethod == null)
+                        {
+                            LogWarning($"Rx properties must have both a getter and a setter.  Skipping {targetType}.{property.Name}");
+                            continue;
+                        }
+
                         // Remove old field (the generated backing field for the auto property)
+                        var oldFieldInstruction = property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).SingleOrDefault();
+                        if (oldFieldInstruction == null)
+                        {
+                            LogWarning($"Rx properties must be auto-properties.  The backing field for property {targetType}.{property.Name} not found.");
+                            continue;
+                        }
                         var oldField = (FieldReference)property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).Single().Operand;
                         var oldFieldDefinition = oldField.Resolve();
                         targetType.Fields.Remove(oldFieldDefinition);
