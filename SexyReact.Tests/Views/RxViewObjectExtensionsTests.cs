@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
@@ -95,6 +96,24 @@ namespace SexyReact.Tests.Views
             await completionSource.Task;
 
             RxApp.UiScheduler = originalScheduler;
+        }
+
+        [Test]
+        public void UpdateModelAfterBind()
+        {
+            var viewObject = new TestViewObject();
+            var model = new TestViewModel();
+            model.StringProperty = "foo";
+            viewObject.Model = model;
+            string s = null;
+            viewObject.Bind(x => x.StringProperty).ObserveModelProperty().Subscribe(x =>
+            {
+                s = x;
+            });
+            Assert.AreEqual("foo", s);
+
+            model.StringProperty = "bar";
+            Assert.AreEqual("bar", s);
         }
 /*
 

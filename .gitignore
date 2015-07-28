@@ -18,3 +18,4 @@ SexyReact.Tester/obj/
 *.nupkg
 SexyReact.Ios/obj/
 nuget/artifacts/
+SexyReact.Fody/nuget/artifacts/
