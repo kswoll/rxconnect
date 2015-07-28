@@ -51,6 +51,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\ObservableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\ActionDisposable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxListViewAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

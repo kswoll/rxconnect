@@ -7,13 +7,9 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact", "SexyReact\Sexy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody", "SexyReact.Fody\SexyReact.Fody.csproj", "{3B216673-01AB-4180-808A-29F6ACC4B185}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SexyReact.Fody.Helpers", "SexyReact.Fody.Helpers\SexyReact.Fody.Helpers.shproj", "{BF71544B-EF83-4F28-8DF2-438C3403D15B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C579F5A8-4CF7-4FC3-8385-C6434222E65A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Ios", "SexyReact.Ios\SexyReact.Ios.csproj", "{804822D9-AC57-40E1-8921-1CD236A77DCE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Fody.Helpers.Ios", "SexyReact.Fody.Helpers.Ios\SexyReact.Fody.Helpers.Ios.csproj", "{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Ios.Samples", "SexyReact.Ios.Samples\SexyReact.Ios.Samples.csproj", "{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}"
 EndProject
@@ -51,18 +47,6 @@ Global
 		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhone.Build.0 = Release|Any CPU
 		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhone.Build.0 = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{9855FB6A-7C20-4733-BF82-DEE7DDD343CD}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
 		{B78CD9B6-E6BC-45BD-BF2D-8EF918D6BDC3}.Debug|iPhone.ActiveCfg = Debug|iPhone

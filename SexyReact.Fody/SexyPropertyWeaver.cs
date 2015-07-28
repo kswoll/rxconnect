@@ -52,13 +52,6 @@ namespace SexyReact.Fody
                 return;
             }
             LogInfo($"{sexyReact.Name} {sexyReact.Version}");
-            var helpers = ModuleDefinition.FindAssembly("SexyReact.Fody.Helpers");
-            if (helpers == null)
-            {
-                LogError("Could not find assembly: SexyReact.Fody.Helpers (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
-                return;
-            }
-            LogInfo($"{helpers.Name} {helpers.Version}");
             var reactiveObject = new TypeReference("SexyReact", "IRxObject", ModuleDefinition, sexyReact);
             var targetTypes = ModuleDefinition.GetAllTypes().Where(x => x.BaseType != null && reactiveObject.IsAssignableFrom(x.BaseType)).ToArray();
             var propertyInfoType = ModuleDefinition.Import(typeof(PropertyInfo));
@@ -71,7 +64,7 @@ namespace SexyReact.Fody
             if (setMethod == null)
                 throw new Exception("setMethod is null");
 
-            var reactiveAttribute = ModuleDefinition.FindType("SexyReact.Fody.Helpers", "RxAttribute", helpers);
+            var reactiveAttribute = ModuleDefinition.FindType("SexyReact.Fody.Helpers", "RxAttribute", sexyReact);
             if (reactiveAttribute == null)
                 throw new Exception("reactiveAttribute is null");
 

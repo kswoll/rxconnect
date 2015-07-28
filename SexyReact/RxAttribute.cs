@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SexyReact.Fody.Helpers
+namespace SexyReact
 {
     /// <summary>
     /// Decorate on your properties in your rx objects.  You implement them with auto-properties, but
