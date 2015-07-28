@@ -12,6 +12,14 @@ namespace SexyReact
 //            Func<IObservable<TValue>> merge = () => Observable.Merge(list.Select(x => x.ObserveProperty(selector)));
 //            return list.Select(_ => merge()).ToObservable().Merge(list.Changed.Select(_ => merge())).Switch();
 //        }
+
+        public static RxList<T> Derive<TSource, T>(this RxList<TSource> source, Func<TSource, T> selector, 
+            Func<TSource, IObservable<bool>> filter
+        )
+            where TSource : IRxObject
+        {
+            return null;
+        }
     }
 }
 

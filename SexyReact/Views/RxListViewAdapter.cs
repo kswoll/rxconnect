@@ -23,8 +23,6 @@ namespace SexyReact.Views
         private Func<TSection, TItem, TCell> cellFactory;
         private IDisposable sectionAddedSubscription;
         private IDisposable sectionRemovedSubscription;
-        private IDisposable itemsAddedSubscription;
-        private IDisposable itemsRemovedSubscription;
         private Dictionary<TSection, IDisposable[]> sectionSubscriptions = new Dictionary<TSection, IDisposable[]>();
         private List<Tuple<TSection, List<TItem>>> localCopy = new List<Tuple<TSection, List<TItem>>>();
         private RxListViewAdapterCachingPolicy cachingPolicy = RxListViewAdapterCachingPolicy.GlobalCache;
@@ -94,10 +92,6 @@ namespace SexyReact.Views
                 {
                     sectionAddedSubscription.Dispose();
                     sectionRemovedSubscription.Dispose();
-                    if (itemsAddedSubscription != null)
-                        itemsAddedSubscription.Dispose();
-                    if (itemsRemovedSubscription != null)
-                        itemsRemovedSubscription.Dispose();
                 }
             }
         }
@@ -111,10 +105,6 @@ namespace SexyReact.Views
                 {
                     sectionAddedSubscription.Dispose();
                     sectionRemovedSubscription.Dispose();
-                    if (itemsAddedSubscription != null)
-                        itemsAddedSubscription.Dispose();
-                    if (itemsRemovedSubscription != null)
-                        itemsRemovedSubscription.Dispose();
                     foreach (var section in data)
                     {
                         OnSectionRemoved(section);

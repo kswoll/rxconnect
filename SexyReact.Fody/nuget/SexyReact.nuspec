@@ -1,7 +1,7 @@
 <package>
   <metadata>
     <id>SexyReact.Fody</id>
-    <version>1.0.19</version>
+    <version>1.0.20</version>
     <authors>kirk</authors>
     <owners>kirk</owners>
     <projectUrl>https://github.com/kswoll/sexy-react</projectUrl>

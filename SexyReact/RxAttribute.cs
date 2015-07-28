@@ -9,8 +9,13 @@ namespace SexyReact
     /// Future plans: Decorate on your classes to implement more efficient storage/property-observer
     /// strategies.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class RxAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    public class Rx2Attribute : Attribute
     {
     }
 }

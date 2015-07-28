@@ -55,7 +55,7 @@ namespace SexyReact.Fody
             var reactiveObject = new TypeReference("SexyReact", "IRxObject", ModuleDefinition, sexyReact);
             var targetTypes = ModuleDefinition.GetAllTypes().Where(x => x.BaseType != null && reactiveObject.IsAssignableFrom(x.BaseType)).ToArray();
             var propertyInfoType = ModuleDefinition.Import(typeof(PropertyInfo));
-            LogInfo($"propertyInfoType: {propertyInfoType}");
+//            LogInfo($"propertyInfoType: {propertyInfoType}");
             var getMethod = ModuleDefinition.Import(reactiveObject.Resolve().Methods.SingleOrDefault(x => x.Name == "Get"));
             if (getMethod == null)
                 throw new Exception("getMethod is null");
@@ -64,7 +64,7 @@ namespace SexyReact.Fody
             if (setMethod == null)
                 throw new Exception("setMethod is null");
 
-            var reactiveAttribute = ModuleDefinition.FindType("SexyReact.Fody.Helpers", "RxAttribute", sexyReact);
+            var reactiveAttribute = ModuleDefinition.FindType("SexyReact", "RxAttribute", sexyReact);
             if (reactiveAttribute == null)
                 throw new Exception("reactiveAttribute is null");
 
@@ -73,8 +73,6 @@ namespace SexyReact.Fody
             var getTypeFromTypeHandle = ModuleDefinition.Import(typeType.Resolve().Methods.Single(x => x.Name == "GetTypeFromHandle"));
             foreach (var targetType in targetTypes)
             {
-                LogInfo(targetType.ToString());
-
                 var rxForClass = targetType.IsDefined(reactiveAttribute);
 
                 PropertyDefinition[] properties;
@@ -96,7 +94,7 @@ namespace SexyReact.Fody
                     var staticConstructor = targetType.GetStaticConstructor();
                     if (staticConstructor == null)
                     {
-                        LogInfo("Creating static constructor");
+//                        LogInfo("Creating static constructor");
                         staticConstructor = new MethodDefinition(".cctor", MethodAttributes.Static | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, ModuleDefinition.TypeSystem.Void);
                         staticConstructor.Body = new MethodBody(staticConstructor);
                         targetType.Methods.Add(staticConstructor);
