@@ -9,7 +9,6 @@ namespace SexyReact
         IObservable<Unit> Disposed { get; }
         IObservable<IEnumerable<RxListItem<T>>> RangeAdded { get; }
         IObservable<IEnumerable<RxListItem<T>>> RangeRemoved { get; }
-        IObservable<IEnumerable<RxListMovedItem<T>>> RangeMoved { get; }
         IObservable<IEnumerable<RxListModifiedItem<T>>> RangeModified { get; }
         IObservable<RxListChange<T>> Changed { get; }
         IObservable<RxListItem<T>> Added { get; }
@@ -22,7 +21,6 @@ namespace SexyReact
         IObservable<T> ItemModified { get; }
         IObservable<IEnumerable<T>> ItemsAdded { get; }
         IObservable<IEnumerable<T>> ItemsRemoved { get; }
-        IObservable<IEnumerable<T>> ItemsMoved { get; }
         IObservable<IEnumerable<T>> ItemsModified { get; }
     }
 }

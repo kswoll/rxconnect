@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reactive.Linq;
 
 namespace SexyReact
 {
@@ -27,8 +25,8 @@ namespace SexyReact
                     storage.RemoveRange(changes.Removed.Select(x => storage[x.Index]));
                 if (changes.Modified.Any())
                     storage.ModifyRange(changes.Modified.Select(x => new RxListItem<T>(x.Index, selector(x.NewValue))));
-                if (changes.Moved.Any())
-                    storage.MoveRange(changes.Moved.Select(x => new RxListMovedItem<T>(x.FromIndex, x.ToIndex, storage[x.FromIndex])));
+                if (changes.Moved != null)
+                    storage.Move(changes.Moved.Value.FromIndex, changes.Moved.Value.ToIndex);
             });
 
             // When the returned list is disposed, make sure to unsubscribe from the source list

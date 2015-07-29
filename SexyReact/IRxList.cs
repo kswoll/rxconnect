@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
-using System.Text;
 
 namespace SexyReact
 {
@@ -14,6 +12,5 @@ namespace SexyReact
         void RemoveRange(IEnumerable<T> items);
         void RemoveRange(int startIndex, int count);
         void ModifyRange(IEnumerable<RxListItem<T>> items);
-        void MoveRange(IEnumerable<RxListMovedItem<T>> items);
     }
 }

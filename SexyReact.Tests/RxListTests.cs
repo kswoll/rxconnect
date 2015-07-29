@@ -8,6 +8,22 @@ namespace SexyReact.Tests
     public class RxListTests
     {
         [Test]
+        public void MoveSameItem()
+        {
+            var list = new RxList<int>(1, 2, 3);
+            list.Move(2, 2);
+            Assert.AreEqual(3, list[2]);
+        }
+
+        [Test]
+        public void MoveDifferentItem()
+        {
+            var list = new RxList<int>(1, 2, 3);
+            list.Move(1, 2);
+            Assert.AreEqual(2, list[2]);
+        }
+
+        [Test]
         public void Added()
         {
             var list = new RxList<string>();

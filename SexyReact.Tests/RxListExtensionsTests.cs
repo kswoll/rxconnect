@@ -66,5 +66,16 @@ namespace SexyReact.Tests
             Assert.AreEqual(2, derived[1]);
             Assert.AreEqual(5, derived[2]);
         }
+
+        [Test]
+        public void DeriveWithSelectorMove()
+        {
+            var list = new RxList<string>("1", "2", "3");
+            var derived = list.Derive(x => int.Parse(x));
+            list.Move(0, 2);
+            Assert.AreEqual(2, derived[0]);
+            Assert.AreEqual(3, derived[1]);
+            Assert.AreEqual(1, derived[2]);            
+        }
     }
 }

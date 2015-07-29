@@ -18,8 +18,8 @@ namespace SexyReact
         private List<T> storage;
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeRemoved = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
-        private Lazy<Subject<IEnumerable<RxListMovedItem<T>>>> rangeMoved = new Lazy<Subject<IEnumerable<RxListMovedItem<T>>>>();
         private Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>> rangeModified = new Lazy<Subject<IEnumerable<RxListModifiedItem<T>>>>();
+        private Lazy<Subject<RxListMovedItem<T>>> moved = new Lazy<Subject<RxListMovedItem<T>>>();
         private Lazy<Subject<RxListChange<T>>> changed = new Lazy<Subject<RxListChange<T>>>();
         private Lazy<Subject<Unit>> disposed = new Lazy<Subject<Unit>>();
 
@@ -44,8 +44,8 @@ namespace SexyReact
                 rangeAdded.Value.Dispose();
             if (rangeRemoved.IsValueCreated)
                 rangeRemoved.Value.Dispose();
-            if (rangeMoved.IsValueCreated)
-                rangeMoved.Value.Dispose();
+            if (moved.IsValueCreated)
+                moved.Value.Dispose();
             if (rangeModified.IsValueCreated)
                 rangeModified.Value.Dispose();
             if (changed.IsValueCreated)
@@ -57,95 +57,29 @@ namespace SexyReact
             }
         }
 
-        public IObservable<Unit> Disposed
-        {
-            get { return disposed.Value; }
-        }
+        public int Count => storage.Count;
+        public bool IsReadOnly => false;
+        public int IndexOf(T item) => storage.IndexOf(item);
+        public IObservable<Unit> Disposed => disposed.Value;
+        public IObservable<IEnumerable<RxListItem<T>>> RangeAdded => rangeAdded.Value;
+        public IObservable<IEnumerable<RxListItem<T>>> RangeRemoved => rangeRemoved.Value;
+        public IObservable<IEnumerable<RxListModifiedItem<T>>> RangeModified => rangeModified.Value;
+        public IObservable<RxListChange<T>> Changed => changed.Value;
+        public IObservable<RxListItem<T>> Added => RangeAdded.SelectMany(x => x);
+        public IObservable<RxListItem<T>> Removed => RangeRemoved.SelectMany(x => x);
+        public IObservable<RxListMovedItem<T>> Moved => moved.Value;
+        public IObservable<RxListModifiedItem<T>> Modified => RangeModified.SelectMany(x => x);
+        public IObservable<T> ItemAdded => Added.Select(x => x.Value);
+        public IObservable<T> ItemRemoved => Removed.Select(x => x.Value);
+        public IObservable<T> ItemMoved => Moved.Select(x => x.Value);
+        public IObservable<T> ItemModified => Modified.Select(x => x.NewValue);
+        public IObservable<IEnumerable<T>> ItemsAdded => RangeAdded.Select(x => x.Select(y => y.Value));
+        public IObservable<IEnumerable<T>> ItemsRemoved => RangeRemoved.Select(x => x.Select(y => y.Value));
+        public IObservable<IEnumerable<T>> ItemsModified => RangeModified.Select(x => x.Select(y => y.NewValue));
+        public IEnumerator<T> GetEnumerator() => storage.GetEnumerator();
 
-        public IObservable<IEnumerable<RxListItem<T>>> RangeAdded
-        {
-            get { return rangeAdded.Value; }
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IObservable<IEnumerable<RxListItem<T>>> RangeRemoved
-        {
-            get { return rangeRemoved.Value; }
-        }
-
-        public IObservable<IEnumerable<RxListMovedItem<T>>> RangeMoved
-        {
-            get { return rangeMoved.Value; }
-        }
-
-        public IObservable<IEnumerable<RxListModifiedItem<T>>> RangeModified
-        {
-            get { return rangeModified.Value; }
-        }
-
-        public IObservable<RxListChange<T>> Changed
-        {
-            get { return changed.Value; }
-        }
-
-        public IObservable<RxListItem<T>> Added
-        {
-            get { return RangeAdded.SelectMany(x => x); }
-        }
-
-        public IObservable<RxListItem<T>> Removed
-        {
-            get { return RangeRemoved.SelectMany(x => x); }
-        }
-
-        public IObservable<RxListMovedItem<T>> Moved
-        {
-            get { return RangeMoved.SelectMany(x => x); }
-        }
-
-        public IObservable<RxListModifiedItem<T>> Modified
-        {
-            get { return RangeModified.SelectMany(x => x); }
-        }
-
-        public IObservable<T> ItemAdded
-        {
-            get { return Added.Select(x => x.Value); }
-        }
-
-        public IObservable<T> ItemRemoved
-        {
-            get { return Removed.Select(x => x.Value); }
-        }
-
-        public IObservable<T> ItemMoved
-        {
-            get { return Moved.Select(x => x.Value); }
-        }
-
-        public IObservable<T> ItemModified
-        {
-            get { return Modified.Select(x => x.NewValue); }
-        }
-
-        public IObservable<IEnumerable<T>> ItemsAdded
-        {
-            get { return RangeAdded.Select(x => x.Select(y => y.Value)); }
-        }
-
-        public IObservable<IEnumerable<T>> ItemsRemoved
-        {
-            get { return RangeRemoved.Select(x => x.Select(y => y.Value)); }
-        }
-
-        public IObservable<IEnumerable<T>> ItemsMoved
-        {
-            get { return RangeMoved.Select(x => x.Select(y => y.Value)); }
-        }
-
-        public IObservable<IEnumerable<T>> ItemsModified
-        {
-            get { return RangeModified.Select(x => x.Select(y => y.NewValue)); }
-        }
 
         protected virtual void OnChanged(RxListChange<T> change)
         {
@@ -157,9 +91,9 @@ namespace SexyReact
             {
                 rangeRemoved.Value.OnNext(change.Removed);
             }
-            if (rangeMoved.IsValueCreated && change.Moved.Any())
+            if (moved.IsValueCreated && change.Moved.HasValue)
             {
-                rangeMoved.Value.OnNext(change.Moved);
+                moved.Value.OnNext(change.Moved.Value);
             }
             if (rangeModified.IsValueCreated && change.Modified.Any())
             {
@@ -169,16 +103,6 @@ namespace SexyReact
             {
                 changed.Value.OnNext(change);
             }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return storage.GetEnumerator();
         }
 
         public void Add(T item)
@@ -235,20 +159,6 @@ namespace SexyReact
             OnChanged(new RxListChange<T>(modified: modified));
         }
 
-        public void MoveRange(IEnumerable<RxListMovedItem<T>> items)
-        {
-            var itemsArray = items.ToArray();
-            foreach (var item in itemsArray)
-            {
-                storage.RemoveAt(item.FromIndex);
-            }
-            foreach (var item in itemsArray.OrderBy(x => x.ToIndex))
-            {
-                storage.Insert(item.ToIndex, item.Value);
-            }
-            OnChanged(new RxListChange<T>(moved: itemsArray));
-        }
-
         public void Clear()
         {
             var change = new RxListChange<T>(removed: storage.Select((x, i) => new RxListItem<T>(i, x)).ToArray());
@@ -275,21 +185,6 @@ namespace SexyReact
             storage.RemoveAt(index);
             OnChanged(new RxListChange<T>(removed: Enumerables.Return(new RxListItem<T>(index, item))));
             return true;
-        }
-
-        public int Count
-        {
-            get { return storage.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public int IndexOf(T item)
-        {
-            return storage.IndexOf(item);
         }
 
         public void Insert(int index, T item)
@@ -324,7 +219,7 @@ namespace SexyReact
             var item = storage[fromIndex];
             storage.RemoveAt(fromIndex);
             storage.Insert(toIndex, item);
-            OnChanged(new RxListChange<T>(moved: Enumerables.Return(new RxListMovedItem<T>(fromIndex, toIndex, item))));
+            OnChanged(new RxListChange<T>(moved: new RxListMovedItem<T>(fromIndex, toIndex, item)));
         }
 
         public void Move(int toIndex, T item)
