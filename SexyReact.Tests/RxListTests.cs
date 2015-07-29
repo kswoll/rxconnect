@@ -224,6 +224,9 @@ namespace SexyReact.Tests
             list.Remove(one);
             one.StringProperty = "bar";
             Assert.AreEqual("foo", s);
+
+            list[0] = new TestModel { StringProperty = "3" };
+            Assert.AreEqual("3", s);
         }
 
         [Rx]
