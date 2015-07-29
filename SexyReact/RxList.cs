@@ -13,7 +13,7 @@ namespace SexyReact
     /// A list that provides a number of observables for keeping track of its contents.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the list</typeparam>
-    public class RxList<T> : IRxList<T>
+    public class RxList<T> : IRxList<T>, IRxReadOnlyList<T>
     {
         private List<T> storage;
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();

@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxDerivedList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxFilteredList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListElementObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListItem.cs" />

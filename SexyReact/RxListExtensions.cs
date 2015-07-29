@@ -34,53 +34,18 @@ namespace SexyReact
         /// <param name="removed">If not null, fired when an element from the source list is either removed or modified.  You 
         /// can take cleanup actions for the old items by using this callback.</param>
         /// <returns></returns>
-        public static RxDerivedList<T> Derive<TSource, T>(this IRxList<TSource> source, Func<TSource, T> selector, Action<T> removed = null)
+        public static RxDerivedList<TSource, T> Derive<TSource, T>(this IRxList<TSource> source, Func<TSource, T> selector, Action<T> removed = null)
         {
-            var locker = new object();
-            RxList<T> storage = null;
-
-            Action<RxListChange<TSource>> onNext = changes =>
-            {
-                lock (locker)
-                {
-                    if (changes.Added.Any())
-                    {
-                        storage.InsertRange(changes.Added.Select(x => new RxListItem<T>(x.Index, selector(x.Value))));
-                    }
-                    foreach (var item in changes.Removed.OrderByDescending(x => x.Index))
-                    {
-                        removed?.Invoke(storage[item.Index]);
-                        storage.RemoveAt(item.Index);
-                    }
-                    foreach (var item in changes.Modified)
-                    {
-                        removed?.Invoke(storage[item.Index]);
-                        storage[item.Index] = selector(item.NewValue);
-                    }
-                    if (changes.Moved != null)
-                    {
-                        storage.Move(changes.Moved.Value.FromIndex, changes.Moved.Value.ToIndex);
-                    }                    
-                }
-            };
-
-            lock (locker)
-            {
-                storage = new RxList<T>(source.Select(selector));
-                var result = new RxDerivedList<T>(storage);
-                var subscription = source.Changed.Subscribe(onNext);
-
-                // When the returned list is disposed, make sure to unsubscribe from the source list
-                result.Disposed.Subscribe(_ => subscription.Dispose());
-
-                return result;                
-            }
+            return new RxDerivedList<TSource, T>(source, selector, removed);
         }
-//
-//        public static RxDerivedList<T> Derive<TSource, T>(this IRxList<TSource> source, Func<TSource, T> selector,
-//            Func<TSource, IObservable<bool>> filter)
-//        {
-//            
-//        }
+
+        public static RxFilteredList<TSource, T, TValue> Derive<TSource, T, TValue>(this IRxList<TSource> source,
+            Func<TSource, T> selector, Expression<Func<TSource, TValue>> filterSource,
+            Func<TValue, bool> filter, Action<T> removed
+        )
+            where TSource : IRxObject
+        {
+            return new RxFilteredList<TSource, T, TValue>(source, selector, filterSource, filter, removed);
+        }
     }
 }
