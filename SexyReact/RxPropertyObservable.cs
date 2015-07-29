@@ -85,10 +85,7 @@ namespace SexyReact
                     {
                         lock (parent)
                         {
-                            if (subscription != null)
-                            {
-                                subscription.Dispose();
-                            }
+                            subscription?.Dispose();
                         }
                         parent.OnNext(default(TValue));
                     }
@@ -101,10 +98,7 @@ namespace SexyReact
                                 property = parent.propertyPath[pathIndex];
                                 observeProperty = observePropertyAsObjectMethod.MakeGenericMethod(property.PropertyType);                                
                             }
-                            if (subscription != null)
-                            {
-                                subscription.Dispose();
-                            }
+                            subscription?.Dispose();
                             var rxObject = (IRxObject)value;
                             if (pathIndex < parent.propertyPath.Count - 1)
                             {
@@ -131,14 +125,8 @@ namespace SexyReact
 
                 public void Dispose()
                 {
-                    if (subscription != null)
-                    {
-                        subscription.Dispose();
-                    }
-                    if (nextPathObserver != null)
-                    {
-                        nextPathObserver.Dispose();
-                    }
+                    subscription?.Dispose();
+                    nextPathObserver?.Dispose();
                 }
             }
 
@@ -173,10 +161,7 @@ namespace SexyReact
             public void Dispose()
             {
                 subscription.Dispose();
-                if (rootPathObserver != null)
-                {
-                    rootPathObserver.Dispose();
-                }
+                rootPathObserver?.Dispose();
             }
         }
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-
-namespace SexyReact
+﻿namespace SexyReact
 {
     /// <summary>
     /// Use an instance of this class when you want to conveniently wrap the behavior of an RxObject but you

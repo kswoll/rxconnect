@@ -7,40 +7,18 @@ namespace SexyReact
     /// </summary>
     public struct PropertyChanged<T> : IPropertyChanged<T>
     {
-        private readonly PropertyInfo property;
-        private readonly T oldValue;
-        private readonly T newValue;
+        public PropertyInfo Property { get; }
+        public T OldValue { get; }
+        public T NewValue { get; }
 
         public PropertyChanged(PropertyInfo property, T oldValue, T newValue)
         {
-            this.property = property;
-            this.oldValue = oldValue;
-            this.newValue = newValue;
+            Property = property;
+            OldValue = oldValue;
+            NewValue = newValue;
         }
 
-        public PropertyInfo Property
-        {
-            get { return property; }
-        }
-
-        public T OldValue
-        {
-            get { return oldValue; }
-        }
-
-        public T NewValue
-        {
-            get { return newValue; }
-        }
-
-        object IPropertyChanged.OldValue
-        {
-            get { return OldValue; }
-        }
-
-        object IPropertyChanged.NewValue
-        {
-            get { return NewValue; }
-        }
+        object IPropertyChanged.OldValue => OldValue;
+        object IPropertyChanged.NewValue => NewValue;
     }
 }

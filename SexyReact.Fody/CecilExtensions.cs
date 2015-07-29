@@ -71,7 +71,7 @@ namespace SexyReact.Fody
                 {
                     result = current;
                 }
-                current = current.BaseType == null ? null : current.BaseType.Resolve();
+                current = current.BaseType?.Resolve();
             }
             return result;
         }

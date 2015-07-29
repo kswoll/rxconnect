@@ -9,27 +9,18 @@ namespace SexyReact
     /// </summary>
     public struct PropertyChanging<T> : IPropertyChanging<T>
     {
-        private readonly PropertyInfo property;
-        private readonly T oldValue;
+        public PropertyInfo Property { get; }
+        public T OldValue { get; }
+
         private readonly Func<T> getNewValue;
         private readonly Action<T> setNewValue;
 
         public PropertyChanging(PropertyInfo property, T oldValue, Func<T> getNewValue, Action<T> setNewValue) : this()
         {
-            this.property = property;
-            this.oldValue = oldValue;
+            Property = property;
+            OldValue = oldValue;
             this.getNewValue = getNewValue;
             this.setNewValue = setNewValue;
-        }
-
-        public PropertyInfo Property
-        {
-            get { return property; }
-        }
-
-        public T OldValue
-        {
-            get { return oldValue; }
         }
 
         public T NewValue
@@ -38,10 +29,7 @@ namespace SexyReact
             set { setNewValue(value); }
         }
 
-        object IPropertyChanging.OldValue
-        {
-            get { return OldValue; }
-        }
+        object IPropertyChanging.OldValue => OldValue;
 
         object IPropertyChanging.NewValue
         {

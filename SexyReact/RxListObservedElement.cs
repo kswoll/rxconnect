@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SexyReact
+﻿namespace SexyReact
 {
     public struct RxListObservedElement<TElement, TValue>
     {

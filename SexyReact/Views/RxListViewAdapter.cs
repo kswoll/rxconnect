@@ -15,7 +15,8 @@ namespace SexyReact.Views
         where TItem : IRxObject
         where TCell : IRxViewObject<TItem>
     {
-        private TView view;
+        public TView View { get; }
+
         private RxList<TSection> data;
         private Func<TSection, RxList<TItem>> itemsInSection;
         private Dictionary<TItem, TCell> cellsByItem = new Dictionary<TItem, TCell>();
@@ -45,7 +46,7 @@ namespace SexyReact.Views
             Func<TCell> reuseCellProvider
         )
         {
-            this.view = view;
+            View = view;
             this.itemsInSection = itemsInSection;
             this.cellFactory = cellFactory;
             this.sectionAdded = sectionAdded;
@@ -53,11 +54,6 @@ namespace SexyReact.Views
             this.itemsAdded = itemsAdded;
             this.itemsRemoved = itemsRemoved;
             this.reuseCellProvider = reuseCellProvider;
-        }
-
-        public TView View
-        {
-            get { return view; }
         }
 
         public RxList<TItem> GetItems(int sectionIndex) 
@@ -129,13 +125,12 @@ namespace SexyReact.Views
             var localItems = new List<TItem>();
             var sectionIndex = data.IndexOf(section);
             localCopy.Insert(sectionIndex, Tuple.Create(section, localItems));
-            if (sectionAdded != null)
-                sectionAdded(data.IndexOf(section));
+            sectionAdded?.Invoke(data.IndexOf(section));
             var subscriptions = new[]
             {
                 items.Changed.Where(x => x.Added.Any() || x.Removed.Any()).Subscribe(_ =>
                 {
-                    var mergeResult = localItems.Merge<TItem>(items);
+                    var mergeResult = localItems.Merge(items);
                     var localItemIndices = localItems.Select((x, i) => new { Item = x, Index = i }).ToDictionary(x => x.Item, x => x.Index);
                     var itemIndices = items.Select((x, i) => new { Item = x, Index = i }).ToDictionary(x => x.Item, x => x.Index);
                     if (mergeResult.Added.Any())
@@ -167,7 +162,6 @@ namespace SexyReact.Views
             var items = localCopy[sectionIndex].Item2;
             if (items.Any())
             {
-                var localItems = localCopy[sectionIndex];
                 foreach (var item in items)
                 {
                     ReleaseCell(item);
@@ -176,8 +170,7 @@ namespace SexyReact.Views
             }
 
             localCopy.RemoveAt(sectionIndex);
-            if (sectionRemoved != null)
-                sectionRemoved(sectionIndex);
+            sectionRemoved?.Invoke(sectionIndex);
 
             IDisposable[] subscriptions;
             if (sectionSubscriptions.TryGetValue(section, out subscriptions))
@@ -192,13 +185,11 @@ namespace SexyReact.Views
         protected virtual void OnItemsAdded(TSection section, IEnumerable<Tuple<int, TItem>> items)
         {
             var sectionIndex = localCopy.IndexOf(x => Equals(x.Item1, section));
-            var localItems = localCopy[sectionIndex];
             foreach (var item in items.OrderBy(x => x.Item1))
             {
                 localCopy[sectionIndex].Item2.Insert(item.Item1, item.Item2);
             }
-            if (itemsAdded != null)
-                itemsAdded(sectionIndex, section, items);
+            itemsAdded?.Invoke(sectionIndex, section, items);
         }
 
         protected virtual void OnItemsRemoved(TSection section, IEnumerable<Tuple<int, TItem>> items)
@@ -209,22 +200,18 @@ namespace SexyReact.Views
             {
                 localItems.Item2.RemoveAt(item.Item1);
             }
-            if (itemsRemoved != null)
-                itemsRemoved(sectionIndex, section, items);
+            itemsRemoved?.Invoke(sectionIndex, section, items);
             foreach (var item in items)
             {
                 ReleaseCell(item.Item2);
             }
         }
 
-        public int SectionCount 
-        {
-            get { return localCopy.Count; }
-        }
+        public int SectionCount => localCopy.Count;
 
         public int RowsInSection(int sectionIndex)
         {
-            var section = localCopy[(int)sectionIndex];
+            var section = localCopy[sectionIndex];
             return section.Item2.Count;
         }
 

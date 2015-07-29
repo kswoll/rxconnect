@@ -9,7 +9,7 @@ namespace SexyReact.Utils
         public static IObservable<T> ObserveOnUiThread<T>(this IObservable<T> observable)
         {
             var subject = new Subject<T>();
-            observable.Subscribe(x => RxApp.UiScheduler.Schedule<Unit>(default(Unit), (scheduler, state) => 
+            observable.Subscribe(x => RxApp.UiScheduler.Schedule(default(Unit), (scheduler, state) => 
             {
                 subject.OnNext(x);
                 return new EmptyDisposable();
@@ -21,7 +21,7 @@ namespace SexyReact.Utils
         {
             return observable.Subscribe(x => 
             {
-                RxApp.UiScheduler.Schedule<Unit>(default(Unit), (_, __) => 
+                RxApp.UiScheduler.Schedule(default(Unit), (_, __) => 
                 {
                     subscriber(x);
                     return new EmptyDisposable();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SexyReact
 {
-    public interface IRxList<T> : IList<T>, IRxReadOnlyList<T>, IDisposable
+    public interface IRxList<T> : IList<T>, IRxReadOnlyList<T>
     {
         void Move(int fromIndex, int toIndex);
         void Move(int toIndex, T item);
