@@ -28,7 +28,7 @@ namespace SexyReact
                 if (changes.Modified.Any())
                     storage.ModifyRange(changes.Modified.Select(x => new RxListItem<T>(x.Index, selector(x.NewValue))));
                 if (changes.Moved.Any())
-                    storage
+                    storage.MoveRange(changes.Moved.Select(x => new RxListMovedItem<T>(x.FromIndex, x.ToIndex, storage[x.FromIndex])));
             });
 
             // When the returned list is disposed, make sure to unsubscribe from the source list

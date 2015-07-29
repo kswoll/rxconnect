@@ -80,7 +80,7 @@ namespace SexyReact.Views
         {
             IRxCommand command = null;
             Action propagate = () => command.ExecuteAsync();
-            TEventHandler listener = eventHandlerFactory(propagate);
+            var listener = eventHandlerFactory(propagate);
             add(view, listener);
             var buttonDisposable = new ActionDisposable(() => remove(view, listener));
             var subscription = binder.ObserveModelProperty().Subscribe(x => 
