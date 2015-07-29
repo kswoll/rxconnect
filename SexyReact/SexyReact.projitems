@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxDerivedList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxListElementObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IPropertyChanged.cs" />
@@ -29,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxListChange.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListModifiedItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListMovedItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxListObservedElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxPropertyObservable.cs" />

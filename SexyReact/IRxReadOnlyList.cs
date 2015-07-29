@@ -4,7 +4,7 @@ using System.Reactive;
 
 namespace SexyReact
 {
-    public interface IRxReadOnlyList<T> : IReadOnlyList<T>
+    public interface IRxReadOnlyList<T> : IReadOnlyList<T>, IDisposable
     {
         IObservable<Unit> Disposed { get; }
         IObservable<IEnumerable<RxListItem<T>>> RangeAdded { get; }

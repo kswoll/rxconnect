@@ -34,5 +34,10 @@ namespace SexyReact
         {
             this.storage = storage;
         }
+
+        public void Dispose()
+        {
+            storage.Dispose();
+        }
     }
 }
