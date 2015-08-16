@@ -87,7 +87,7 @@
       <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\portable-windows8+net45+wp8\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
     <Reference Include="SexyReact.Fody.Helpers">
-      <HintPath>..\packages\SexyReact.Fody.1.0.19\lib\Xamarin.iOS10\SexyReact.Fody.Helpers.dll</HintPath>
+      <HintPath>..\packages\SexyReact.Fody.1.0.20\lib\Xamarin.iOS10\SexyReact.Fody.Helpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
