@@ -16,8 +16,8 @@ namespace SexyReact.Views
         where TCell : IRxViewObject<TItem>
     {
         private TView view;
-        private RxList<TSection> data;
-        private Func<TSection, RxList<TItem>> itemsInSection;
+        private IRxList<TSection> data;
+        private Func<TSection, IRxList<TItem>> itemsInSection;
         private Dictionary<TItem, TCell> cellsByItem = new Dictionary<TItem, TCell>();
         private List<TCell> globalCellCache = new List<TCell>();
         private Func<TSection, TItem, TCell> cellFactory;
@@ -36,7 +36,7 @@ namespace SexyReact.Views
 
         public RxListViewAdapter(
             TView view, 
-            Func<TSection, RxList<TItem>> itemsInSection,
+            Func<TSection, IRxList<TItem>> itemsInSection,
             Func<TSection, TItem, TCell> cellFactory,
             Action<int> sectionAdded,
             Action<int> sectionRemoved,
@@ -60,7 +60,7 @@ namespace SexyReact.Views
             get { return view; }
         }
 
-        public RxList<TItem> GetItems(int sectionIndex) 
+        public IRxList<TItem> GetItems(int sectionIndex) 
         {
             var section = localCopy[sectionIndex];
             var items = itemsInSection(section.Item1);
@@ -96,7 +96,7 @@ namespace SexyReact.Views
             }
         }
 
-        public RxList<TSection> Data
+        public IRxList<TSection> Data
         {
             get { return data; }
             set 

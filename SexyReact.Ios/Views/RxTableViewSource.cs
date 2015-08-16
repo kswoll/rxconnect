@@ -29,7 +29,7 @@ namespace SexyReact.Views
 
         public RxTableViewSource(
             UITableView tableView, 
-            Func<TSection, RxList<TItem>> itemsInSection,
+            Func<TSection, IRxList<TItem>> itemsInSection,
             Func<TSection, TItem, TCell> cellFactory)
         {
             cellKey = new NSString(typeof(TItem).FullName);
@@ -60,7 +60,7 @@ namespace SexyReact.Views
             }
         }
 
-        public RxList<TSection> Data
+        public IRxList<TSection> Data
         {
             get { return adapter.Data; }
             set { adapter.Data = value; }

@@ -8,6 +8,8 @@ namespace SexyReact.Fody
 {
     public static class CecilExtensions
     {
+        public static Action<string> LogInfo { get; set; }
+
         public static AssemblyNameReference FindAssembly(this ModuleDefinition module, string name)
         {
             return module.AssemblyReferences

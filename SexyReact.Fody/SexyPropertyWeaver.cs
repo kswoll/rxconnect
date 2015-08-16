@@ -45,6 +45,8 @@ namespace SexyReact.Fody
 
         public void Execute()
         {
+            CecilExtensions.LogInfo = LogInfo;
+
             var sexyReact = ModuleDefinition.FindAssembly("SexyReact");
             if (sexyReact == null)
             {

@@ -512,10 +512,13 @@ namespace SexyReact
         /// <param name="obj">The object whose property should be updated.</param>
         /// <param name="observable">The observable whose sequence of values will be used to update the value of the property.</param>
         /// <param name="property">The property whose value should be updated by the observabe.</param>
-        /// <typeparam name="TValue">The property type of the properyt.</typeparam>
+        /// <typeparam name="TValue">The property type of the property.</typeparam>
         public static void ObservableAsProperty<TValue>(this IRxObject obj, IObservable<TValue> observable, PropertyInfo property)
         {
-            obj.Register(observable.DistinctUntilChanged().Subscribe(x => obj.Set(property, x)));
+            obj.Register(observable.DistinctUntilChanged().Subscribe(x => 
+            {
+                obj.Set(property, x);
+            }));
         }
 
         /// <summary>
@@ -525,7 +528,7 @@ namespace SexyReact
         /// <param name="observable">The observable whose sequence of values will be used to update the value of the property.</param>
         /// <param name="property">The property whose value should be updated by the observabe.</param>
         /// <typeparam name="T">The type of the object that contains the property.</typeparam>
-        /// <typeparam name="TValue">The property type of the properyt.</typeparam>
+        /// <typeparam name="TValue">The property type of the property.</typeparam>
         public static void ObservableAsProperty<T, TValue>(this T obj, IObservable<TValue> observable, Expression<Func<T, TValue>> property) 
             where T : IRxObject
         {

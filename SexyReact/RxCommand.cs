@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
+using System.Reactive;
 
 namespace SexyReact
 {
@@ -72,6 +73,11 @@ namespace SexyReact
         public IDisposable Subscribe(IObserver<TOutput> observer)
         {
             return subject.Value.Subscribe(observer);
+        }
+
+        IDisposable IObservable<Unit>.Subscribe(IObserver<Unit> observer)
+        {
+            return ((IObservable<TOutput>)this).Select(x => Unit.Default).Subscribe();
         }
 
         public TOutput Execute(TInput input)
