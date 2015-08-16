@@ -16,3 +16,6 @@ SexyReact.Net45/obj/
 SexyReact.Net45/bin/
 SexyReact.Tester/obj/
 *.nupkg
+SexyReact.Ios/obj/
+nuget/artifacts/
+SexyReact.Fody/nuget/artifacts/

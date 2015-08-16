@@ -12,4 +12,9 @@ namespace SexyReact
     public class RxAttribute : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    public class Rx2Attribute : Attribute
+    {
+    }
 }

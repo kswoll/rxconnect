@@ -35,6 +35,10 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="SexyReact.Fody.Helpers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SexyReact.Fody.1.0.21\lib\net45\SexyReact.Fody.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive.PlatformServices">
@@ -45,9 +49,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="SexyReact.Fody.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\SexyReact.Fody.1.0.18\lib\net45\SexyReact.Fody.Helpers.dll</HintPath>
-    </Reference>
     <Reference Include="System.Reactive.Core">
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
     </Reference>
@@ -62,6 +63,7 @@
     <Compile Include="FodyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RxCommandTests.cs" />
+    <Compile Include="RxListExtensionsTests.cs" />
     <Compile Include="RxListTests.cs" />
     <Compile Include="RxObjectTests.cs" />
     <Compile Include="RxTestSetup.cs" />
@@ -81,6 +83,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SexyReact.Net45\SexyReact.Net45.csproj">
+      <Project>{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}</Project>
+      <Name>SexyReact.Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.0\build\Fody.targets" Condition="Exists('..\packages\Fody.1.29.0\build\Fody.targets')" />

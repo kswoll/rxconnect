@@ -8,6 +8,22 @@ namespace SexyReact.Tests
     public class RxListTests
     {
         [Test]
+        public void MoveSameItem()
+        {
+            var list = new RxList<int>(1, 2, 3);
+            list.Move(2, 2);
+            Assert.AreEqual(3, list[2]);
+        }
+
+        [Test]
+        public void MoveDifferentItem()
+        {
+            var list = new RxList<int>(1, 2, 3);
+            list.Move(1, 2);
+            Assert.AreEqual(2, list[2]);
+        }
+
+        [Test]
         public void Added()
         {
             var list = new RxList<string>();
@@ -191,6 +207,30 @@ namespace SexyReact.Tests
             Assert.AreEqual("1a", item.Value);
             Assert.AreEqual("2a", list[0]);
             Assert.AreEqual("1a", list[1]);
+        }
+
+        [Test]
+        public void ObserveElement()
+        {
+            var one = new TestModel { StringProperty = "1" };
+            var two = new TestModel { StringProperty = "2" };
+            var list = new RxList<TestModel>(one, two);
+            string s = null;
+            list.ObserveElement(x => x.StringProperty).Subscribe(x => s = x.Value);
+
+            list[0].StringProperty = "foo";
+            Assert.AreEqual("foo", s);
+
+            list.Remove(one);
+            one.StringProperty = "bar";
+            Assert.AreEqual("foo", s);
+        }
+
+        [Rx]
+        public class TestModel : RxObject
+        {
+            public string StringProperty { get; set; }
+            public bool BoolProperty { get; set; }
         }
     }
 }

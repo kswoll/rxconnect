@@ -11,12 +11,12 @@ copy ..\SexyReact.nuspec .
 
 mkdir lib
 mkdir lib\net45
-REM mkdir lib\Xamarin.iOS10
+mkdir lib\Xamarin.iOS10
 REM mkdir lib\MonoAndroid
 REM mkdir "lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10"
 
 copy ..\..\bin\Debug\SexyReact.Fody.* .
-REM copy ..\..\ReactiveUI.Fody.Helpers.Ios\bin\iPhone\Debug\ReactiveUI.Fody.Helpers.* lib\Xamarin.iOS10
+copy ..\artifacts\ios\SexyReact.Fody.Helpers.* lib\Xamarin.iOS10
 REM copy ..\..\ReactiveUI.Fody.1.0.26\lib\Xamarin.iOS10\ReactiveUI.Fody.Helpers.* lib\Xamarin.iOS10
 copy ..\..\..\SexyReact.Fody.Helpers.Net45\bin\Debug\SexyReact.Fody.Helpers.* lib\net45
 REM copy ..\..\ReactiveUI.Fody.Helpers.Pcl\bin\Debug\ReactiveUI.Fody.Helpers.* "lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10"

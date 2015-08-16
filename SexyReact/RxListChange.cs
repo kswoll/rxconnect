@@ -5,37 +5,17 @@ namespace SexyReact
 {
     public struct RxListChange<T>
     {
-        private readonly IEnumerable<RxListItem<T>> added;
-        private readonly IEnumerable<RxListItem<T>> removed;
-        private readonly IEnumerable<RxListMovedItem<T>> moved;
-        private readonly IEnumerable<RxListModifiedItem<T>> modified;
+        public IEnumerable<RxListItem<T>> Added { get; }
+        public IEnumerable<RxListItem<T>> Removed { get; }
+        public IEnumerable<RxListModifiedItem<T>> Modified { get; }
+        public RxListMovedItem<T>? Moved { get; }
 
-        public RxListChange(IEnumerable<RxListItem<T>> added = null, IEnumerable<RxListItem<T>> removed = null, IEnumerable<RxListMovedItem<T>> moved = null, IEnumerable<RxListModifiedItem<T>> modified = null)
+        public RxListChange(IEnumerable<RxListItem<T>> added = null, IEnumerable<RxListItem<T>> removed = null, IEnumerable<RxListModifiedItem<T>> modified = null, RxListMovedItem<T>? moved = null)
         {
-            this.added = added ?? Enumerable.Empty<RxListItem<T>>();
-            this.removed = removed ?? Enumerable.Empty<RxListItem<T>>();
-            this.moved = moved ?? Enumerable.Empty<RxListMovedItem<T>>();
-            this.modified = modified ?? Enumerable.Empty<RxListModifiedItem<T>>();
-        }
-
-        public IEnumerable<RxListItem<T>> Added
-        {
-            get { return added; }
-        }
-
-        public IEnumerable<RxListItem<T>> Removed
-        {
-            get { return removed; }
-        }
-
-        public IEnumerable<RxListMovedItem<T>> Moved
-        {
-            get { return moved; }
-        }
-
-        public IEnumerable<RxListModifiedItem<T>> Modified
-        {
-            get { return modified; }
+            Added = added ?? Enumerable.Empty<RxListItem<T>>();
+            Removed = removed ?? Enumerable.Empty<RxListItem<T>>();
+            Modified = modified ?? Enumerable.Empty<RxListModifiedItem<T>>();
+            Moved = moved;
         }
     }
 }
