@@ -73,6 +73,7 @@ namespace SexyReact.Fody
             foreach (var targetType in targetTypes)
             {
                 var rxForClass = targetType.IsDefined(reactiveAttribute);
+                var logger = rxForClass ? LogInfo : LogWarning;
 
                 PropertyDefinition[] properties;
 
@@ -108,7 +109,7 @@ namespace SexyReact.Fody
 
                         if (property.GetMethod == null || property.SetMethod == null)
                         {
-                            LogWarning($"Rx properties must have both a getter and a setter.  Skipping {targetType}.{property.Name}");
+                            logger($"Rx properties must have both a getter and a setter.  Skipping {targetType}.{property.Name}");
                             continue;
                         }
 
@@ -116,7 +117,7 @@ namespace SexyReact.Fody
                         var oldFieldInstruction = property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).SingleOrDefault();
                         if (oldFieldInstruction == null)
                         {
-                            LogWarning($"Rx properties must be auto-properties.  The backing field for property {targetType}.{property.Name} not found.");
+                            logger($"Rx properties must be auto-properties.  The backing field for property {targetType}.{property.Name} not found.");
                             continue;
                         }
                         var oldField = (FieldReference)property.GetMethod.Body.Instructions.Where(x => x.Operand is FieldReference).Single().Operand;
