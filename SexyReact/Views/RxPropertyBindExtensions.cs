@@ -110,8 +110,8 @@ namespace SexyReact.Views
             if (setMainMember == null)
                 throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", nameof(viewProperty));
 
-            Stack<MemberExpression> stack = new Stack<MemberExpression>();
-            MemberExpression member = setMainMember;
+            var stack = new Stack<MemberExpression>();
+            var member = setMainMember;
             while (member != null)
             {
                 stack.Push(member);

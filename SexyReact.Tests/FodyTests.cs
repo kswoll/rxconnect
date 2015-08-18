@@ -44,6 +44,16 @@ namespace SexyReact.Tests
             obj.StringProperty = "foo";
             Assert.AreEqual("foo", s);
         }
+
+        [Test]
+        public void EntireSubClass()
+        {
+            var obj = new RxSubClassObject();
+            string s = null;
+            obj.ObserveProperty(x => x.Description).Subscribe(x => s = x);
+            obj.Description = "foo";
+            Assert.AreEqual("foo", s);
+        }
     }
 
     public class TestFodyObject : RxObject
@@ -55,6 +65,11 @@ namespace SexyReact.Tests
     public class RxClassObject : RxObject
     {
         public string StringProperty { get; set; }
+    }
+
+    public class RxSubClassObject : RxClassObject
+    {
+        public string Description { get; set; }
     }
 
     public class TestFodyStaticConstructor : RxObject

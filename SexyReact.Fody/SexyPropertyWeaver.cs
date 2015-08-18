@@ -72,7 +72,7 @@ namespace SexyReact.Fody
             var getTypeFromTypeHandle = ModuleDefinition.Import(typeType.Resolve().Methods.Single(x => x.Name == "GetTypeFromHandle"));
             foreach (var targetType in targetTypes)
             {
-                var rxForClass = targetType.IsDefined(reactiveAttribute);
+                var rxForClass = targetType.IsDefined(reactiveAttribute, true);
                 var logger = rxForClass ? LogInfo : LogWarning;
 
                 PropertyDefinition[] properties;
