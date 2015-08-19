@@ -81,9 +81,17 @@ namespace SexyReact.Fody
         public static bool IsDefined(this IMemberDefinition member, TypeReference attributeType, bool inherit = false)
         {
             var typeIsDefined = member.HasCustomAttributes && member.CustomAttributes.Any(x => x.AttributeType.FullName == attributeType.FullName);
-            if (inherit && member.DeclaringType.BaseType != null)
+            if (!typeIsDefined)
             {
-                typeIsDefined = member.DeclaringType.BaseType.Resolve().IsDefined(attributeType, true);
+                if (inherit && member is TypeDefinition)
+                {
+                    if (((TypeDefinition)member).BaseType != null)
+                        typeIsDefined = ((TypeDefinition)member).BaseType.Resolve().IsDefined(attributeType, true);
+                }
+                else if (inherit && member.DeclaringType.BaseType != null)
+                {
+                    typeIsDefined = member.DeclaringType.BaseType.Resolve().IsDefined(attributeType, true);
+                }                
             }
             return typeIsDefined;
         }
