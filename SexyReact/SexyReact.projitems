@@ -59,7 +59,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxListViewAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxCommandBindExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Views\RxInputBindExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />
