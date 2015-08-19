@@ -36,7 +36,7 @@ namespace SexyReact
         /// then subsequent calls to ExecuteAsync return the defaultValue until the execution of the initial invocation completes.</param>
         public static IRxCommand CreateAsync(Func<Task> action, IObservable<bool> canExecute = null, bool allowSimultaneousExecution = false)
         {
-            return new RxCommand<Unit, Unit>(
+            return new RxCommand<Unit>(
                 async x => 
                 {
                     await action();
@@ -56,7 +56,7 @@ namespace SexyReact
         /// then subsequent calls to ExecuteAsync return the defaultValue until the execution of the initial invocation completes.</param>
         public static IRxCommand<TInput> Create<TInput>(Action<TInput> action, IObservable<bool> canExecute = null, bool allowSimultaneousExecution = false)
         {
-            return new RxCommand<TInput, Unit>(
+            return new RxCommand<TInput>(
                 x =>
                 {
                     action(x);
@@ -76,7 +76,7 @@ namespace SexyReact
         /// then subsequent calls to ExecuteAsync return the defaultValue until the execution of the initial invocation completes.</param>
         public static IRxCommand<TInput> CreateAsync<TInput>(Func<TInput, Task> action, IObservable<bool> canExecute = null, bool allowSimultaneousExecution = false)
         {
-            return new RxCommand<TInput, Unit>(
+            return new RxCommand<TInput>(
                 async x =>
                 {
                     await action(x);

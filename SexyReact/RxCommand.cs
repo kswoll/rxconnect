@@ -6,9 +6,28 @@ using System.Reactive;
 
 namespace SexyReact
 {
+    public class RxCommand<TInput> : 
+        RxCommand<TInput, Unit>, 
+        IRxCommand,
+        IRxCommand<TInput>
+    {
+        public RxCommand(Func<TInput, Task<Unit>> action, IObservable<bool> canExecute = null, Func<Unit> defaultValue = null, bool allowSimultaneousExecution = false) 
+            : base(action, canExecute, defaultValue, allowSimultaneousExecution)
+        {
+        }
+
+        Task IRxCommand.ExecuteAsync()
+        {
+            return ExecuteAsync(default(TInput));
+        }
+
+        Task IRxCommand<TInput>.ExecuteAsync(TInput input)
+        {
+            return ExecuteAsync(input);
+        }
+    }
+
     public class RxCommand<TInput, TOutput> : 
-        IRxCommand, 
-        IRxCommand<TInput>, 
         IRxFunction<TOutput>, 
         IRxFunction<TInput, TOutput>
     {
@@ -68,15 +87,6 @@ namespace SexyReact
             return subject.Value.Subscribe(observer);
         }
 
-        IDisposable IObservable<Unit>.Subscribe(IObserver<Unit> observer)
-        {
-            if (typeof(TOutput) == typeof(Unit))
-                return Subscribe((IObserver<TOutput>)observer);
-                
-
-            return ((IObservable<TOutput>)this).Select(x => Unit.Default).Subscribe();
-        }
-
         public TOutput Execute(TInput input)
         {
             return ExecuteAsync(input).Result;
@@ -118,16 +128,6 @@ namespace SexyReact
             {
                 isAllowedToExecute = value;
             }
-        }
-
-        Task IRxCommand.ExecuteAsync()
-        {
-            return ExecuteAsync(default(TInput));
-        }
-
-        Task IRxCommand<TInput>.ExecuteAsync(TInput input)
-        {
-            return ExecuteAsync(input);
         }
 
         Task<TOutput> IRxFunction<TOutput>.ExecuteAsync()
