@@ -71,20 +71,22 @@ namespace SexyReact.Views
             return adapter.GetCell(indexPath.Section, indexPath.Row);
         }
 
-        private void OnItemsAdded(int sectionIndex, TSection section, IEnumerable<Tuple<int, TItem>> items)
+        private void OnItemsAdded(int sectionIndex, TSection section, IEnumerable<Tuple<int, TItem>> items, Action addToLocal)
         {
             CATransaction.DisableActions = true;
             TableView.BeginUpdates();
+            addToLocal();
             TableView.InsertRows(items.Select(x => NSIndexPath.FromItemSection(x.Item1, sectionIndex)).ToArray(), 
                 UITableViewRowAnimation.None);
             TableView.EndUpdates();
             CATransaction.DisableActions = false;
         }
 
-        protected virtual void OnItemsRemoved(int sectionIndex, TSection section, IEnumerable<Tuple<int, TItem>> items)
+        protected virtual void OnItemsRemoved(int sectionIndex, TSection section, IEnumerable<Tuple<int, TItem>> items, Action removeFromLocal)
         {
             CATransaction.DisableActions = true;
             TableView.BeginUpdates();
+            removeFromLocal();
             TableView.DeleteRows(items.Select(x => NSIndexPath.FromItemSection(x.Item1, sectionIndex)).ToArray(),
                 UITableViewRowAnimation.None);
             TableView.EndUpdates();

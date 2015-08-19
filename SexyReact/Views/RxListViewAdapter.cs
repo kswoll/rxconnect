@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using SexyReact.Utils;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace SexyReact.Views
 {
@@ -24,15 +25,15 @@ namespace SexyReact.Views
         private IDisposable sectionAddedSubscription;
         private IDisposable sectionRemovedSubscription;
         private Dictionary<TSection, IDisposable[]> sectionSubscriptions = new Dictionary<TSection, IDisposable[]>();
-        private List<Tuple<TSection, List<TItem>>> localCopy = new List<Tuple<TSection, List<TItem>>>();
+        private List<Tuple<TSection, ObservableCollection<TItem>>> localCopy = new List<Tuple<TSection, ObservableCollection<TItem>>>();
         private RxListViewAdapterCachingPolicy cachingPolicy = RxListViewAdapterCachingPolicy.GlobalCache;
         private bool disposed;
         private Func<TCell> reuseCellProvider;
 
         private Action<int> sectionAdded;
         private Action<int> sectionRemoved;
-        private Action<int, TSection, IEnumerable<Tuple<int, TItem>>> itemsAdded;
-        private Action<int, TSection, IEnumerable<Tuple<int, TItem>>> itemsRemoved;
+        private Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsAdded;
+        private Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsRemoved;
 
         public RxListViewAdapter(
             TView view, 
@@ -40,8 +41,8 @@ namespace SexyReact.Views
             Func<TSection, TItem, TCell> cellFactory,
             Action<int> sectionAdded,
             Action<int> sectionRemoved,
-            Action<int, TSection, IEnumerable<Tuple<int, TItem>>> itemsAdded,
-            Action<int, TSection, IEnumerable<Tuple<int, TItem>>> itemsRemoved,
+            Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsAdded,
+            Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsRemoved,
             Func<TCell> reuseCellProvider
         )
         {
@@ -101,23 +102,26 @@ namespace SexyReact.Views
             get { return data; }
             set 
             { 
-                if (data != null)
+                if (data != value) 
                 {
-                    sectionAddedSubscription.Dispose();
-                    sectionRemovedSubscription.Dispose();
-                    foreach (var section in data)
+                    if (data != null)
                     {
-                        OnSectionRemoved(section);
+                        sectionAddedSubscription.Dispose();
+                        sectionRemovedSubscription.Dispose();
+                        foreach (var section in data)
+                        {
+                            OnSectionRemoved(section);
+                        }
                     }
-                }
-                data = value;
-                if (value != null)
-                {
-                    sectionAddedSubscription = value.ItemAdded.Subscribe(OnSectionAdded);
-                    sectionRemovedSubscription = value.ItemRemoved.Subscribe(OnSectionRemoved);
-                    foreach (var section in value)
+                    data = value;
+                    if (value != null)
                     {
-                        OnSectionAdded(section);
+                        sectionAddedSubscription = value.ItemAdded.Subscribe(OnSectionAdded);
+                        sectionRemovedSubscription = value.ItemRemoved.Subscribe(OnSectionRemoved);
+                        foreach (var section in value)
+                        {
+                            OnSectionAdded(section);
+                        }
                     }
                 }
             }
@@ -126,7 +130,17 @@ namespace SexyReact.Views
         protected virtual void OnSectionAdded(TSection section)
         {
             var items = itemsInSection(section);
-            var localItems = new List<TItem>();
+            var localItems = new ObservableCollection<TItem>();
+            localItems.CollectionChanged += (object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => 
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (var item in e.NewItems)
+                    {
+                        Console.WriteLine($"{typeof(TItem).FullName}");
+                    }
+                }
+            };
             var sectionIndex = data.IndexOf(section);
             localCopy.Insert(sectionIndex, Tuple.Create(section, localItems));
             sectionAdded?.Invoke(data.IndexOf(section));
@@ -189,22 +203,26 @@ namespace SexyReact.Views
         protected virtual void OnItemsAdded(TSection section, IEnumerable<Tuple<int, TItem>> items)
         {
             var sectionIndex = localCopy.IndexOf(x => Equals(x.Item1, section));
-            foreach (var item in items.OrderBy(x => x.Item1))
+            itemsAdded?.Invoke(sectionIndex, section, items, () => 
             {
-                localCopy[sectionIndex].Item2.Insert(item.Item1, item.Item2);
-            }
-            itemsAdded?.Invoke(sectionIndex, section, items);
+                foreach (var item in items.OrderBy(x => x.Item1))
+                {
+                    localCopy[sectionIndex].Item2.Insert(item.Item1, item.Item2);
+                }
+            });
         }
 
         protected virtual void OnItemsRemoved(TSection section, IEnumerable<Tuple<int, TItem>> items)
         {
             var sectionIndex = localCopy.IndexOf(x => Equals(x.Item1, section));
             var localItems = localCopy[sectionIndex];
-            foreach (var item in items.OrderByDescending(x => x.Item1))
+            itemsRemoved?.Invoke(sectionIndex, section, items, () =>
             {
-                localItems.Item2.RemoveAt(item.Item1);
-            }
-            itemsRemoved?.Invoke(sectionIndex, section, items);
+                foreach (var item in items.OrderByDescending(x => x.Item1))
+                {
+                    localItems.Item2.RemoveAt(item.Item1);
+                }
+            });
             foreach (var item in items)
             {
                 ReleaseCell(item.Item2);
