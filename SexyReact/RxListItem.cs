@@ -5,29 +5,20 @@
     /// </summary>
     public struct RxListItem<T>
     {
-        private readonly int index;
-        private readonly T value;
-
-        public RxListItem(int index, T value)
-        {
-            this.index = index;
-            this.value = value;
-        }
-
         /// <summary>
         /// The index of the item at the time an action occurred.
         /// </summary>
-        public int Index
-        {
-            get { return index; }
-        }
+        public int Index { get; }
 
         /// <summary>
         /// The element within the RxList that was involved in some action.
         /// </summary>
-        public T Value
+        public T Value { get; }
+
+        public RxListItem(int index, T value)
         {
-            get { return value; }
+            Index = index;
+            Value = value;
         }
     }
 }

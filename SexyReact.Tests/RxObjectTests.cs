@@ -124,7 +124,7 @@ namespace SexyReact.Tests
         {
             var obj = new ContainerObject();
             string value = "error";
-            obj.ObserveProperty<ContainerObject, string>(new[] { typeof(ContainerObject).GetProperty("Test"), typeof(TestObject).GetProperty("StringProperty") }).Subscribe(x => value = x);
+            obj.ObserveProperty<ContainerObject, string>(typeof(ContainerObject).GetProperty("Test"), typeof(TestObject).GetProperty("StringProperty")).Subscribe(x => value = x);
 
             Assert.IsNull(value);
 
@@ -261,7 +261,7 @@ namespace SexyReact.Tests
 
         public class PropertyForObservableObject : RxObject
         {
-            public string ProxyProperty { get { return Get<string>(); } }
+            public string ProxyProperty => Get<string>();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace SexyReact.Utils
@@ -35,13 +34,16 @@ namespace SexyReact.Utils
 
         private struct ReturnEnumerator<T> : IEnumerator<T>
         {
-            private T value;
+            public T Current { get; }
+
             private bool hasReadValue;
 
             public ReturnEnumerator(T value) : this()
             {
-                this.value = value;
+                Current = value;
             }
+
+            object IEnumerator.Current => Current;
 
             public void Dispose()
             {
@@ -63,16 +65,6 @@ namespace SexyReact.Utils
             public void Reset()
             {
                 hasReadValue = false;
-            }
-
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
-
-            public T Current
-            {
-                get { return value; }
             }
         }
 
@@ -128,30 +120,15 @@ namespace SexyReact.Utils
 
         public struct MergeResult<TLeft, TRight, TUnchanged>
         {
-            private readonly List<TRight> added;
-            private readonly List<TLeft> removed;
-            private readonly List<TUnchanged> unchanged;
+            public List<TRight> Added { get; }
+            public List<TLeft> Removed { get; }
+            public List<TUnchanged> Unchanged { get; }
 
             public MergeResult(List<TRight> added, List<TLeft> removed, List<TUnchanged> unchanged) : this()
             {
-                this.added = added;
-                this.removed = removed;
-                this.unchanged = unchanged;
-            }
-
-            public List<TRight> Added
-            {
-                get { return added; }
-            }
-
-            public List<TLeft> Removed
-            {
-                get { return removed; }
-            }
-
-            public List<TUnchanged> Unchanged
-            {
-                get { return unchanged; }
+                Added = added;
+                Removed = removed;
+                Unchanged = unchanged;
             }
         }
 

@@ -108,7 +108,7 @@ namespace SexyReact.Views
         {
             var setMainMember = viewProperty.Body as MemberExpression;
             if (setMainMember == null)
-                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "viewProperty");
+                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", nameof(viewProperty));
 
             Stack<MemberExpression> stack = new Stack<MemberExpression>();
             MemberExpression member = setMainMember;
@@ -125,7 +125,7 @@ namespace SexyReact.Views
                 var expression = stack.Pop();
                 target = Expression.MakeMemberAccess(target, expression.Member);
 
-                var memberType = expression.Member is FieldInfo ? ((FieldInfo)expression.Member).FieldType : ((PropertyInfo)expression.Member).PropertyType;
+                var memberType = (expression.Member as FieldInfo)?.FieldType ?? ((PropertyInfo)expression.Member).PropertyType;
                 if (!memberType.IsValueType && stack.Any())
                     predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
             }
@@ -142,7 +142,7 @@ namespace SexyReact.Views
         {
             var setMainMember = binder.ModelProperty.Body as MemberExpression;
             if (setMainMember == null)
-                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "modelProperty");
+                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "binder");
 
             Stack<MemberExpression> stack = new Stack<MemberExpression>();
             MemberExpression member = setMainMember;

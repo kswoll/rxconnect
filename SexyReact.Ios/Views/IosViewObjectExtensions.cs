@@ -33,7 +33,10 @@ namespace SexyReact.Views
             var tableSource = new RxTableViewSource<IRxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item));
             var result = binder
                 .ObserveModelProperty()
-                .Subscribe(x => tableSource.Data = x == null ? null : new RxList<IRxList<TModelItem>>(x));
+                .Subscribe(x => 
+                {
+                    tableSource.Data = x == null ? null : new RxList<IRxList<TModelItem>>(x);
+                });
             tableView.Source = tableSource;
             return result;
         }

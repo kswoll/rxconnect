@@ -2,30 +2,15 @@
 {
     public struct RxListModifiedItem<T>
     {
-        private int index;
-        private readonly T oldValue;
-        private readonly T newValue;
+        public int Index { get; }
+        public T OldValue { get; }
+        public T NewValue { get; }
 
         public RxListModifiedItem(int index, T oldValue, T newValue)
         {
-            this.index = index;
-            this.oldValue = oldValue;
-            this.newValue = newValue;
-        }
-
-        public int Index
-        {
-            get { return index; }
-        }
-
-        public T OldValue
-        {
-            get { return oldValue; }
-        }
-
-        public T NewValue
-        {
-            get { return newValue; }
+            Index = index;
+            OldValue = oldValue;
+            NewValue = newValue;
         }
     }
 }

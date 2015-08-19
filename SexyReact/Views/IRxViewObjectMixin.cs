@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SexyReact.Views
+﻿namespace SexyReact.Views
 {
     public interface IRxViewObjectMixin<T> : IRxViewObject<T>, IRxObjectMixin
         where T : IRxObject

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 
 namespace SexyReact
 {
-    public class RxDerivedList<T> : IRxReadOnlyList<T>
+    /// <summary>
+    /// Use RxListExtensions' list.Derive(...)
+    /// </summary>
+    public class RxDerivedList<TSource, T> : IRxReadOnlyList<T>
     {
-        private RxList<T> storage;
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<T> GetEnumerator() => storage.GetEnumerator();
         public int Count => storage.Count;
         public T this[int index] => storage[index];
@@ -29,15 +30,74 @@ namespace SexyReact
         public IObservable<IEnumerable<T>> ItemsAdded => storage.ItemsAdded;
         public IObservable<IEnumerable<T>> ItemsRemoved => storage.ItemsRemoved;
         public IObservable<IEnumerable<T>> ItemsModified => storage.ItemsModified;
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public RxDerivedList(RxList<T> storage)
+        protected readonly RxList<T> storage;
+
+        private IDisposable subscription;
+        private object locker = new object();
+        private Func<TSource, T> selector;
+        private Action<T> removed;
+
+        protected internal RxDerivedList(IRxList<TSource> source, Func<TSource, T> selector, Action<T> removed = null)
         {
-            this.storage = storage;
+            this.selector = selector;
+            this.removed = removed;
+
+            storage = new RxList<T>(source.Select(selector));
+
+            lock (locker)
+            {
+                subscription = source.Changed.Subscribe(OnSourceChanged);
+            }
+        }
+
+        protected virtual void OnSourceChanged(RxListChange<TSource> changes)
+        {
+            lock (locker)
+            {
+                OnInsert(changes.Added.ToArray());
+                OnRemove(changes.Removed.OrderByDescending(x => x.Index).ToArray());
+                OnModify(changes.Modified.ToArray());
+                if (changes.Moved != null)
+                {
+                    OnMove(changes.Moved.Value);
+                }                    
+            }            
+        }
+
+        protected virtual void OnInsert(IEnumerable<RxListItem<TSource>> inserts)
+        {
+            storage.InsertRange(inserts.Select(x => new RxListItem<T>(x.Index, selector(x.Value))));
+        }
+
+        protected virtual void OnRemove(IEnumerable<RxListItem<TSource>> removes)
+        {
+            foreach (var item in removes)
+            {
+                removed?.Invoke(storage[item.Index]);
+                storage.RemoveAt(item.Index);            
+            }
+        }
+
+        protected virtual void OnModify(IEnumerable<RxListModifiedItem<TSource>> modifications)
+        {
+            foreach (var item in modifications)
+            {
+                removed?.Invoke(storage[item.Index]);
+                storage[item.Index] = selector(item.NewValue);
+            }
+        }
+
+        protected virtual void OnMove(RxListMovedItem<TSource> move)
+        {
+            storage.Move(move.FromIndex, move.ToIndex);            
         }
 
         public void Dispose()
         {
             storage.Dispose();
+            subscription.Dispose();
         }
     }
 }

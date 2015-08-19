@@ -13,10 +13,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICanExecute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxListObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxReadOnlyList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxDerivedList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxFilteredList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListElementObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListItem.cs" />
@@ -56,6 +58,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\ActionDisposable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxListViewAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxCommandBindExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\RxInputBindExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)packages.config" />

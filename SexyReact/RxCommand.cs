@@ -60,15 +60,8 @@ namespace SexyReact
             this.canExecute = new Lazy<IObservable<bool>>(canExecuteFactory);
         }
 
-        public IObservable<bool> CanExecute
-        {
-            get { return canExecute.Value; }
-        }
-
-        public IObservable<bool> IsExecuting
-        {
-            get { return isExecuting.Value; }
-        }
+        public IObservable<bool> CanExecute => canExecute.Value;
+        public IObservable<bool> IsExecuting => isExecuting.Value;
 
         public IDisposable Subscribe(IObserver<TOutput> observer)
         {
@@ -77,6 +70,10 @@ namespace SexyReact
 
         IDisposable IObservable<Unit>.Subscribe(IObserver<Unit> observer)
         {
+            if (typeof(TOutput) == typeof(Unit))
+                return Subscribe((IObserver<TOutput>)observer);
+                
+
             return ((IObservable<TOutput>)this).Select(x => Unit.Default).Subscribe();
         }
 

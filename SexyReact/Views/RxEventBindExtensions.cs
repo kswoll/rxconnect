@@ -67,7 +67,6 @@ namespace SexyReact.Views
             return new CompositeDisposable(toSubscription, new Unsubscribe<TView, TEventHandler>(view, remove, listener));
         }
 
-
         public static IDisposable To<TModel, TModelValue, TView, TEventHandler>(
             this RxViewObjectBinder<TModel, TModelValue> binder,
             TView view, 

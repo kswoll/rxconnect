@@ -59,6 +59,7 @@
     <Compile Include="Views\RxTableViewSource.cs" />
     <Compile Include="Views\RxViewController.cs" />
     <Compile Include="IosUiScheduler.cs" />
+    <Compile Include="Views\UIControlEventBindExtensions.cs" />
   </ItemGroup>
   <Import Project="..\SexyReact\SexyReact.projitems" Label="Shared" Condition="Exists('..\SexyReact\SexyReact.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

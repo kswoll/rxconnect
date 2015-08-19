@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -28,15 +27,10 @@ namespace SexyReact
             this.observePropertyStrategy = observePropertyStrategy;
         }
 
-        public IObservable<IPropertyChanging> Changing
-        {
-            get { return changing.Value; }
-        }
-
-        public IObservable<IPropertyChanged> Changed
-        {
-            get { return changed.Value; }
-        }
+        public IObservable<IPropertyChanging> Changing => changing.Value;
+        public IObservable<IPropertyChanged> Changed => changed.Value;
+        TValue IRxObject.Get<TValue>(PropertyInfo property) => Get<TValue>(property);
+        void IRxObject.Set<TValue>(PropertyInfo property, TValue value) => Set(property, value);
 
         /// <summary>
         /// Gets the current value of the property as returned by the IStorageStrategy.
@@ -62,11 +56,11 @@ namespace SexyReact
         protected TValue Get<TValue>([CallerMemberName]string propertyName = null)
         {
             if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
+                throw new ArgumentNullException(nameof(propertyName));
 
             var propertyInfo = GetType().GetProperty(propertyName);
             if (propertyInfo == null)
-                throw new ArgumentException("Property not found", "propertyName");
+                throw new ArgumentException("Property not found", nameof(propertyName));
 
             return Get<TValue>(propertyInfo);
         }
@@ -111,11 +105,11 @@ namespace SexyReact
         protected void Set<TValue>(TValue newValue, [CallerMemberName]string propertyName = null)
         {
             if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
+                throw new ArgumentNullException(nameof(propertyName));
 
             var propertyInfo = GetType().GetProperty(propertyName);
             if (propertyInfo == null)
-                throw new ArgumentException("Property not found", "propertyName");
+                throw new ArgumentException("Property not found", nameof(propertyName));
 
             Set(propertyInfo, newValue);
         }
@@ -135,16 +129,6 @@ namespace SexyReact
         public void Register(IDisposable disposable)
         {
             disposables.Value.Add(disposable);
-        }
-
-        TValue IRxObject.Get<TValue>(PropertyInfo property)
-        {
-            return Get<TValue>(property);
-        }
-
-        void IRxObject.Set<TValue>(PropertyInfo property, TValue value)
-        {
-            Set(property, value);
         }
 
         public void Dispose()
