@@ -11,6 +11,16 @@ namespace SexyReact
         IRxCommand,
         IRxCommand<TInput>
     {
+        /// <summary>
+        /// You are free to create commands using this constructor, but you may find it more convenient to use one of 
+        /// the factory methods in RxCommand and RxFunction.
+        /// </summary>
+        /// <param name="action">The action to execute when invoking the command.</param>
+        /// <param name="canExecute">An observable that dictates whether or not the command may execute. If not 
+        /// specified, an observable is created that produces true.</param>
+        /// <param name="defaultValue">A factory function to provide the return value for when the method fails to execute.</param>
+        /// <param name="allowSimultaneousExecution">If true, multiple execution of this command may be performed.  If false, 
+        /// then subsequent calls to ExecuteAsync return the defaultValue until the execution of the initial invocation completes.</param>
         public RxCommand(Func<TInput, Task<Unit>> action, IObservable<bool> canExecute = null, Func<Unit> defaultValue = null, bool allowSimultaneousExecution = false) 
             : base(action, canExecute, defaultValue, allowSimultaneousExecution)
         {
