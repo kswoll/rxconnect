@@ -131,16 +131,6 @@ namespace SexyReact.Views
         {
             var items = itemsInSection(section);
             var localItems = new ObservableCollection<TItem>();
-            localItems.CollectionChanged += (object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => 
-            {
-                if (e.NewItems != null)
-                {
-                    foreach (var item in e.NewItems)
-                    {
-                        Console.WriteLine($"{typeof(TItem).FullName}");
-                    }
-                }
-            };
             var sectionIndex = data.IndexOf(section);
             localCopy.Insert(sectionIndex, Tuple.Create(section, localItems));
             sectionAdded?.Invoke(data.IndexOf(section));
