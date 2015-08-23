@@ -48,7 +48,7 @@ namespace SexyReact
                 throw new ArgumentNullException(nameof(obj));
             var memberExpression = property.Body as MemberExpression;
             if (memberExpression == null)
-                throw new ArgumentException("Lambda should specify a property.", nameof(property));
+                throw new ArgumentException($"Lambda '{property}' should specify a property.", nameof(property));
 
             var initialPropertyInfo = memberExpression.Member as PropertyInfo;
             if (initialPropertyInfo == null)

@@ -30,7 +30,8 @@ namespace SexyReact.Views
         public RxTableViewSource(
             UITableView tableView, 
             Func<TSection, IRxList<TItem>> itemsInSection,
-            Func<TSection, TItem, TCell> cellFactory)
+            Func<TSection, TItem, TCell> cellFactory,
+            Func<TSection, TItem, IRxCommand> onRemoveItem)
         {
             cellKey = new NSString(typeof(TItem).FullName);
             adapter = new RxListViewAdapter<UITableView, TSection, TItem, TCell>(tableView, itemsInSection, cellFactory, 
@@ -38,7 +39,8 @@ namespace SexyReact.Views
                 sectionIndex => tableView.DeleteSections(NSIndexSet.FromIndex(sectionIndex), UITableViewRowAnimation.Automatic),
                 OnItemsAdded,
                 OnItemsRemoved,
-                () => (TCell)tableView.DequeueReusableCell(cellKey));
+                () => (TCell)tableView.DequeueReusableCell(cellKey),
+                onRemoveItem);
         }
 
         public UITableView TableView

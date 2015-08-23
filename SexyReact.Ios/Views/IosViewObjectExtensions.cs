@@ -24,13 +24,14 @@ namespace SexyReact.Views
         public static IDisposable To<TModel, TModelItem, TCell>(
             this RxViewObjectBinder<TModel, RxList<TModelItem>> binder,
             UITableView tableView, 
-            Func<TModelItem, TCell> cellFactory
+            Func<TModelItem, TCell> cellFactory,
+            Func<IRxList<TModelItem>, TModelItem, IRxCommand> onRemoveItem = null
         )
             where TModel : IRxObject
             where TModelItem : IRxObject
             where TCell : RxTableViewCell<TModelItem>
         {
-            var tableSource = new RxTableViewSource<IRxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item));
+            var tableSource = new RxTableViewSource<IRxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item), onRemoveItem);
             var result = binder
                 .ObserveModelProperty()
                 .Subscribe(x => 
@@ -56,13 +57,14 @@ namespace SexyReact.Views
         public static IDisposable To<TModel, TModelItem, TCell>(
             this RxViewObjectBinder<TModel, IRxList<TModelItem>> binder,
             UITableView tableView, 
-            Func<TModelItem, TCell> cellFactory
+            Func<TModelItem, TCell> cellFactory,
+            Func<IRxList<TModelItem>, TModelItem, IRxCommand> onRemoveItem = null
         )
             where TModel : IRxObject
             where TModelItem : IRxObject
             where TCell : RxTableViewCell<TModelItem>
         {
-            var tableSource = new RxTableViewSource<IRxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item));
+            var tableSource = new RxTableViewSource<IRxList<TModelItem>, TModelItem, TCell>(tableView, x => x, (section, item) => cellFactory(item), onRemoveItem);
             var result = binder
                 .ObserveModelProperty()
                 .Subscribe(x => tableSource.Data = x == null ? null : new RxList<IRxList<TModelItem>>(x));

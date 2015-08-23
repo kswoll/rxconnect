@@ -34,6 +34,7 @@ namespace SexyReact.Views
         private Action<int> sectionRemoved;
         private Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsAdded;
         private Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsRemoved;
+        private Func<TSection, TItem, IRxCommand> onRemoveItem;
 
         public RxListViewAdapter(
             TView view, 
@@ -43,7 +44,8 @@ namespace SexyReact.Views
             Action<int> sectionRemoved,
             Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsAdded,
             Action<int, TSection, IEnumerable<Tuple<int, TItem>>, Action> itemsRemoved,
-            Func<TCell> reuseCellProvider
+            Func<TCell> reuseCellProvider,
+            Func<TSection, TItem, IRxCommand> onRemoveItem
         )
         {
             this.view = view;
@@ -54,6 +56,7 @@ namespace SexyReact.Views
             this.itemsAdded = itemsAdded;
             this.itemsRemoved = itemsRemoved;
             this.reuseCellProvider = reuseCellProvider;
+            this.onRemoveItem = onRemoveItem;
         }
 
         public TView View
@@ -74,6 +77,9 @@ namespace SexyReact.Views
             var item = section.Item2[itemIndex];
             var items = itemsInSection(section.Item1);
             items.Remove(item);
+
+            if (onRemoveItem != null)
+                onRemoveItem(section.Item1, item).ExecuteAsync();
         }
 
         public void Dispose()
