@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FodyTests.cs" />
+    <Compile Include="MemoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RxCommandTests.cs" />
     <Compile Include="RxListExtensionsTests.cs" />

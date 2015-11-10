@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Reflection;
 
@@ -8,7 +9,7 @@ namespace SexyReact
     public class DictionaryObservePropertyStrategy : IObservePropertyStrategy
     {
         private IRxObject obj;
-        private ConcurrentDictionary<string, object> observables = new ConcurrentDictionary<string, object>();
+        private Dictionary<string, object> observables = new Dictionary<string, object>();
 
         public DictionaryObservePropertyStrategy(IRxObject obj)
         {
@@ -17,16 +18,19 @@ namespace SexyReact
 
         private ReplaySubject<TValue> SubjectForProperty<TValue>(PropertyInfo property)
         {
-//            if (!property.DeclaringType.IsInstanceOfType(obj))
-//                throw new ArgumentException("Property '" + property.Name + "' is a member of " + property.DeclaringType.FullName + " but is being invoked against " + obj.GetType().FullName, "property");
-
-            return (ReplaySubject<TValue>)observables.GetOrAdd(property.Name, x =>
+            lock (observables)
             {
-                var result = new ReplaySubject<TValue>(1);
-                var currentValue = (TValue)property.GetValue(obj);
-                result.OnNext(currentValue);
-                return result;
-            });                
+                object result;
+                if (!observables.TryGetValue(property.Name, out result))
+                {
+                    var subject = new ReplaySubject<TValue>();
+                    result = subject;
+                    var currentValue = (TValue)property.GetValue(obj);
+                    subject.OnNext(currentValue);
+                    observables[property.Name] = result;
+                }
+                return (ReplaySubject<TValue>)result;
+            }
         }
 
         public IObservable<TValue> ObservableForProperty<TValue>(PropertyInfo property)

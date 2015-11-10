@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EmptyObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICanExecute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxListObservables.cs" />
