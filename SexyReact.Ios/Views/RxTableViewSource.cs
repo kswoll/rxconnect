@@ -108,7 +108,7 @@ namespace SexyReact.Views
         public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = GetCell(tableView, indexPath);
-            return cell.SizeThatFits(new CGSize(float.MaxValue, float.MaxValue)).Height;
+            return cell.SizeThatFits(new CGSize(tableView.Frame.Width, float.MaxValue)).Height;
         }
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
