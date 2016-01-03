@@ -79,7 +79,7 @@ namespace SexyReact.Views
             items.Remove(item);
 
             if (onRemoveItem != null)
-                onRemoveItem(section.Item1, item).ExecuteAsync();
+                onRemoveItem(section.Item1, item).InvokeAsync();
         }
 
         public void Dispose()

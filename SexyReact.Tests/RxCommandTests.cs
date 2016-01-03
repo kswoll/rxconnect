@@ -14,7 +14,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create(() => s = "foo");
-            await command.ExecuteAsync();
+            await command.InvokeAsync();
             Assert.AreEqual("foo", s);
         }
 
@@ -23,7 +23,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create(() => s = "foo");
-            command.Execute();
+            command.Invoke();
             Assert.AreEqual("foo", s);
         }
 
@@ -32,7 +32,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create<string>(x => s = x);
-            await command.ExecuteAsync("foo");
+            await command.InvokeAsync("foo");
             Assert.AreEqual("foo", s);
         }
 
@@ -41,7 +41,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create<string>(x => s = x);
-            command.Execute("foo");
+            command.Invoke("foo");
             Assert.AreEqual("foo", s);
         }
 
@@ -51,7 +51,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction.Create(() => "foo");
             command.Subscribe(x => observed = x);
-            var s = await command.ExecuteAsync();
+            var s = await command.InvokeAsync();
             Assert.AreEqual("foo", s);
             Assert.AreEqual("foo", observed);
         }
@@ -62,7 +62,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction.Create(() => "foo");
             command.Subscribe(x => observed = x);
-            var s = command.Execute();
+            var s = command.Invoke();
             Assert.AreEqual("foo", s);            
             Assert.AreEqual("foo", observed);
         }
@@ -73,7 +73,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction<string>.Create(x => x);
             command.Subscribe(x => observed = x);
-            var s = await command.ExecuteAsync("foo");
+            var s = await command.InvokeAsync("foo");
             Assert.AreEqual("foo", s);
             Assert.AreEqual("foo", observed);
         }
@@ -84,7 +84,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction<string>.Create(x => x);
             command.Subscribe(x => observed = x);
-            var s = command.Execute("foo");
+            var s = command.Invoke("foo");
             Assert.AreEqual("foo", s);
             Assert.AreEqual("foo", observed);
         }
@@ -100,7 +100,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create(async () => s = await GetFoo());
-            await command.ExecuteAsync();
+            await command.InvokeAsync();
             Assert.AreEqual("foo", s);
         }
 
@@ -109,7 +109,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create(async () => s = await GetFoo());
-            command.Execute();
+            command.Invoke();
             Assert.AreEqual("foo", s);
         }
 
@@ -118,7 +118,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create<string>(async x => s = x + await GetFoo());
-            await command.ExecuteAsync("foo");
+            await command.InvokeAsync("foo");
             Assert.AreEqual("foofoo", s);
         }
 
@@ -127,7 +127,7 @@ namespace SexyReact.Tests
         {
             string s = null;
             var command = RxCommand.Create<string>(async x => s = x + await GetFoo());
-            command.Execute("foo");
+            command.Invoke("foo");
             Assert.AreEqual("foofoo", s);
         }
 
@@ -137,7 +137,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction.CreateAsync(async () => await GetFoo());
             command.Subscribe(x => observed = x);
-            var s = await command.ExecuteAsync();
+            var s = await command.InvokeAsync();
             Assert.AreEqual("foo", s);
             Assert.AreEqual("foo", observed);
         }
@@ -148,7 +148,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction.CreateAsync(async () => await GetFoo());
             command.Subscribe(x => observed = x);
-            var s = command.Execute();
+            var s = command.Invoke();
             Assert.AreEqual("foo", s);            
             Assert.AreEqual("foo", observed);
         }
@@ -159,7 +159,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction<string>.CreateAsync(async x => x + await GetFoo());
             command.Subscribe(x => observed = x);
-            var s = await command.ExecuteAsync("foo");
+            var s = await command.InvokeAsync("foo");
             Assert.AreEqual("foofoo", s);
             Assert.AreEqual("foofoo", observed);
         }
@@ -170,7 +170,7 @@ namespace SexyReact.Tests
             string observed = null;
             var command = RxFunction<string>.CreateAsync(async x => x + await GetFoo());
             command.Subscribe(x => observed = x);
-            var s = command.Execute("foo");
+            var s = command.Invoke("foo");
             Assert.AreEqual("foofoo", s);
             Assert.AreEqual("foofoo", observed);
         }
@@ -191,7 +191,7 @@ namespace SexyReact.Tests
                 b = "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            await combinedCommand.ExecuteAsync();
+            await combinedCommand.InvokeAsync();
 
             Assert.AreEqual("bar", b);
         }
@@ -212,7 +212,7 @@ namespace SexyReact.Tests
                 b = x;
             });
             var combinedCommand = commandA.Combine(commandB);
-            await combinedCommand.ExecuteAsync("bar");
+            await combinedCommand.InvokeAsync("bar");
 
             Assert.AreEqual("bar", b);
         }
@@ -233,7 +233,7 @@ namespace SexyReact.Tests
                 b = "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            await combinedCommand.ExecuteAsync("foo");
+            await combinedCommand.InvokeAsync("foo");
 
             Assert.AreEqual("bar", b);
         }
@@ -254,7 +254,7 @@ namespace SexyReact.Tests
                 b = x;
             });
             var combinedCommand = commandA.Combine(commandB);
-            await combinedCommand.ExecuteAsync("foo");
+            await combinedCommand.InvokeAsync("foo");
 
             Assert.AreEqual("foo", b);
         }
@@ -276,7 +276,7 @@ namespace SexyReact.Tests
                 return "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync();
+            var result = await combinedCommand.InvokeAsync();
 
             Assert.AreEqual("bar", result);
         }
@@ -298,7 +298,7 @@ namespace SexyReact.Tests
                 return "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync("foo");
+            var result = await combinedCommand.InvokeAsync("foo");
 
             Assert.AreEqual("bar", result);
         }
@@ -320,7 +320,7 @@ namespace SexyReact.Tests
                 return x;
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync("bar");
+            var result = await combinedCommand.InvokeAsync("bar");
 
             Assert.AreEqual("bar", result);
         }
@@ -343,7 +343,7 @@ namespace SexyReact.Tests
                 return x + "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync();
+            var result = await combinedCommand.InvokeAsync();
 
             Assert.AreEqual("foobar", result);
         }
@@ -366,7 +366,7 @@ namespace SexyReact.Tests
                 return x + "bar";
             });
             var combinedCommand = commandA.Combine(commandB);
-            var result = await combinedCommand.ExecuteAsync("foo");
+            var result = await combinedCommand.InvokeAsync("foo");
 
             Assert.AreEqual("foobar", result);
         }
@@ -377,12 +377,12 @@ namespace SexyReact.Tests
             IRxFunction<string> function = null;
             function = RxFunction.CreateAsync(async () =>
             {
-                var secondInvocation = await function.ExecuteAsync();
+                var secondInvocation = await function.InvokeAsync();
                 Assert.IsNull(secondInvocation);
                 return "foo";
             });
 
-            var result = await function.ExecuteAsync();
+            var result = await function.InvokeAsync();
             Assert.AreEqual("foo", result);
         }
 
@@ -396,11 +396,11 @@ namespace SexyReact.Tests
                 if (stackDepth == 1)
                     return "complete";
                 stackDepth++;
-                var secondInvocation = await function.ExecuteAsync();
+                var secondInvocation = await function.InvokeAsync();
                 return secondInvocation;
             }, allowSimultaneousExecution: true);
 
-            var result = await function.ExecuteAsync();
+            var result = await function.InvokeAsync();
             Assert.AreEqual("complete", result);
         }
 
@@ -408,7 +408,7 @@ namespace SexyReact.Tests
         public async void CanExecuteFalse()
         {
             var command = RxFunction.Create(() => GetFoo(), Observable.Return(false));
-            var result = await command.ExecuteAsync();
+            var result = await command.InvokeAsync();
             Assert.IsNull(result);
         }
 
@@ -423,12 +423,12 @@ namespace SexyReact.Tests
                     Assert.Fail("Execution is recursing");
                 stackDepth++;
 
-                var secondInvocation = await function.ExecuteAsync();
+                var secondInvocation = await function.InvokeAsync();
                 Assert.IsNull(secondInvocation);
                 return "foo";
             }, Observable.Return(true));
 
-            var result = await function.ExecuteAsync();
+            var result = await function.InvokeAsync();
             Assert.AreEqual("foo", result);
         }
 
@@ -437,7 +437,7 @@ namespace SexyReact.Tests
         {
             var canExecute = new Subject<bool>();
             var command = RxFunction.CreateAsync(() => GetFoo(), canExecute);
-            var result = await command.ExecuteAsync();
+            var result = await command.InvokeAsync();
             Assert.AreEqual("foo", result);
         }
 
@@ -446,14 +446,14 @@ namespace SexyReact.Tests
         {
             var canExecute = new Subject<bool>();
             var command = RxFunction.CreateAsync(() => GetFoo(), canExecute);
-            var result = await command.ExecuteAsync();
+            var result = await command.InvokeAsync();
 
             Assert.AreEqual("foo", result);
             canExecute.OnNext(false);
-            result = await command.ExecuteAsync();
+            result = await command.InvokeAsync();
             Assert.IsNull(result);
             canExecute.OnNext(true);
-            result = await command.ExecuteAsync();
+            result = await command.InvokeAsync();
             Assert.AreEqual("foo", result);
         }
 
@@ -461,9 +461,9 @@ namespace SexyReact.Tests
         public async void ExecuteTwice()
         {
             var command = RxFunction.CreateAsync(() => GetFoo());
-            var result = await command.ExecuteAsync();
+            var result = await command.InvokeAsync();
             Assert.AreEqual("foo", result);
-            result = await command.ExecuteAsync();
+            result = await command.InvokeAsync();
             Assert.AreEqual("foo", result);
         }
     }

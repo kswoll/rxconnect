@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
@@ -13,7 +14,7 @@ namespace SexyReact
     /// A list that provides a number of observables for keeping track of its contents.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the list</typeparam>
-    public class RxList<T> : IRxList<T>, IRxReadOnlyList<T>
+    public class RxList<T> : IRxList<T>, IRxReadOnlyList<T>, INotifyCollectionChanged
     {
         private List<T> storage;
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
@@ -22,6 +23,7 @@ namespace SexyReact
         private Lazy<Subject<RxListMovedItem<T>>> moved = new Lazy<Subject<RxListMovedItem<T>>>();
         private Lazy<Subject<RxListChange<T>>> changed = new Lazy<Subject<RxListChange<T>>>();
         private Lazy<Subject<Unit>> disposed = new Lazy<Subject<Unit>>();
+        private NotifyCollectionChangedEventHandler collectionChanged;
 
         public RxList()
         {
@@ -102,6 +104,25 @@ namespace SexyReact
             if (changed.IsValueCreated)
             {
                 changed.Value.OnNext(change);
+            }
+            if (collectionChanged != null)
+            {
+                if (change.Added.Any())
+                {
+                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, change.Added.Select(x => x.Value).ToList(), change.Added.Select(x => x.Index).Min()));
+                }
+                if (change.Removed.Any())
+                {
+                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, change.Removed.Select(x => x.Value).ToList(), change.Removed.Select(x => x.Index).Min()));
+                }
+                if (change.Modified.Any())
+                {
+                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, change.Modified.Select(x => x.NewValue).ToList(), change.Modified.Select(x => x.OldValue).ToList(), change.Modified.Select(x => x.Index).Min()));
+                }
+                if (change.Moved != null)
+                {
+                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, change.Moved.Value.Value, change.Moved.Value.ToIndex, change.Moved.Value.FromIndex));
+                }
             }
         }
 
@@ -226,6 +247,12 @@ namespace SexyReact
         {
             var fromIndex = storage.IndexOf(item);
             Move(fromIndex, toIndex);
+        }
+
+        event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
+        {
+            add { collectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Combine(collectionChanged, value); }
+            remove { collectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Remove(collectionChanged, value); }
         }
     }
 }

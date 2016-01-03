@@ -78,7 +78,7 @@ namespace SexyReact.Views
             where TModelValue : IRxCommand
         {
             IRxCommand command = null;
-            Action propagate = () => command.ExecuteAsync();
+            Action propagate = () => command.InvokeAsync();
             var listener = eventHandlerFactory(propagate);
             add(view, listener);
             var buttonDisposable = new ActionDisposable(() => remove(view, listener));
