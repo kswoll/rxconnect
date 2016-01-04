@@ -70,6 +70,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RxCommand.cs" />
     <Compile Include="RxWpf.cs" />
+    <Compile Include="Views\RxGrid.cs" />
+    <Compile Include="Views\RxInputBindExtensions.cs" />
     <Compile Include="Views\RxWindow.cs" />
     <Compile Include="WpfUiScheduler.cs" />
   </ItemGroup>

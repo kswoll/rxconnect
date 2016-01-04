@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Reflection;
-using System.Windows;
+using System.Windows.Controls;
 
 namespace SexyReact.Views
 {
-    public class RxWindow<T> : Window, IRxViewObject<T> 
+    public class RxGrid<T> : Grid, IRxViewObject<T> 
         where T : IRxObject
     {
         private IRxViewObject<T> mixin = new RxViewObject<T>();
         private bool isDisposed;
-
-        static RxWindow()
-        {
-            RxWpf.RegisterDependency();
-        }
-
-        public RxWindow()
-        {
-            Unloaded += (sender, args) => Dispose();
-        }
 
         public void Register(IDisposable disposable) => mixin.Register(disposable);
         public TValue Get<TValue>(PropertyInfo property) => mixin.Get<TValue>(property);
@@ -26,6 +16,11 @@ namespace SexyReact.Views
         public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property) => mixin.ObserveProperty<TValue>(property);
         public IObservable<IPropertyChanging> Changing => mixin.Changing;
         public IObservable<IPropertyChanged> Changed => mixin.Changed;
+
+        public RxGrid()
+        {
+            Unloaded += (sender, args) => Dispose();
+        }
 
         object IRxViewObject.Model
         {

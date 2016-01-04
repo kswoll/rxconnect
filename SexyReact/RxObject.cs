@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace SexyReact
 {
-    public class RxObject : IRxObject
+    public class RxObject : IRxObject, INotifyPropertyChanged, INotifyPropertyChanging
     {
         private IStorageStrategy storageStrategy;
         private Lazy<List<IDisposable>> disposables = new Lazy<List<IDisposable>>();
@@ -14,6 +15,8 @@ namespace SexyReact
         private Lazy<Subject<IPropertyChanged>> changed = new Lazy<Subject<IPropertyChanged>>(() => new Subject<IPropertyChanged>());
         private Lazy<Subject<IPropertyChanging>> changing = new Lazy<Subject<IPropertyChanging>>(() => new Subject<IPropertyChanging>());
         private bool disposed;
+        private PropertyChangedEventHandler propertyChanged;
+        private PropertyChangingEventHandler propertyChanging;
 
         public RxObject()
         {
@@ -82,6 +85,7 @@ namespace SexyReact
                 var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
                 if (changing.IsValueCreated)
                     changing.Value.OnNext(propertyChanging);
+                this.propertyChanging?.Invoke(this, new PropertyChangingEventArgs(property.Name));
             
                 storageStrategy.Store(property, newValue);
 
@@ -90,6 +94,7 @@ namespace SexyReact
                     changed.Value.OnNext(propertyChanged);
 
                 observePropertyStrategy.OnNext(property, newValue);                
+                this.propertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));
             }
         }
 
@@ -154,6 +159,18 @@ namespace SexyReact
                     disposable.Dispose();
                 disposables.Value.Clear();
             }
+        }
+
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add { propertyChanged = (PropertyChangedEventHandler)Delegate.Combine(propertyChanged, value); }
+            remove { propertyChanged = (PropertyChangedEventHandler)Delegate.Remove(propertyChanged, value); }
+        }
+
+        event PropertyChangingEventHandler INotifyPropertyChanging.PropertyChanging
+        {
+            add { propertyChanging = (PropertyChangingEventHandler)Delegate.Combine(propertyChanging, value); }
+            remove { propertyChanging = (PropertyChangingEventHandler)Delegate.Remove(propertyChanging, value); }
         }
     }
 }
