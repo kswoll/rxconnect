@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using SexyReact.Utils;
 
@@ -82,6 +83,14 @@ namespace SexyReact.Views
             where TModel : IRxObject
         {
             return binder.Mate(view, viewProperty, x => x, x => x);
+        }
+
+        public static IObservable<TModelValue> ObserveModelPropertyChange<TModel, TModelValue>(
+            this RxViewObjectBinder<TModel, TModelValue> binder
+            )
+            where TModel : IRxObject
+        {
+            return binder.ObserveModelProperty().Skip(1);
         }
 
         public static IObservable<TModelValue> ObserveModelProperty<TModel, TModelValue>(

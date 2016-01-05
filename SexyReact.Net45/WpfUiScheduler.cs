@@ -20,13 +20,21 @@ namespace SexyReact
             get
             {
                 if (dispatcherScheduler != null)
-                    return dispatcherScheduler;
+                {
+                    if (dispatcherScheduler.Dispatcher.Thread == Thread.CurrentThread)
+                        return CurrentThreadScheduler.Instance;
+                    else 
+                        return dispatcherScheduler;
+                }
 
                 var dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
-                if (dispatcher == null)
+                if (dispatcher != null)
+                    dispatcherScheduler = DispatcherScheduler.Current;
+
+                if (dispatcher == null || dispatcher.Thread == Thread.CurrentThread)
                     return CurrentThreadScheduler.Instance;
                 else
-                    return dispatcherScheduler = DispatcherScheduler.Current;                
+                    return dispatcherScheduler;
             }
         }
 

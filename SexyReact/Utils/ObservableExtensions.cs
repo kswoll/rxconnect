@@ -19,7 +19,7 @@ namespace SexyReact.Utils
 
         public static IDisposable SubscribeOnUiThread<T>(this IObservable<T> observable, Action<T> subscriber)
         {
-            return observable.Subscribe(x => 
+            return observable.Subscribe(x =>
             {
                 RxApp.UiScheduler.Schedule(default(Unit), (_, __) => 
                 {

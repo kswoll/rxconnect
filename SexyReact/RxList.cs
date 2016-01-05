@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using SexyReact.Utils;
 using System.Reactive;
+using System.Reactive.Concurrency;
 
 namespace SexyReact
 {
@@ -107,21 +108,24 @@ namespace SexyReact
             }
             if (collectionChanged != null)
             {
+                Action<object, NotifyCollectionChangedEventArgs> uiCollectionChanged = (sender, args) =>
+                    RxApp.UiScheduler.Schedule(() => collectionChanged(sender, args));
+
                 if (change.Added.Any())
                 {
-                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, change.Added.Select(x => x.Value).ToList(), change.Added.Select(x => x.Index).Min()));
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, change.Added.Select(x => x.Value).ToList(), change.Added.Select(x => x.Index).Min()));
                 }
                 if (change.Removed.Any())
                 {
-                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, change.Removed.Select(x => x.Value).ToList(), change.Removed.Select(x => x.Index).Min()));
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, change.Removed.Select(x => x.Value).ToList(), change.Removed.Select(x => x.Index).Min()));
                 }
                 if (change.Modified.Any())
                 {
-                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, change.Modified.Select(x => x.NewValue).ToList(), change.Modified.Select(x => x.OldValue).ToList(), change.Modified.Select(x => x.Index).Min()));
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, change.Modified.Select(x => x.NewValue).ToList(), change.Modified.Select(x => x.OldValue).ToList(), change.Modified.Select(x => x.Index).Min()));
                 }
                 if (change.Moved != null)
                 {
-                    collectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, change.Moved.Value.Value, change.Moved.Value.ToIndex, change.Moved.Value.FromIndex));
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, change.Moved.Value.Value, change.Moved.Value.ToIndex, change.Moved.Value.FromIndex));
                 }
             }
         }
