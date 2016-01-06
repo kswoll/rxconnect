@@ -23,7 +23,7 @@ namespace SexyReact
                 object result;
                 if (!observables.TryGetValue(property.Name, out result))
                 {
-                    var subject = new ReplaySubject<TValue>();
+                    var subject = new ReplaySubject<TValue>(1);
                     result = subject;
                     var currentValue = (TValue)property.GetValue(obj);
                     subject.OnNext(currentValue);
