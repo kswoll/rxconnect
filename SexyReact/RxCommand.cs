@@ -3,6 +3,8 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using SexyReact.Utils;
 
 namespace SexyReact
 {
@@ -101,9 +103,9 @@ namespace SexyReact
             return subject.Value.Subscribe(observer);
         }
 
-        public TOutput Invoke(TInput input)
+        public void Invoke(TInput input)
         {
-            return InvokeAsync(input).Result;
+            InvokeAsync(input).RunAsync();
         }
 
         /// <summary>

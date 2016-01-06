@@ -32,7 +32,7 @@ namespace SexyReact.Views
             this RxViewObjectBinder<TModel, TValue> binder,
             TView view, 
             Expression<Func<TView, TValue>> viewProperty,            
-            Func<Action, TEventHandler> eventHandlerFactory,
+            Func<Action<TValue>, TEventHandler> eventHandlerFactory,
             Action<TView, TEventHandler> add,
             Action<TView, TEventHandler> remove
         )
@@ -45,7 +45,7 @@ namespace SexyReact.Views
             this RxViewObjectBinder<TModel, TModelValue> binder,
             TView view, 
             Expression<Func<TView, TViewValue>> viewProperty,            
-            Func<Action, TEventHandler> eventHandlerFactory,
+            Func<Action<TViewValue>, TEventHandler> eventHandlerFactory,
             Action<TView, TEventHandler> add,
             Action<TView, TEventHandler> remove,
             Func<TModelValue, TViewValue> toViewValue,
@@ -55,11 +55,10 @@ namespace SexyReact.Views
         {
             var toSubscription = binder.To(view, viewProperty, toViewValue);
 
-            var viewGetter = viewProperty.Compile();
             var modelSetter = binder.CreateModelPropertySetter();
-            var propagate = new Action(() => 
+            var propagate = new Action<TViewValue>(x => 
             {
-                modelSetter(toModelValue(viewGetter(view)));
+                modelSetter(toModelValue(x));
             });
             var listener = eventHandlerFactory(propagate);
             add(view, listener);
