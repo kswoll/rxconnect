@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using System.Reactive;
+using System.Threading.Tasks;
 
 namespace SexyReact.Utils
 {
@@ -17,6 +18,24 @@ namespace SexyReact.Utils
             return subject;
         }
 
+        /// <summary>
+        /// Allows you to conveniently perform an async operation on your subscription.  The caveat is that the body of the 
+        /// subscription will return immediately without waiting for the async operation to complete.  
+        /// </summary>
+        public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> subscriber)
+        {
+            return observable.Subscribe(x =>
+            {
+                Task.Run(async () =>
+                {
+                    await subscriber(x);
+                });
+            });
+        }
+
+        /// <summary>
+        /// Ensures that the subscriber's work happens on the UI thread.
+        /// </summary>
         public static IDisposable SubscribeOnUiThread<T>(this IObservable<T> observable, Action<T> subscriber)
         {
             return observable.Subscribe(x =>
