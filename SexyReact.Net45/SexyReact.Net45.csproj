@@ -72,6 +72,7 @@
     <Compile Include="RxWpf.cs" />
     <Compile Include="Views\RxGrid.cs" />
     <Compile Include="Views\RxInputBindExtensions.cs" />
+    <Compile Include="Views\RxStackPanel.cs" />
     <Compile Include="Views\RxWindow.cs" />
     <Compile Include="WpfUiScheduler.cs" />
   </ItemGroup>
