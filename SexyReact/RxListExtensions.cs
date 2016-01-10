@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -46,6 +48,69 @@ namespace SexyReact
             where TSource : IRxObject
         {
             return new RxFilteredList<TSource, T, TValue>(source, selector, filterSource, filter, removed);
+        }
+
+        public static ObservableCollection<T> ToObservableCollection<T>(this IRxList<T> list)
+        {
+            var result = new ObservableCollection<T>(list);
+            var disableRxEvents = false;
+            var disableObservableCollectionEvents = false;
+            list.Changed.Subscribe(x =>
+            {
+                if (disableRxEvents)
+                    return;
+                disableObservableCollectionEvents = true;
+                foreach (var item in x.Added)
+                {
+                    result.Insert(item.Index, item.Value);
+                }
+                foreach (var item in x.Removed)
+                {
+                    result.Remove(item.Value);
+                }
+                foreach (var item in x.Modified)
+                {
+                    result[item.Index] = item.NewValue;
+                }
+                if (x.Moved != null)
+                {
+                    result.Move(x.Moved.Value.FromIndex, x.Moved.Value.ToIndex);
+                }
+                disableObservableCollectionEvents = false;
+            });
+            result.CollectionChanged += (sender, args) =>
+            {
+                if (disableObservableCollectionEvents)
+                    return;
+                disableRxEvents = true;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        for (int i = 0, j = args.NewStartingIndex; i < args.NewItems.Count; i++, j++)
+                        {
+                            list.Insert(j, (T)args.NewItems[i]);
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var item in args.OldItems)
+                        {
+                            list.Remove((T)item);
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Move:
+                        list.Move(args.OldStartingIndex, args.NewStartingIndex);
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                        list[args.NewStartingIndex] = (T)args.NewItems[0];
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        list.Clear();
+                        list.AddRange(result);
+                        break;
+                }
+                disableRxEvents = false;
+            };
+            return result;
         }
     }
 }
