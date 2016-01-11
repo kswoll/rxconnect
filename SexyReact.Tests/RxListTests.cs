@@ -216,7 +216,7 @@ namespace SexyReact.Tests
             var two = new TestModel { StringProperty = "2" };
             var list = new RxList<TestModel>(one, two);
             string s = null;
-            list.ObserveElement(x => x.StringProperty).Subscribe(x => s = x.Value);
+            list.ObserveElementProperty(x => x.StringProperty).Subscribe(x => s = x.Value);
 
             list[0].StringProperty = "foo";
             Assert.AreEqual("foo", s);

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive;
+using System.Reactive.Linq;
 
 namespace SexyReact
 {
@@ -18,10 +19,88 @@ namespace SexyReact
         /// <param name="list">The list on which to observe elements</param>
         /// <param name="selector">Identifies a property path to a value on the current element</param>
         /// <returns>The observable that monitors changes to a property for elements currently in the list</returns>
-        public static IObservable<RxListObservedElement<T, TValue>> ObserveElement<T, TValue>(this IRxList<T> list, Expression<Func<T, TValue>> selector)
+        public static IObservable<RxListObservedElement<T, TValue>> ObserveElementPropertyChanged<T, TValue>(this IRxList<T> list, Expression<Func<T, TValue>> selector)
             where T : IRxObject
         {
-            return new RxListElementObservable<T, TValue>(list, selector);
+            return new RxListElementObservable<T, TValue>(list, selector, true);
+        }
+
+        /// <summary>
+        /// Returns an observable that fires whenever a value for an element currently in the list changes.  This means that if
+        /// an element was in the list when this method is called but subsequently removed, further changes to the property on 
+        /// that element will not propagate down this observable.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements of the list</typeparam>
+        /// <typeparam name="TValue">The type of the value returned by the selector</typeparam>
+        /// <param name="list">The list on which to observe elements</param>
+        /// <param name="selector">Identifies a property path to a value on the current element</param>
+        /// <returns>The observable that monitors changes to a property for elements currently in the list</returns>
+        public static IObservable<RxListObservedElement<T, TValue>> ObserveElementProperty<T, TValue>(this IRxList<T> list, Expression<Func<T, TValue>> selector)
+            where T : IRxObject
+        {
+            return new RxListElementObservable<T, TValue>(list, selector, false);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<RxListObservedElement<T, TValue>> ObserveElementChange<T, TValue1, TValue2, TValue>(
+            this IRxList<T> list, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Func<TValue1, TValue2, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = list.ObserveElementPropertyChanged(property1);
+            var property2Observable = list.ObserveElementPropertyChanged(property2);
+            return property1Observable.CombineLatest(property2Observable, (x, y) => new RxListObservedElement<T, TValue>(x.Element, resultSelector(x.Value, y.Value)));
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<RxListObservedElement<T, Unit>> ObserveElementChange<T, TValue1, TValue2>(
+            this IRxList<T> list, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2
+        )
+            where T : IRxObject
+        {
+            return list.ObserveElementChange(property1, property2, (x1, x2) => Unit.Default);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<RxListObservedElement<T, Unit>> ObserveElement<T, TValue1, TValue2>(
+            this IRxList<T> list, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2
+        )
+            where T : IRxObject
+        {
+            return list.ObserveElement(property1, property2, (x1, x2) => Unit.Default);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<RxListObservedElement<T, TValue>> ObserveElement<T, TValue1, TValue2, TValue>(
+            this IRxList<T> list, 
+            Expression<Func<T, TValue1>> property1,
+            Expression<Func<T, TValue2>> property2,
+            Func<TValue1, TValue2, TValue> resultSelector
+        )
+            where T : IRxObject
+        {
+            var property1Observable = list.ObserveElementProperty(property1);
+            var property2Observable = list.ObserveElementProperty(property2);
+            return property1Observable.CombineLatest(property2Observable, (x, y) => new RxListObservedElement<T, TValue>(x.Element, resultSelector(x.Value, y.Value)));
         }
 
         /// <summary>
