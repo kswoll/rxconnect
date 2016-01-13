@@ -49,6 +49,7 @@ namespace SexyReact
             {
                 value.Dispose();
             }
+            observables.Clear();
         }
     }
 }

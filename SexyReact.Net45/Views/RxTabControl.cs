@@ -17,11 +17,6 @@ namespace SexyReact.Views
         public IObservable<IPropertyChanging> Changing => mixin.Changing;
         public IObservable<IPropertyChanged> Changed => mixin.Changed;
 
-        public RxTabControl()
-        {
-            Unloaded += (sender, args) => Dispose();
-        }
-
         object IRxViewObject.Model
         {
             get { return Model; }

@@ -15,11 +15,6 @@ namespace SexyReact.Views
             RxWpf.RegisterDependency();
         }
 
-        public RxWindow()
-        {
-            Unloaded += (sender, args) => Dispose();
-        }
-
         public void Register(IDisposable disposable) => mixin.Register(disposable);
         public TValue Get<TValue>(PropertyInfo property) => mixin.Get<TValue>(property);
         public void Set<TValue>(PropertyInfo property, TValue value) => mixin.Set(property, value);
