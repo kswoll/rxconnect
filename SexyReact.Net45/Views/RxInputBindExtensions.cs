@@ -84,11 +84,13 @@ namespace SexyReact.Views
                 x => x == null ? default(TItem) : (TItem)x);
         }
 
-        public static DataGridTextColumn AddTextColumn<T, TValue>(this RxDataGrid<T> grid, string header, Expression<Func<T, TValue>> property)
+        public static DataGridTextColumn AddTextColumn<T, TValue>(this RxDataGrid<T> grid, string header, Expression<Func<T, TValue>> property, DataGridLength? width = null, bool isReadOnly = false)
             where T : IRxObject
         {
-            var column = new DataGridTextColumn { Header = header };
+            var column = new DataGridTextColumn { Header = header, IsReadOnly = isReadOnly };
             column.Binding = new Binding(property.GetPropertyInfo().Name);
+            if (width != null)
+                column.Width = width.Value;
             grid.Columns.Add(column);
             return column;
         }
