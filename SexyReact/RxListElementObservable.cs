@@ -11,6 +11,9 @@ namespace SexyReact
 
         public RxListElementObservable(IRxList<T> list, Expression<Func<T, TValue>> selector, bool onlyChanges) : this()
         {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+
             this.list = list;
             this.selector = selector;
             this.onlyChanges = onlyChanges;
@@ -31,9 +34,16 @@ namespace SexyReact
             {
                 this.observer = observer;
                 if (onlyChanges)
-                    subscriptions = list.Derive(x => x.ObservePropertyChange(selector).Subscribe(y => OnElementChanged(x, y)), x => x.Dispose());
+                {
+                    if (selector == null)
+                        subscriptions = list.Derive(x => x.Changed.Subscribe(y => OnElementChanged(x, default(TValue))), x => x.Dispose());
+                    else
+                        subscriptions = list.Derive(x => x.ObservePropertyChange(selector).Subscribe(y => OnElementChanged(x, y)), x => x.Dispose());
+                }
                 else
+                {
                     subscriptions = list.Derive(x => x.ObserveProperty(selector).Subscribe(y => OnElementChanged(x, y)), x => x.Dispose());
+                }
             }
 
             private void OnElementChanged(T element, TValue value)

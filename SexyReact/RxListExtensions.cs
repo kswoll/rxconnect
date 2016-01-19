@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
+using SexyReact.Utils;
 
 namespace SexyReact
 {
@@ -39,6 +40,18 @@ namespace SexyReact
             where T : IRxObject
         {
             return new RxListElementObservable<T, TValue>(list, selector, false);
+        }
+
+        /// <summary>
+        /// Observe the values of multiple properties. Each time the value of one of the properties changes, a new item
+        /// will be emitted.  The value is based on resultSelector which has access to the current value of each property.
+        /// </summary>
+        public static IObservable<RxListObservedElement<T, Unit>> ObserveElementChange<T>(
+            this IRxList<T> list
+        )
+            where T : IRxObject
+        {
+            return new RxListElementObservable<T, Unit>(list, null, true);
         }
 
         /// <summary>
@@ -134,7 +147,7 @@ namespace SexyReact
             var result = new ObservableCollection<T>(list);
             var disableRxEvents = false;
             var disableObservableCollectionEvents = false;
-            list.Changed.Subscribe(x =>
+            list.Changed.SubscribeOnUiThread(x =>
             {
                 if (disableRxEvents)
                     return;
@@ -190,6 +203,80 @@ namespace SexyReact
                 disableRxEvents = false;
             };
             return result;
+        }
+
+        /// <summary>
+        /// Just a port of List.BinarySearch.  Searches the entire sorted collection for an element using the default comparer 
+        /// and returns the zero-based index of the element.
+        /// </summary>
+        /// <returns>The zero-based index of item in the sorted List, if item is found; otherwise, a negative number that is the 
+        /// bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise 
+        /// complement of Count.</returns>
+        public static int BinarySearch<T, TOrderByValue>(this RxList<T> list, T value, Func<T, TOrderByValue> orderBy)
+            where TOrderByValue : IComparable
+        {
+            const int index = 0;
+            var length = list.Count;
+            var lo = index;
+            var hi = index + length - 1;
+            while (lo <= hi)
+            {
+                var i = lo + ((hi - lo) >> 1);
+                var order = orderBy(list[i]).CompareTo(orderBy(value));
+ 
+                if (order == 0)
+                {
+                    return i;
+                }
+
+                if (order < 0)
+                {
+                    lo = i + 1;
+                }
+                else
+                {
+                    hi = i - 1;
+                }
+            }
+ 
+            return ~lo;
+        }
+
+        /// <summary>
+        /// Just a port of List.BinarySearch.  Searches the entire sorted collection for an element using the default comparer 
+        /// and returns the zero-based index of the element.
+        /// </summary>
+        /// <returns>The zero-based index of item in the sorted List, if item is found; otherwise, a negative number that is the 
+        /// bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise 
+        /// complement of Count.</returns>
+        public static int BinarySearch<T, TValue>(this RxList<T> list, Func<T, TValue> selector, TValue value)
+            where TValue : IComparable
+        {
+            const int index = 0;
+            var length = list.Count;
+            var lo = index;
+            var hi = index + length - 1;
+            while (lo <= hi)
+            {
+                var i = lo + ((hi - lo) >> 1);
+                var order = selector(list[i]).CompareTo(value);
+ 
+                if (order == 0)
+                {
+                    return i;
+                }
+
+                if (order < 0)
+                {
+                    lo = i + 1;
+                }
+                else
+                {
+                    hi = i - 1;
+                }
+            }
+ 
+            return ~lo;
         }
     }
 }
