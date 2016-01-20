@@ -82,10 +82,7 @@ namespace SexyReact
             TValue oldValue = storageStrategy.Retrieve<TValue>(property);
             if (!Equals(oldValue, newValue))
             {
-                var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
-                if (changing.IsValueCreated)
-                    changing.Value.OnNext(propertyChanging);
-                this.propertyChanging?.Invoke(this, new PropertyChangingEventArgs(property.Name));
+                newValue = OnChanging(property, oldValue, newValue);
             
                 storageStrategy.Store(property, newValue);
 
@@ -93,9 +90,23 @@ namespace SexyReact
                 if (changed.IsValueCreated)
                     changed.Value.OnNext(propertyChanged);
 
-                observePropertyStrategy.OnNext(property, newValue);                
-                this.propertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));
+                OnChanged(property, newValue);
             }
+        }
+
+        protected TValue OnChanging<TValue>(PropertyInfo property, TValue oldValue, TValue newValue)
+        {
+            var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
+            if (changing.IsValueCreated)
+                changing.Value.OnNext(propertyChanging);
+            this.propertyChanging?.Invoke(this, new PropertyChangingEventArgs(property.Name));
+            return newValue;
+        }
+
+        protected void OnChanged<TValue>(PropertyInfo property, TValue newValue)
+        {
+            observePropertyStrategy.OnNext(property, newValue);                
+            propertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));            
         }
 
         /// <summary>
