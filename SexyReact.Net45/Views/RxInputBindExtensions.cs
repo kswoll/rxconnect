@@ -41,6 +41,37 @@ namespace SexyReact.Views
                 x => x == null ? default(TValue) : (TValue)x);
         }
 
+        public static IDisposable Mate<TModel, TValue>(
+            this RxViewObjectBinder<TModel, TValue> binder,
+            ComboBox view,
+            Expression<Func<TModel, IEnumerable<TValue>>> itemsSource
+        )
+            where TModel : IRxObject
+        {
+            bool settingItemsSource = false;
+            binder.ViewObject.Bind(itemsSource).To(x =>
+            {
+                settingItemsSource = true;
+                view.ItemsSource = x;
+                settingItemsSource = false;
+            });
+
+            return binder.Mate(
+                view, 
+                x => x.SelectedValue, 
+                x => new SelectionChangedEventHandler((sender, args) =>
+                {
+                    if (args.AddedItems.Count > 0 && !settingItemsSource)
+                    {
+                        x(args.AddedItems[0]);
+                    }
+                }), 
+                (x, l) => x.SelectionChanged += l, 
+                (x, l) => x.SelectionChanged -= l, 
+                x => x, 
+                x => x == null ? default(TValue) : (TValue)x);
+        }
+
         public static void To<TModel>(
             this RxViewObjectBinder<TModel, string> binder,
             FrameworkElementFactory factory,
@@ -88,7 +119,7 @@ namespace SexyReact.Views
             where T : IRxObject
         {
             var column = new DataGridTextColumn { Header = header, IsReadOnly = isReadOnly };
-            column.Binding = new Binding(property.GetPropertyInfo().Name);
+            column.Binding = new Binding(property.GetPropertyInfo().Name) { UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
             if (width != null)
                 column.Width = width.Value;
             grid.Columns.Add(column);
