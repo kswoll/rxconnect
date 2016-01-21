@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Windows;
@@ -124,6 +125,28 @@ namespace SexyReact.Views
                 column.Width = width.Value;
             grid.Columns.Add(column);
             return column;
+        }
+
+        public static DataGridComboBoxColumn AddComboBoxColumn<T, TValue>(this RxDataGrid<T> grid, string header, Expression<Func<T, TValue>> property, DataGridLength? width = null)
+            where T : IRxObject
+        {
+            var column = new DataGridComboBoxColumn { Header = header };
+            column.SelectedValueBinding = new Binding(property.GetPropertyInfo().Name) { UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+            if (width != null)
+                column.Width = width.Value;
+            grid.Columns.Add(column);
+            return column;
+        }
+
+        public static void To<TModel, TItem>(this RxViewObjectBinder<TModel, TItem> binder, DataGridComboBoxColumn column)
+            where TModel : IRxObject
+            where TItem : class, IEnumerable
+        {
+            binder.To(x =>
+            {
+                if (column.ItemsSource != x)
+                    column.ItemsSource = x;
+            });
         }
     }
 }
