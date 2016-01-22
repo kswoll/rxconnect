@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -90,7 +91,7 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var binding = new Binding(binder.ModelProperty.GetPropertyInfo().Name) { Mode = BindingMode.TwoWay };
+            var binding = new Binding(string.Join(".", binder.ModelProperty.GetPropertyPath().Select(x => x.Name))) { Mode = BindingMode.TwoWay };
             var converter = WpfTypeConverters.GetTypeConverter(binder.ModelProperty, property);
             if (converter != null)
                 binding.Converter = converter;
@@ -104,7 +105,7 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var binding = new Binding(binder.ModelProperty.GetPropertyInfo().Name) { Mode = BindingMode.TwoWay };
+            var binding = new Binding(string.Join(".", binder.ModelProperty.GetPropertyPath().Select(x => x.Name))) { Mode = BindingMode.TwoWay };
             var converter = WpfTypeConverters.GetTypeConverter(binder.ModelProperty, property);
             if (converter != null)
                 binding.Converter = converter;
