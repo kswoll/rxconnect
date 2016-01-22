@@ -77,6 +77,8 @@
     <Compile Include="Views\RxStackPanel.cs" />
     <Compile Include="Views\RxTabControl.cs" />
     <Compile Include="Views\RxWindow.cs" />
+    <Compile Include="Views\ValueConverters\GridLengthAsIntConverter.cs" />
+    <Compile Include="Views\WpfTypeConverters.cs" />
     <Compile Include="WpfUiScheduler.cs" />
   </ItemGroup>
   <ItemGroup>

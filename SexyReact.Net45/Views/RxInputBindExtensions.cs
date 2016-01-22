@@ -83,6 +83,34 @@ namespace SexyReact.Views
             factory.SetValue(source, new Binding(binder.ModelProperty.GetPropertyInfo().Name));
         }
 
+        public static void Mate<TModel, TValue>(
+            this RxViewObjectBinder<TModel, TValue> binder,
+            FrameworkElement element,
+            DependencyProperty property
+        )
+            where TModel : IRxObject
+        {
+            var binding = new Binding(binder.ModelProperty.GetPropertyInfo().Name) { Mode = BindingMode.TwoWay };
+            var converter = WpfTypeConverters.GetTypeConverter(binder.ModelProperty, property);
+            if (converter != null)
+                binding.Converter = converter;
+            element.SetBinding(property, binding);
+        }
+
+        public static void Mate<TModel, TValue>(
+            this RxViewObjectBinder<TModel, TValue> binder,
+            FrameworkContentElement element,
+            DependencyProperty property
+        )
+            where TModel : IRxObject
+        {
+            var binding = new Binding(binder.ModelProperty.GetPropertyInfo().Name) { Mode = BindingMode.TwoWay };
+            var converter = WpfTypeConverters.GetTypeConverter(binder.ModelProperty, property);
+            if (converter != null)
+                binding.Converter = converter;
+            element.SetBinding(property, binding);
+        }
+
         public static void To<TModel, TValue>(
             this RxViewObjectBinder<TModel, IEnumerable<TValue>> binder,
             ListView listView
