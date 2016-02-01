@@ -100,7 +100,7 @@ namespace SexyReact.Views
         {
             var remainingPath = binder.ModelProperty.GetPropertyPath();
             var propertyPath = new PropertyInfo[remainingPath.Length + 1];
-            propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
+            propertyPath[0] = RxViewObject<TModel>.ViewObjectModelProperty;
             for (var i = 0; i < remainingPath.Length; i++)
             {
                 propertyPath[i + 1] = remainingPath[i];
@@ -165,7 +165,7 @@ namespace SexyReact.Views
             Expression predicate = Expression.Equal(Expression.Constant(binder.ViewObject), Expression.Constant(null));
 
             // view.Model
-            target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);
+            target = Expression.MakeMemberAccess(target, RxViewObject<TModel>.ViewObjectModelProperty);
             predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
 
             while (stack.Any())
@@ -183,12 +183,6 @@ namespace SexyReact.Views
             var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
             var lambda = Expression.Lambda<Action<TModelValue>>(body, value);
             return lambda.Compile();
-        }
-
-        private static class ReflectionCache<TModel>
-            where TModel : IRxObject
-        {
-            public static readonly PropertyInfo ViewObjectModelProperty = typeof(IRxViewObject<TModel>).GetProperty("Model");
         }
     }
 }

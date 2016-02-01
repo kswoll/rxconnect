@@ -7,12 +7,17 @@ namespace SexyReact.Views
     public class RxWindow<T> : Window, IRxViewObject<T> 
         where T : IRxObject
     {
-        private IRxViewObject<T> mixin = new RxViewObject<T>();
+        private IRxViewObject<T> mixin;
         private bool isDisposed;
 
         static RxWindow()
         {
             RxWpf.RegisterDependency();
+        }
+
+        public RxWindow()
+        {
+            mixin = new RxViewObject<T>(this);
         }
 
         public void Register(IDisposable disposable) => mixin.Register(disposable);

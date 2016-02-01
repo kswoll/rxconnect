@@ -7,7 +7,7 @@ namespace SexyReact.Views
     public class RxDockPanel<T> : DockPanel, IRxViewObject<T> 
         where T : IRxObject
     {
-        private IRxViewObject<T> mixin = new RxViewObject<T>();
+        private IRxViewObject<T> mixin;
         private bool isDisposed;
 
         public void Register(IDisposable disposable) => mixin.Register(disposable);
@@ -16,6 +16,11 @@ namespace SexyReact.Views
         public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property) => mixin.ObserveProperty<TValue>(property);
         public IObservable<IPropertyChanging> Changing => mixin.Changing;
         public IObservable<IPropertyChanged> Changed => mixin.Changed;
+
+        public RxDockPanel()
+        {
+            mixin = new RxViewObject<T>(this);
+        }
 
         object IRxViewObject.Model
         {

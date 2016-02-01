@@ -6,10 +6,15 @@ namespace SexyReact.Tests.Views
 {
     public class TestViewObject : IRxViewObject<TestViewModel>
     {
-        private IRxViewObject<TestViewModel> mixin = new RxViewObject<TestViewModel>();
+        private IRxViewObject<TestViewModel> mixin;
         public readonly TestLabel testLabel = new TestLabel();
         public TestSubViewObject subViewObject;
         public readonly NonRxTestLabel nonRxTestLabel = new NonRxTestLabel();
+
+        public TestViewObject()
+        {
+            mixin = new RxViewObject<TestViewModel>(this);
+        }
 
         object IRxViewObject.Model
         {

@@ -7,8 +7,13 @@ namespace SexyReact.Views
     public class RxTabControl<T> : TabControl, IRxViewObject<T> 
         where T : IRxObject
     {
-        private IRxViewObject<T> mixin = new RxViewObject<T>();
+        private IRxViewObject<T> mixin;
         private bool isDisposed;
+
+        public RxTabControl()
+        {
+            mixin = new RxViewObject<T>(this);
+        }
 
         public void Register(IDisposable disposable) => mixin.Register(disposable);
         public TValue Get<TValue>(PropertyInfo property) => mixin.Get<TValue>(property);
