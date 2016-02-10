@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
@@ -129,13 +130,25 @@ namespace SexyReact
 
             isExecuting.Value.OnNext(true);
 
-            var result = await action(input);
-            if (subject.IsValueCreated)
-                subject.Value.OnNext(result);
+            try
+            {
+                var result = await action(input);
+                if (subject.IsValueCreated)
+                    subject.Value.OnNext(result);
 
-            isExecuting.Value.OnNext(false);
+                isExecuting.Value.OnNext(false);
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception executing RxCommand");
+                Debug.WriteLine(e.ToString());
+                if (subject.IsValueCreated)
+                    subject.Value.OnError(e);
+                isExecuting.Value.OnNext(false);
+                return default(TOutput);
+            }
         }
 
         private void UpdateIsAllowedToExecute(bool value)
