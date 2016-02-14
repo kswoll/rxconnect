@@ -13,6 +13,7 @@ namespace SexyReact.Views
         public RxTextBlock()
         {
             mixin = new RxViewObject<T>(this);
+            DataContextChanged += (sender, args) => Model = (T)args.NewValue;
         }
 
         public void Register(IDisposable disposable) => mixin.Register(disposable);
