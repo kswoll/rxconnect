@@ -51,12 +51,18 @@ namespace SexyReact.Utils
         public static void SubscribeOnce<T>(this IObservable<T> observable, Action<T> subscriber)
         {
             IDisposable subscription = null;
+            bool needsToDispose = false;
             Action<T> instrumentedSubscriber = x =>
             {
                 subscriber(x);
-                subscription.Dispose();
+                if (subscription != null)
+                    subscription.Dispose();
+                else
+                    needsToDispose = true;
             };
             subscription = observable.Subscribe(instrumentedSubscriber);
+            if (needsToDispose)
+                subscription.Dispose();
         }
 
         public struct EmptyDisposable : IDisposable
