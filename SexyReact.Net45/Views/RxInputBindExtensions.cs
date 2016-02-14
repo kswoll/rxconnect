@@ -74,6 +74,13 @@ namespace SexyReact.Views
                 x => x == null ? default(TValue) : (TValue)x);
         }
 
+        public static Binding CreateBinding<TModel, TValue>(this RxViewObjectBinder<TModel, TValue> binder)
+            where TModel : IRxObject
+        {
+            var binding = new Binding(string.Join(".", binder.ModelProperty.GetPropertyPath().Select(x => x.Name))) { Mode = BindingMode.TwoWay };
+            return binding;
+        }
+
         public static void To<TModel>(
             this RxViewObjectBinder<TModel, string> binder,
             FrameworkElementFactory factory,
@@ -81,7 +88,7 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            factory.SetValue(source, new Binding(binder.ModelProperty.GetPropertyInfo().Name));
+            factory.SetValue(source, binder.CreateBinding());
         }
 
         public static void Mate<TModel, TValue>(
@@ -105,8 +112,8 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            var binding = new Binding(string.Join(".", binder.ModelProperty.GetPropertyPath().Select(x => x.Name))) { Mode = BindingMode.TwoWay };
             var converter = WpfTypeConverters.GetTypeConverter(binder.ModelProperty, property);
+            var binding = binder.CreateBinding();
             if (converter != null)
                 binding.Converter = converter;
             element.SetBinding(property, binding);

@@ -76,6 +76,7 @@
     <Compile Include="Views\RxInputBindExtensions.cs" />
     <Compile Include="Views\RxStackPanel.cs" />
     <Compile Include="Views\RxTabControl.cs" />
+    <Compile Include="Views\RxTextBlock.cs" />
     <Compile Include="Views\RxWindow.cs" />
     <Compile Include="Views\ValueConverters\GridLengthAsIntConverter.cs" />
     <Compile Include="Views\WpfTypeConverters.cs" />
