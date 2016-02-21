@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Subjects;
@@ -14,6 +15,8 @@ namespace SexyReact
         private IObservePropertyStrategy observePropertyStrategy;
         private Lazy<Subject<IPropertyChanged>> changed = new Lazy<Subject<IPropertyChanged>>(() => new Subject<IPropertyChanged>());
         private Lazy<Subject<IPropertyChanging>> changing = new Lazy<Subject<IPropertyChanging>>(() => new Subject<IPropertyChanging>());
+        private Lazy<ConcurrentDictionary<PropertyInfo, Subject<IPropertyChanged>>> changedByProperty = new Lazy<ConcurrentDictionary<PropertyInfo, Subject<IPropertyChanged>>>();
+        private Lazy<ConcurrentDictionary<PropertyInfo, Subject<IPropertyChanging>>> changingByProperty = new Lazy<ConcurrentDictionary<PropertyInfo, Subject<IPropertyChanging>>>();
         private bool disposed;
         private PropertyChangedEventHandler propertyChanged;
         private PropertyChangingEventHandler propertyChanging;
@@ -34,6 +37,16 @@ namespace SexyReact
         public IObservable<IPropertyChanged> Changed => changed.Value;
         TValue IRxObject.Get<TValue>(PropertyInfo property) => Get<TValue>(property);
         void IRxObject.Set<TValue>(PropertyInfo property, TValue value) => Set(property, value);
+
+        public IObservable<IPropertyChanged> GetChangedByProperty(PropertyInfo property)
+        {
+            return changedByProperty.Value.GetOrAdd(property, _ => new Subject<IPropertyChanged>());
+        }
+
+        public IObservable<IPropertyChanging> GetChangingByProperty(PropertyInfo property)
+        {
+            return changingByProperty.Value.GetOrAdd(property, _ => new Subject<IPropertyChanging>());
+        }
 
         /// <summary>
         /// Gets the current value of the property as returned by the IStorageStrategy.
@@ -86,11 +99,7 @@ namespace SexyReact
             
                 storageStrategy.Store(property, newValue);
 
-                var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
-                if (changed.IsValueCreated)
-                    changed.Value.OnNext(propertyChanged);
-
-                OnChanged(property, newValue);
+                OnChanged(property, oldValue, newValue);
             }
         }
 
@@ -98,15 +107,35 @@ namespace SexyReact
         {
             var propertyChanging = new PropertyChanging<TValue>(property, oldValue, () => newValue, x => newValue = x);
             if (changing.IsValueCreated)
+            {
                 changing.Value.OnNext(propertyChanging);
+            }
+            if (changingByProperty.IsValueCreated)
+            {
+                Subject<IPropertyChanging> subject;
+                if (changingByProperty.Value.TryGetValue(property, out subject)) 
+                    subject.OnNext(propertyChanging);
+            }
             this.propertyChanging?.Invoke(this, new PropertyChangingEventArgs(property.Name));
             return newValue;
         }
 
-        protected void OnChanged<TValue>(PropertyInfo property, TValue newValue)
+        protected void OnChanged<TValue>(PropertyInfo property, TValue oldValue, TValue newValue)
         {
+            var propertyChanged = new PropertyChanged<TValue>(property, oldValue, newValue);
+            if (changed.IsValueCreated)
+            {
+                changed.Value.OnNext(propertyChanged);
+            }
+            if (changedByProperty.IsValueCreated)
+            {
+                Subject<IPropertyChanged> subject;
+                if (changedByProperty.Value.TryGetValue(property, out subject))
+                    subject.OnNext(propertyChanged);
+            }
+
             observePropertyStrategy.OnNext(property, newValue);                
-            propertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));            
+            this.propertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));            
         }
 
         /// <summary>

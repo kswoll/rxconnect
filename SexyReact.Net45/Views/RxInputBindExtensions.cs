@@ -162,13 +162,19 @@ namespace SexyReact.Views
         public static void To<TModel, TValue>(
             this RxViewObjectBinder<TModel, RxList<TValue>> binder,
             TreeView treeView,
-            Expression<Func<TValue, IEnumerable<TValue>>> childrenProvider
+            Expression<Func<TValue, IEnumerable<TValue>>> childrenProvider, 
+            Type itemTemplateType
         )
             where TModel : IRxObject
             where TValue : IRxObject
         {
-            var dataTemplate = new HierarchicalDataTemplate(typeof(TValue));
-            dataTemplate.ItemsSource = childrenProvider.CreateBinding();
+            var dataTemplate = new HierarchicalDataTemplate(typeof(TValue))
+            {
+                VisualTree = new FrameworkElementFactory(itemTemplateType)
+            };
+            var binding = childrenProvider.CreateBinding();
+            binding.Mode = BindingMode.OneWay;
+            dataTemplate.ItemsSource = binding;
 
             treeView.ItemTemplate = dataTemplate;
             binder.To(x => treeView.ItemsSource = x);
@@ -178,23 +184,16 @@ namespace SexyReact.Views
             this RxViewObjectBinder<TModel, RxList<TValue>> binder,
             TreeView treeView,
             Expression<Func<TValue, IEnumerable<TValue>>> childrenProvider,
-            Expression<Func<TModel, TValue>> selectedValueModelProperty
+            Expression<Func<TModel, TValue>> selectedValueModelProperty, 
+            Type itemTemplateType
         )
             where TModel : IRxObject
             where TValue : IRxObject
         {
-            binder.To(treeView, childrenProvider);
-            binder.ViewObject.Bind(selectedValueModelProperty).Mate(
-                treeView, 
-                x => x.SelectedValue, 
-                x => new RoutedPropertyChangedEventHandler<object>((sender, args) =>
-                {
-                    x(args.NewValue);
-                }), 
-                (view, l) => view.SelectedItemChanged += l, 
-                (view, l) => view.SelectedItemChanged -= l, 
-                x => x, 
-                x => x == null ? default(TValue) : (TValue)x);
+            binder.To(treeView, childrenProvider, itemTemplateType);
+
+            var selectedItemBinder = binder.ViewObject.Bind(selectedValueModelProperty);
+            treeView.ItemContainerStyle.Setters.Add(new Setter(TreeViewItem.IsSelectedProperty, selectedItemBinder));
         }
 
         public static DataGridTextColumn AddTextColumn<T, TValue>(this RxDataGrid<T> grid, string header, Expression<Func<T, TValue>> property, DataGridLength? width = null, bool isReadOnly = false)

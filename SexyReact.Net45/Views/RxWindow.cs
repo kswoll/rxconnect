@@ -26,6 +26,8 @@ namespace SexyReact.Views
         public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property) => mixin.ObserveProperty<TValue>(property);
         public IObservable<IPropertyChanging> Changing => mixin.Changing;
         public IObservable<IPropertyChanged> Changed => mixin.Changed;
+        public IObservable<IPropertyChanged> GetChangedByProperty(PropertyInfo property) => mixin.GetChangedByProperty(property);
+        public IObservable<IPropertyChanging> GetChangingByProperty(PropertyInfo property) => mixin.GetChangingByProperty(property);
 
         object IRxViewObject.Model
         {
