@@ -13,12 +13,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EmptyObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICanInvoke.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxDictionaryObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxListObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxReadOnlyList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxDerivedList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFilteredList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListElementObservable.cs" />
