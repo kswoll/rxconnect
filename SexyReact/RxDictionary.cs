@@ -7,7 +7,7 @@ using System.Reactive.Subjects;
 
 namespace SexyReact
 {
-    public class RxDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IRxDictionaryObservables<TKey, TValue>, IRxDictionaryObservables
+    public class RxDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IRxDictionaryObservables<TKey, TValue>, IRxDictionaryObservables, IDictionary
     {
         private Dictionary<TKey, TValue> storage = new Dictionary<TKey, TValue>();
         private Lazy<Subject<KeyValuePair<TKey, TValue>>> added = new Lazy<Subject<KeyValuePair<TKey, TValue>>>();
@@ -106,5 +106,22 @@ namespace SexyReact
         IObservable<KeyValuePair<object, object>> IRxDictionaryObservables.Added => Added.Select(x => new KeyValuePair<object, object>(x.Key, x.Value));
         IObservable<KeyValuePair<object, object>> IRxDictionaryObservables.Set => Set.Select(x => new KeyValuePair<object, object>(x.Key, x.Value));
         IObservable<KeyValuePair<object, object>> IRxDictionaryObservables.Removed => Removed.Select(x => new KeyValuePair<object, object>(x.Key, x.Value));
+
+        void ICollection.CopyTo(Array array, int index) => ((IDictionary)storage).CopyTo(array, index);
+        object ICollection.SyncRoot => ((IDictionary)storage).SyncRoot;
+        bool ICollection.IsSynchronized => ((IDictionary)storage).IsSynchronized;
+        bool IDictionary.Contains(object key) => ((IDictionary)storage).Contains(key);
+        void IDictionary.Add(object key, object value) => Add((TKey)key, (TValue)value);
+        IDictionaryEnumerator IDictionary.GetEnumerator() => ((IDictionary)storage).GetEnumerator();
+        void IDictionary.Remove(object key) => Remove((TKey)key);
+        ICollection IDictionary.Keys => ((IDictionary)storage).Keys;
+        ICollection IDictionary.Values => ((IDictionary)storage).Values;
+        bool IDictionary.IsFixedSize => false;
+
+        object IDictionary.this[object key]
+        {
+            get { return this[(TKey)key]; }
+            set { this[(TKey)key] = (TValue)value; }
+        }
     }
 }

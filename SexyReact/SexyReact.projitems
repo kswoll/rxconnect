@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EmptyObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICanInvoke.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxDictionaryObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxListObservables.cs" />
