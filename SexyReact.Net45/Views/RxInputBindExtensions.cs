@@ -161,7 +161,7 @@ namespace SexyReact.Views
 
         public static void To<TModel, TValue>(
             this RxViewObjectBinder<TModel, RxList<TValue>> binder,
-            TreeView treeView,
+            RxTreeView<TValue> treeView,
             Expression<Func<TValue, IEnumerable<TValue>>> childrenProvider, 
             Type itemTemplateType
         )
@@ -182,7 +182,7 @@ namespace SexyReact.Views
 
         public static void To<TModel, TValue>(
             this RxViewObjectBinder<TModel, RxList<TValue>> binder,
-            TreeView treeView,
+            RxTreeView<TValue> treeView,
             Expression<Func<TValue, IEnumerable<TValue>>> childrenProvider,
             Expression<Func<TModel, TValue>> selectedValueModelProperty, 
             Type itemTemplateType

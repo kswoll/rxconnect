@@ -27,7 +27,6 @@ namespace SexyReact
         public void Add(KeyValuePair<TKey, TValue> item)
         {
             storage.Add(item.Key, item.Value);
-
         }
 
         public void Clear()
