@@ -1,9 +1,5 @@
 ﻿using System;
-using SexyReact.Views;
-using System.Linq.Expressions;
 using UIKit;
-using SexyReact.Utils;
-using System.Reactive.Disposables;
 
 namespace SexyReact.Views
 {
@@ -98,7 +94,7 @@ namespace SexyReact.Views
         )
             where TModel : IRxObject
         {
-            return binder.Mate(textField, x => x.Text, x => new EventHandler((sender, args) => x()), (x, l) => x.AddTarget(l, UIControlEvent.EditingChanged), (x, l) => x.RemoveTarget(l, UIControlEvent.EditingChanged));
+            return binder.Mate(textField, x => x.Text, x => new EventHandler((sender, args) => x(textField.Text)), (x, l) => x.AddTarget(l, UIControlEvent.EditingChanged), (x, l) => x.RemoveTarget(l, UIControlEvent.EditingChanged));
         }
     }
 }

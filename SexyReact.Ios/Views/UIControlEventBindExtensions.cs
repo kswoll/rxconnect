@@ -76,7 +76,7 @@ namespace SexyReact.Views
             where TView : UIControl
         {
             IRxCommand command = null;
-            Action propagate = () => command.ExecuteAsync();
+            Action propagate = () => command.InvokeAsync();
             var listener = new EventHandler((sender, args) => propagate());
             view.AddTarget(listener, controlEvent);
             var buttonDisposable = new Unsubscribe(view, listener, controlEvent);

@@ -1,15 +1,10 @@
 ﻿using System;
 using UIKit;
-using SexyReact;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Linq;
 using Foundation;
 using CoreAnimation;
-using SexyReact.Utils;
-using SexyReact.Views;
 using CoreGraphics;
-using CoreFoundation;
 
 namespace SexyReact.Views
 {
@@ -129,7 +124,7 @@ namespace SexyReact.Views
         {
             var cell = (RxTableViewCell<TItem>)GetCell(tableView, indexPath);
             if (cell.Command != null)
-                cell.Command.ExecuteAsync();
+                cell.Command.InvokeAsync();
         }
 
         public override bool CanMoveRow(UITableView tableView, NSIndexPath indexPath)

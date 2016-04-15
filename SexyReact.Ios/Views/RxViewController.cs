@@ -1,17 +1,14 @@
 ﻿using System;
 using UIKit;
-using SexyReact.Views;
 using System.Reflection;
 using Foundation;
-using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 
 namespace SexyReact.Views
 {
     public class RxViewController<T> : UIViewController, IRxViewObject<T>
         where T : IRxObject
     {
-        private IRxViewObjectMixin<T> mixin = new RxViewObject<T>();
+        private IRxViewObjectMixin<T> mixin;
 
         static RxViewController() 
         {
@@ -20,22 +17,27 @@ namespace SexyReact.Views
 
         public RxViewController() 
         {
+            mixin = new RxViewObject<T>(this);
         }
 
         public RxViewController(string nibName, NSBundle bundle) : base(nibName, bundle)
         {
+            mixin = new RxViewObject<T>(this);
         }
 
         public RxViewController(NSCoder coder) : base(coder)
         {
+            mixin = new RxViewObject<T>(this);
         }
 
         public RxViewController(NSObjectFlag t) : base(t)
         {
+            mixin = new RxViewObject<T>(this);
         }
 
         public RxViewController(IntPtr handle) : base(handle)
         {
+            mixin = new RxViewObject<T>(this);
         }
 
         object IRxViewObject.Model
@@ -53,45 +55,14 @@ namespace SexyReact.Views
             }
         }
 
-        public void Register(IDisposable disposable)
-        {
-            mixin.Register(disposable);
-        }
-
-        public TValue Get<TValue>(PropertyInfo property)
-        {
-            return mixin.Get<TValue>(property);
-        }
-
-        protected TValue Get<TValue>([CallerMemberName]string propertyName = null)
-        {
-            return mixin.Get<TValue>(propertyName);
-        }
-
-        public void Set<TValue>(PropertyInfo property, TValue value)
-        {
-            mixin.Set(property, value);
-        }
-
-        public void Set<TValue>(TValue newValue, [CallerMemberName]string propertyName = null)
-        {
-            mixin.Set(newValue, propertyName);
-        }
-
-        public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)
-        {
-            return mixin.ObserveProperty<TValue>(property);
-        }
-
-        public IObservable<IPropertyChanging> Changing
-        {
-            get { return mixin.Changing; }
-        }
-
-        public IObservable<IPropertyChanged> Changed
-        {
-            get { return mixin.Changed; }
-        }
+        public void Register(IDisposable disposable) => mixin.Register(disposable);
+        public TValue Get<TValue>(PropertyInfo property) => mixin.Get<TValue>(property);
+        public void Set<TValue>(PropertyInfo property, TValue value) => mixin.Set(property, value);
+        public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property) => mixin.ObserveProperty<TValue>(property);
+        public IObservable<IPropertyChanging> Changing => mixin.Changing;
+        public IObservable<IPropertyChanged> Changed => mixin.Changed;
+        public IObservable<IPropertyChanged> GetChangedByProperty(PropertyInfo property) => mixin.GetChangedByProperty(property);
+        public IObservable<IPropertyChanging> GetChangingByProperty(PropertyInfo property) => mixin.GetChangingByProperty(property);
 
         public T Model
         {

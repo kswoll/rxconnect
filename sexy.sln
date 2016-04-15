@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Tests", "SexyReact.Tests\SexyReact.Tests.csproj", "{C96B21DA-E150-46F3-85A5-B6AC7618224F}"
 EndProject
@@ -13,28 +13,44 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Net45", "SexyReact.Net45\SexyReact.Net45.csproj", "{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SexyReact.Ios", "SexyReact.Ios\SexyReact.Ios.csproj", "{804822D9-AC57-40E1-8921-1CD236A77DCE}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SexyReact\SexyReact.projitems*{6e53032b-f7d9-48db-8485-0e3f22f351a2}*SharedItemsImports = 13
 		SexyReact\SexyReact.projitems*{effc73fa-4329-4139-b9dc-bad35e5db0dc}*SharedItemsImports = 4
+		SexyReact\SexyReact.projitems*{804822d9-ac57-40e1-8921-1cd236a77dce}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AppStore|Any CPU = AppStore|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
+		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.AppStore|Any CPU.Build.0 = Release|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C96B21DA-E150-46F3-85A5-B6AC7618224F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
+		{3B216673-01AB-4180-808A-29F6ACC4B185}.AppStore|Any CPU.Build.0 = Release|Any CPU
 		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B216673-01AB-4180-808A-29F6ACC4B185}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B216673-01AB-4180-808A-29F6ACC4B185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
+		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.AppStore|Any CPU.Build.0 = Release|Any CPU
 		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFFC73FA-4329-4139-B9DC-BAD35E5DB0DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.AppStore|Any CPU.ActiveCfg = AppStore|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.AppStore|Any CPU.Build.0 = AppStore|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{804822D9-AC57-40E1-8921-1CD236A77DCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
