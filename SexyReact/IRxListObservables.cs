@@ -23,4 +23,24 @@ namespace SexyReact
         IObservable<IEnumerable<T>> ItemsRemoved { get; }
         IObservable<IEnumerable<T>> ItemsModified { get; }
     }
+
+    public interface IRxListObservables
+    {
+        IObservable<Unit> Disposed { get; }
+        IObservable<IEnumerable<RxListItem<object>>> RangeAdded { get; }
+        IObservable<IEnumerable<RxListItem<object>>> RangeRemoved { get; }
+        IObservable<IEnumerable<RxListModifiedItem<object>>> RangeModified { get; }
+        IObservable<RxListChange<object>> Changed { get; }
+        IObservable<RxListItem<object>> Added { get; }
+        IObservable<RxListItem<object>> Removed { get; }
+        IObservable<RxListMovedItem<object>> Moved { get; }
+        IObservable<RxListModifiedItem<object>> Modified { get; }
+        IObservable<object> ItemAdded { get; }
+        IObservable<object> ItemRemoved { get; }
+        IObservable<object> ItemMoved { get; }
+        IObservable<object> ItemModified { get; }
+        IObservable<IEnumerable<object>> ItemsAdded { get; }
+        IObservable<IEnumerable<object>> ItemsRemoved { get; }
+        IObservable<IEnumerable<object>> ItemsModified { get; }
+    }
 }

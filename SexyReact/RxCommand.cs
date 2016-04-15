@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using SexyReact.Utils;
 
 namespace SexyReact
 {
@@ -26,18 +29,18 @@ namespace SexyReact
         {
         }
 
-        Task IRxCommand.ExecuteAsync()
+        Task IRxCommand.InvokeAsync()
         {
-            return ExecuteAsync(default(TInput));
+            return InvokeAsync(default(TInput));
         }
 
-        Task IRxCommand<TInput>.ExecuteAsync(TInput input)
+        Task IRxCommand<TInput>.InvokeAsync(TInput input)
         {
-            return ExecuteAsync(input);
+            return InvokeAsync(input);
         }
     }
 
-    public class RxCommand<TInput, TOutput> : 
+    public partial class RxCommand<TInput, TOutput> : 
         IRxFunction<TOutput>, 
         IRxFunction<TInput, TOutput>
     {
@@ -87,9 +90,13 @@ namespace SexyReact
             }
 
             this.canExecute = new Lazy<IObservable<bool>>(canExecuteFactory);
+
+            OnCreated();
         }
 
-        public IObservable<bool> CanExecute => canExecute.Value;
+        partial void OnCreated();
+
+        public IObservable<bool> CanInvoke => canExecute.Value;
         public IObservable<bool> IsExecuting => isExecuting.Value;
 
         public IDisposable Subscribe(IObserver<TOutput> observer)
@@ -97,22 +104,22 @@ namespace SexyReact
             return subject.Value.Subscribe(observer);
         }
 
-        public TOutput Execute(TInput input)
+        public void Invoke(TInput input)
         {
-            return ExecuteAsync(input).Result;
+            InvokeAsync(input).RunAsync();
         }
 
         /// <summary>
         /// Executes the task asynchronously.  The observable represented by this command emits its next value *before*
         /// this method completes and returns its value.
         /// </summary>
-        public async Task<TOutput> ExecuteAsync(TInput input) 
+        public async Task<TOutput> InvokeAsync(TInput input) 
         {
             lock (lockObject)
             {
                 if (!isSubscribedToCanExecute)
                 {
-                    CanExecute.Subscribe(UpdateIsAllowedToExecute);
+                    CanInvoke.Subscribe(UpdateIsAllowedToExecute);
                     isSubscribedToCanExecute = true;
                 }
                 if (!isAllowedToExecute)
@@ -123,13 +130,25 @@ namespace SexyReact
 
             isExecuting.Value.OnNext(true);
 
-            var result = await action(input);
-            if (subject.IsValueCreated)
-                subject.Value.OnNext(result);
+            try
+            {
+                var result = await action(input);
+                if (subject.IsValueCreated)
+                    subject.Value.OnNext(result);
 
-            isExecuting.Value.OnNext(false);
+                isExecuting.Value.OnNext(false);
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception executing RxCommand");
+                Debug.WriteLine(e.ToString());
+                if (subject.IsValueCreated)
+                    subject.Value.OnError(e);
+                isExecuting.Value.OnNext(false);
+                return default(TOutput);
+            }
         }
 
         private void UpdateIsAllowedToExecute(bool value)
@@ -140,14 +159,14 @@ namespace SexyReact
             }
         }
 
-        Task<TOutput> IRxFunction<TOutput>.ExecuteAsync()
+        Task<TOutput> IRxFunction<TOutput>.InvokeAsync()
         {
-            return ExecuteAsync(default(TInput));
+            return InvokeAsync(default(TInput));
         }
 
-        Task<TOutput> IRxFunction<TInput, TOutput>.ExecuteAsync(TInput input) 
+        Task<TOutput> IRxFunction<TInput, TOutput>.InvokeAsync(TInput input) 
         {
-            return ExecuteAsync(input);
+            return InvokeAsync(input);
         }
     }
 }

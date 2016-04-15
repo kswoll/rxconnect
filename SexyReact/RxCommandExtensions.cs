@@ -2,16 +2,16 @@
 
 namespace SexyReact
 {
-    public static class RxCommandExtensions
+    public static partial class RxCommandExtensions
     {
         /// <summary>
         /// Executes the command synchronously by calling Wait() on the async task.  This should generally only be 
         /// called when you know the action will execute synchronously.  Otherwise you will likely face potential 
         /// deadlocks.
         /// </summary>
-        public static void Execute(this IRxCommand command)
+        public static void Invoke(this IRxCommand command)
         {
-            command.ExecuteAsync().Wait();
+            command.InvokeAsync().Wait();
         }
 
         /// <summary>
@@ -19,9 +19,9 @@ namespace SexyReact
         /// called when you know the action will execute synchronously.  Otherwise you will likely face potential 
         /// deadlocks.
         /// </summary>
-        public static void Execute<TInput>(this IRxCommand<TInput> command, TInput input)
+        public static void Invoke<TInput>(this IRxCommand<TInput> command, TInput input)
         {
-            command.ExecuteAsync(input).Wait();
+            command.InvokeAsync(input).Wait();
         }
 
         /// <summary>
@@ -29,9 +29,9 @@ namespace SexyReact
         /// called when you know the action will execute synchronously.  Otherwise you will likely face potential 
         /// deadlocks.
         /// </summary>
-        public static TOutput Execute<TOutput>(this IRxFunction<TOutput> command)
+        public static TOutput Invoke<TOutput>(this IRxFunction<TOutput> command)
         {
-            return command.ExecuteAsync().Result;
+            return command.InvokeAsync().Result;
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace SexyReact
         /// called when you know the action will execute synchronously.  Otherwise you will likely face potential 
         /// deadlocks.
         /// </summary>
-        public static TOutput Execute<TInput, TOutput>(this IRxFunction<TInput, TOutput> command, TInput input)
+        public static TOutput Invoke<TInput, TOutput>(this IRxFunction<TInput, TOutput> command, TInput input)
         {
-            return command.ExecuteAsync(input).Result;
+            return command.InvokeAsync(input).Result;
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace SexyReact
         {
             return RxCommand.Create(async () =>
             {
-                await first.ExecuteAsync();
-                await second.ExecuteAsync();
+                await first.InvokeAsync();
+                await second.InvokeAsync();
             });
         }
 
@@ -70,8 +70,8 @@ namespace SexyReact
         {
             return RxCommand.Create<TInput>(async x =>
             {
-                await first.ExecuteAsync(x);
-                await second.ExecuteAsync();
+                await first.InvokeAsync(x);
+                await second.InvokeAsync();
             });
         }
 
@@ -86,8 +86,8 @@ namespace SexyReact
         {
             return RxCommand.Create<TInput>(async x =>
             {
-                await first.ExecuteAsync(x);
-                await second.ExecuteAsync(x);
+                await first.InvokeAsync(x);
+                await second.InvokeAsync(x);
             });
         }
 
@@ -102,8 +102,8 @@ namespace SexyReact
         {
             return RxCommand.Create<TInput>(async x =>
             {
-                await first.ExecuteAsync();
-                await second.ExecuteAsync(x);
+                await first.InvokeAsync();
+                await second.InvokeAsync(x);
             });
         }
 
@@ -118,8 +118,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync(async () =>
             {
-                await first.ExecuteAsync();
-                return await second.ExecuteAsync();
+                await first.InvokeAsync();
+                return await second.InvokeAsync();
             });
         }
 
@@ -135,8 +135,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                await first.ExecuteAsync();
-                return await second.ExecuteAsync(x);
+                await first.InvokeAsync();
+                return await second.InvokeAsync(x);
             });
         }
 
@@ -152,8 +152,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                await first.ExecuteAsync(x);
-                return await second.ExecuteAsync();
+                await first.InvokeAsync(x);
+                return await second.InvokeAsync();
             });
         }
 
@@ -169,8 +169,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                await first.ExecuteAsync(x);
-                return await second.ExecuteAsync(x);
+                await first.InvokeAsync(x);
+                return await second.InvokeAsync(x);
             });
         }
 
@@ -185,8 +185,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync(async () =>
             {
-                var result = await first.ExecuteAsync();
-                await second.ExecuteAsync();
+                var result = await first.InvokeAsync();
+                await second.InvokeAsync();
                 return result;
             });
         }
@@ -203,8 +203,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                var result = await first.ExecuteAsync(x);
-                await second.ExecuteAsync();
+                var result = await first.InvokeAsync(x);
+                await second.InvokeAsync();
                 return result;
             });
         }
@@ -221,8 +221,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                var result = await first.ExecuteAsync(x);
-                await second.ExecuteAsync(x);
+                var result = await first.InvokeAsync(x);
+                await second.InvokeAsync(x);
                 return result;
             });
         }
@@ -239,8 +239,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TOutput>(async x =>
             {
-                var result = await first.ExecuteAsync();
-                await second.ExecuteAsync(x);
+                var result = await first.InvokeAsync();
+                await second.InvokeAsync(x);
                 return result;
             });
         }
@@ -256,8 +256,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync(async () =>
             {
-                var firstResult = await first.ExecuteAsync();
-                return await second.ExecuteAsync(firstResult);
+                var firstResult = await first.InvokeAsync();
+                return await second.InvokeAsync(firstResult);
             });
         }
 
@@ -273,8 +273,8 @@ namespace SexyReact
         {
             return RxFunction.CreateAsync<TInput, TSecondOutput>(async x =>
             {
-                var firstResult = await first.ExecuteAsync(x);
-                return await second.ExecuteAsync(firstResult);
+                var firstResult = await first.InvokeAsync(x);
+                return await second.InvokeAsync(firstResult);
             });
         }
 
@@ -285,7 +285,7 @@ namespace SexyReact
         /// </summary>
         public static IRxCommand<Unit> AsParameterized(this IRxCommand command)
         {
-            return RxCommand.Create<Unit>(_ => command.ExecuteAsync());
+            return RxCommand.Create<Unit>(_ => command.InvokeAsync());
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace SexyReact
         /// </summary>
         public static IRxFunction<Unit, TOutput> AsParameterized<TOutput>(this IRxFunction<TOutput> command)
         {
-            return RxFunction.CreateAsync<Unit, TOutput>(_ => command.ExecuteAsync());
+            return RxFunction.CreateAsync<Unit, TOutput>(_ => command.InvokeAsync());
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace SexyReact
         /// </summary>
         public static IRxCommand AsCommand<TOutput>(this IRxFunction<TOutput> function)
         {
-            return RxCommand.Create(() => function.ExecuteAsync());
+            return RxCommand.Create(() => function.InvokeAsync());
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace SexyReact
         /// </summary>
         public static IRxCommand<TInput> AsCommand<TInput, TOutput>(this IRxFunction<TInput, TOutput> function)
         {
-            return RxCommand.Create<TInput>(x => function.ExecuteAsync(x));
+            return RxCommand.Create<TInput>(x => function.InvokeAsync(x));
         }
     }
 }

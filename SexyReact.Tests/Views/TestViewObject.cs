@@ -6,10 +6,15 @@ namespace SexyReact.Tests.Views
 {
     public class TestViewObject : IRxViewObject<TestViewModel>
     {
-        private IRxViewObject<TestViewModel> mixin = new RxViewObject<TestViewModel>();
+        private IRxViewObject<TestViewModel> mixin;
         public readonly TestLabel testLabel = new TestLabel();
         public TestSubViewObject subViewObject;
         public readonly NonRxTestLabel nonRxTestLabel = new NonRxTestLabel();
+
+        public TestViewObject()
+        {
+            mixin = new RxViewObject<TestViewModel>(this);
+        }
 
         object IRxViewObject.Model
         {
@@ -26,32 +31,13 @@ namespace SexyReact.Tests.Views
             throw new NotImplementedException();
         }
 
-        public IObservable<IPropertyChanging> Changing
-        {
-            get { return mixin.Changing; }
-        }
-            
-        public IObservable<IPropertyChanged> Changed
-        {
-            get { return mixin.Changed; }
-        }
-
-        public TValue Get<TValue>(PropertyInfo property)
-        {
-            return mixin.Get<TValue>(property);
-        }
-
-        public void Set<TValue>(PropertyInfo property, TValue value)
-        {
-            mixin.Set(property, value);
-        }
-
-        private static PropertyInfo modelProperty = typeof(RxViewObject<TestViewModel>).GetProperty("Model");
-
-        public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property)
-        {
-            return mixin.ObserveProperty<TValue>(modelProperty);
-        }
+        public IObservable<IPropertyChanging> Changing => mixin.Changing;
+        public IObservable<IPropertyChanged> Changed => mixin.Changed;
+        public IObservable<IPropertyChanged> GetChangedByProperty(PropertyInfo property) => mixin.GetChangedByProperty(property);
+        public IObservable<IPropertyChanging> GetChangingByProperty(PropertyInfo property) => mixin.GetChangingByProperty(property);
+        public TValue Get<TValue>(PropertyInfo property) => mixin.Get<TValue>(property);
+        public void Set<TValue>(PropertyInfo property, TValue value) => mixin.Set(property, value);
+        public IObservable<TValue> ObserveProperty<TValue>(PropertyInfo property) => mixin.ObserveProperty<TValue>(property);
 
         public TestViewModel Model
         {

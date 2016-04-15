@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using SexyReact.Utils;
 
@@ -84,6 +85,14 @@ namespace SexyReact.Views
             return binder.Mate(view, viewProperty, x => x, x => x);
         }
 
+        public static IObservable<TModelValue> ObserveModelPropertyChange<TModel, TModelValue>(
+            this RxViewObjectBinder<TModel, TModelValue> binder
+            )
+            where TModel : IRxObject
+        {
+            return binder.ObserveModelProperty().Skip(1);
+        }
+
         public static IObservable<TModelValue> ObserveModelProperty<TModel, TModelValue>(
             this RxViewObjectBinder<TModel, TModelValue> binder
         )
@@ -91,7 +100,7 @@ namespace SexyReact.Views
         {
             var remainingPath = binder.ModelProperty.GetPropertyPath();
             var propertyPath = new PropertyInfo[remainingPath.Length + 1];
-            propertyPath[0] = ReflectionCache<TModel>.ViewObjectModelProperty;
+            propertyPath[0] = RxViewObject<TModel>.ViewObjectModelProperty;
             for (var i = 0; i < remainingPath.Length; i++)
             {
                 propertyPath[i + 1] = remainingPath[i];
@@ -142,10 +151,10 @@ namespace SexyReact.Views
         {
             var setMainMember = binder.ModelProperty.Body as MemberExpression;
             if (setMainMember == null)
-                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", "binder");
+                throw new ArgumentException("Lambda expression must specify a property path of the form (Foo.Bar.FooBar)", nameof(binder));
 
-            Stack<MemberExpression> stack = new Stack<MemberExpression>();
-            MemberExpression member = setMainMember;
+            var stack = new Stack<MemberExpression>();
+            var member = setMainMember;
             while (member != null)
             {
                 stack.Push(member);
@@ -153,27 +162,27 @@ namespace SexyReact.Views
             }
 
             Expression target = Expression.Constant(binder.ViewObject);
+            Expression predicate = Expression.Equal(Expression.Constant(binder.ViewObject), Expression.Constant(null));
 
             // view.Model
-            target = Expression.MakeMemberAccess(target, ReflectionCache<TModel>.ViewObjectModelProperty);
+            target = Expression.MakeMemberAccess(target, RxViewObject<TModel>.ViewObjectModelProperty);
+            predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
 
             while (stack.Any())
             {
                 var expression = stack.Pop();
                 target = Expression.MakeMemberAccess(target, expression.Member);
+
+                var memberType = (expression.Member as FieldInfo)?.FieldType ?? ((PropertyInfo)expression.Member).PropertyType;
+                if (!memberType.IsValueType && stack.Any())
+                    predicate = Expression.OrElse(predicate, Expression.Equal(target, Expression.Constant(null)));
             }
 
             var value = Expression.Parameter(typeof(TModelValue));
 
-            var body = Expression.Assign(target, value);
+            var body = Expression.IfThen(Expression.Not(predicate), Expression.Assign(target, value));
             var lambda = Expression.Lambda<Action<TModelValue>>(body, value);
             return lambda.Compile();
-        }
-
-        private static class ReflectionCache<TModel>
-            where TModel : IRxObject
-        {
-            public static readonly PropertyInfo ViewObjectModelProperty = typeof(IRxViewObject<TModel>).GetProperty("Model");
         }
     }
 }

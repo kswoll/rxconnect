@@ -49,7 +49,7 @@ namespace SexyReact.Fody
             var sexyReact = ModuleDefinition.FindAssembly("SexyReact");
             if (sexyReact == null)
             {
-                LogError("Could not find assembly: SexyReact (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
+                LogInfo("Could not find assembly: SexyReact (" + string.Join(", ", ModuleDefinition.AssemblyReferences.Select(x => x.Name)) + ")");
                 return;
             }
             LogInfo($"{sexyReact.Name} {sexyReact.Version}");

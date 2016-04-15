@@ -1,7 +1,10 @@
-﻿namespace SexyReact
+﻿using System.Reflection;
+
+namespace SexyReact
 {
     public interface IPropertyChanged
     {
+        PropertyInfo Property { get; }
         object OldValue { get; }
         object NewValue { get; }
     }

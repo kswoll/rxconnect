@@ -4,14 +4,14 @@ using System.Reactive;
 
 namespace SexyReact
 {
-    public interface IRxCommand : ICanExecute, IObservable<Unit>
+    public partial interface IRxCommand : ICanInvoke, IObservable<Unit>
     {
-        Task ExecuteAsync();
+        Task InvokeAsync();
     }
 
-    public interface IRxCommand<in TInput> : ICanExecute, IObservable<Unit>
+    public partial interface IRxCommand<in TInput> : ICanInvoke, IObservable<Unit>
     {
-        Task ExecuteAsync(TInput input);
+        Task InvokeAsync(TInput input);
     }
 }
 

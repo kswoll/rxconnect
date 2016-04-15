@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using SexyReact.Utils;
 using System.Reactive;
+using System.Reactive.Concurrency;
 
 namespace SexyReact
 {
@@ -13,7 +15,7 @@ namespace SexyReact
     /// A list that provides a number of observables for keeping track of its contents.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the list</typeparam>
-    public class RxList<T> : IRxList<T>, IRxReadOnlyList<T>
+    public class RxList<T> : IRxList<T>, IRxReadOnlyList<T>, IRxList, INotifyCollectionChanged
     {
         private List<T> storage;
         private Lazy<Subject<IEnumerable<RxListItem<T>>>> rangeAdded = new Lazy<Subject<IEnumerable<RxListItem<T>>>>();
@@ -22,6 +24,7 @@ namespace SexyReact
         private Lazy<Subject<RxListMovedItem<T>>> moved = new Lazy<Subject<RxListMovedItem<T>>>();
         private Lazy<Subject<RxListChange<T>>> changed = new Lazy<Subject<RxListChange<T>>>();
         private Lazy<Subject<Unit>> disposed = new Lazy<Subject<Unit>>();
+        private NotifyCollectionChangedEventHandler collectionChanged;
 
         public RxList()
         {
@@ -102,6 +105,28 @@ namespace SexyReact
             if (changed.IsValueCreated)
             {
                 changed.Value.OnNext(change);
+            }
+            if (collectionChanged != null)
+            {
+                Action<object, NotifyCollectionChangedEventArgs> uiCollectionChanged = (sender, args) =>
+                    RxApp.UiScheduler.Schedule(() => collectionChanged(sender, args));
+
+                if (change.Added.Any())
+                {
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, change.Added.Select(x => x.Value).ToList(), change.Added.Select(x => x.Index).Min()));
+                }
+                if (change.Removed.Any())
+                {
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, change.Removed.Select(x => x.Value).ToList(), change.Removed.Select(x => x.Index).Min()));
+                }
+                if (change.Modified.Any())
+                {
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, change.Modified.Select(x => x.NewValue).ToList(), change.Modified.Select(x => x.OldValue).ToList(), change.Modified.Select(x => x.Index).Min()));
+                }
+                if (change.Moved != null)
+                {
+                    uiCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, change.Moved.Value.Value, change.Moved.Value.ToIndex, change.Moved.Value.FromIndex));
+                }
             }
         }
 
@@ -226,6 +251,162 @@ namespace SexyReact
         {
             var fromIndex = storage.IndexOf(item);
             Move(fromIndex, toIndex);
+        }
+
+        event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
+        {
+            add { collectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Combine(collectionChanged, value); }
+            remove { collectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Remove(collectionChanged, value); }
+        }
+
+        IObservable<IEnumerable<RxListItem<object>>> IRxListObservables.RangeAdded
+        {
+            get { return RangeAdded.Select(x => x.Select(y => new RxListItem<object>(y.Index, y.Value))); }
+        }
+
+        IObservable<IEnumerable<RxListItem<object>>> IRxListObservables.RangeRemoved
+        {
+            get { return RangeRemoved.Select(x => x.Select(y => new RxListItem<object>(y.Index, y.Value))); }
+        }
+
+        IObservable<IEnumerable<RxListModifiedItem<object>>> IRxListObservables.RangeModified
+        {
+            get { return RangeModified.Select(x => x.Select(y => new RxListModifiedItem<object>(y.Index, y.OldValue, y.NewValue))); }
+        }
+
+        IObservable<RxListChange<object>> IRxListObservables.Changed
+        {
+            get {
+                return Changed.Select(x => new RxListChange<object>(
+                    x.Added.Select(y => new RxListItem<object>(y.Index, y.Value)),
+                    x.Removed.Select(y => new RxListItem<object>(y.Index, y.Value)),
+                    x.Modified.Select(y => new RxListModifiedItem<object>(y.Index, y.OldValue, y.NewValue)),
+                    x.Moved == null ? (RxListMovedItem<object>?)null : new RxListMovedItem<object>(x.Moved.Value.FromIndex, x.Moved.Value.ToIndex, x.Moved.Value.Value)
+                ));
+            }
+        }
+
+        IObservable<RxListItem<object>> IRxListObservables.Added
+        {
+            get { return Added.Select(x => new RxListItem<object>(x.Index, x.Value)); }
+        }
+
+        IObservable<RxListItem<object>> IRxListObservables.Removed
+        {
+            get { return Removed.Select(x => new RxListItem<object>(x.Index, x.Value)); }
+        }
+
+        IObservable<RxListMovedItem<object>> IRxListObservables.Moved
+        {
+            get { return Moved.Select(x => new RxListMovedItem<object>(x.FromIndex, x.ToIndex, x.Value)); }
+        }
+
+        IObservable<RxListModifiedItem<object>> IRxListObservables.Modified
+        {
+            get { return Modified.Select(x => new RxListModifiedItem<object>(x.Index, x.OldValue, x.NewValue)); }
+        }
+
+        IObservable<object> IRxListObservables.ItemAdded
+        {
+            get { return ItemAdded.Select(x => (object)x); }
+        }
+
+        IObservable<object> IRxListObservables.ItemRemoved
+        {
+            get { return ItemRemoved.Select(x => (object)x); }
+        }
+
+        IObservable<object> IRxListObservables.ItemMoved
+        {
+            get { return ItemMoved.Select(x => (object)x); }
+        }
+
+        IObservable<object> IRxListObservables.ItemModified
+        {
+            get { return ItemModified.Select(x => (object)x); }
+        }
+
+        IObservable<IEnumerable<object>> IRxListObservables.ItemsAdded
+        {
+            get { return ItemsAdded.Select(x => x.Select(y => (object)y)); }
+        }
+
+        IObservable<IEnumerable<object>> IRxListObservables.ItemsRemoved
+        {
+            get { return ItemsRemoved.Select(x => x.Select(y => (object)y)); }
+        }
+
+        IObservable<IEnumerable<object>> IRxListObservables.ItemsModified
+        {
+            get { return ItemsModified.Select(x => x.Select(y => (object)y)); }
+        }
+
+        void ICollection.CopyTo(Array array, int index)
+        {
+            CopyTo((T[])array, index);
+        }
+
+        object ICollection.SyncRoot => this;
+
+        bool ICollection.IsSynchronized => false;
+
+        int IList.Add(object value)
+        {
+            Add((T)value);
+            return Count - 1;
+        }
+
+        bool IList.Contains(object value)
+        {
+            return value is T && Contains((T)value);
+        }
+
+        int IList.IndexOf(object value)
+        {
+            return value is T ? IndexOf((T)value) : -1;
+        }
+
+        void IList.Insert(int index, object value)
+        {
+            Insert(index, (T)value);
+        }
+
+        void IList.Remove(object value)
+        {
+            Remove((T)value);
+        }
+
+        object IList.this[int index]
+        {
+            get { return this[index]; }
+            set { this[index] = (T)value; }
+        }
+
+        bool IList.IsFixedSize => false;
+
+        void IRxList.Move(int toIndex, object item)
+        {
+            Move(toIndex, (T)item);
+        }
+
+        void IRxList.AddRange(IEnumerable items)
+        {
+            AddRange(items.Cast<T>());
+        }
+
+        void IRxList.InsertRange(IEnumerable<RxListItem<object>> items)
+        {
+            InsertRange(items.Select(x => new RxListItem<T>(x.Index, (T)x.Value)));
+        }
+
+        void IRxList.RemoveRange(IEnumerable<object> items)
+        {
+            RemoveRange(items.Cast<T>());
+        }
+
+        void IRxList.ModifyRange(IEnumerable<RxListItem<object>> items)
+        {
+            ModifyRange(items.Select(x => new RxListItem<T>(x.Index, (T)x.Value)));
         }
     }
 }

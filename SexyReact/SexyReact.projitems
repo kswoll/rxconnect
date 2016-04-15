@@ -12,13 +12,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryObservePropertyStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryStorageStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EmptyObservePropertyStrategy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ICanExecute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ICanInvoke.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRxDictionaryObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxListObservables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IRxReadOnlyList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxCommandFactories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxDerivedList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RxDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFilteredList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxListElementObservable.cs" />
@@ -38,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RxObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RxPropertyObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\Enumerables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\TaskExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\IRxViewObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\RxEventBindExtensions.cs" />
