@@ -107,9 +107,22 @@ namespace SexyReact.Views
 
         public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
         {
+            // If the cell is null, then we don't want to use the cell's bounds since it will be wrong.  Instead just use the width
+            // of the table view
             var cell = GetCell(tableView, indexPath);
-            var result = cell.SizeThatFits(new CGSize(tableView.Frame.Width, float.MaxValue)).Height;
-            return result;
+            if (cell.Superview == null)
+            {
+                var newSize = cell.SizeThatFits(new CGSize(tableView.Frame.Width, nfloat.PositiveInfinity));
+                cell.Bounds = new CGRect(0, 0, newSize.Width, newSize.Height);
+                cell.LayoutSubviews();
+                return newSize.Height;
+            }
+            // Otherwise, we want to use the width of the ContentView, which could have shrunk due to cell editing
+            else 
+            {
+                var result = cell.SizeThatFits(new CGSize(cell.ContentView.Bounds.Width, float.MaxValue)).Height;
+                return result;
+            }
         }
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
