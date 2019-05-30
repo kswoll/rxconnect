@@ -12,8 +12,5 @@
     <description>Reactive framework for building uis</description>
     <copyright>Copyright 2015</copyright>
     <tags>rx ui</tags>
-    <dependencies>
-      <dependency id="Fody" version="1.0" />
-    </dependencies>
   </metadata>
 </package>
