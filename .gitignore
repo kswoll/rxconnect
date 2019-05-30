@@ -19,3 +19,7 @@ SexyReact.Tester/obj/
 SexyReact.Ios/obj/
 nuget/artifacts/
 SexyReact.Fody/nuget/artifacts/
+.vs/
+_ReSharper.Caches/
+
+*.zip

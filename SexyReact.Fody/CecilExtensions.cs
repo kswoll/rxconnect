@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -56,7 +57,7 @@ namespace SexyReact.Fody
 
                 foreach (var @interface in current.Interfaces)
                 {
-                    queue.Enqueue(@interface.Resolve());
+                    queue.Enqueue(@interface.InterfaceType.Resolve());
                 }
             }
 
