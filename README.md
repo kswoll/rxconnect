@@ -32,7 +32,7 @@ To its body so that it looks like:
 ## Obtaining an observable for a property
 
     var model = new MyViewModel();
-    IObservable<string> observable = model.ObserveProperty(x => x.StringProperty);
+    IObservable<string> observable = model.ObserveProperty(x => x.MyStringProperty);
 
 
 ## FAQ
